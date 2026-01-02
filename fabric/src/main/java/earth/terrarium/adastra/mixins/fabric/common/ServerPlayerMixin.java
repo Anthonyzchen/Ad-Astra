@@ -19,16 +19,22 @@ public abstract class ServerPlayerMixin extends Player {
         super(level, pos, yRot, gameProfile);
     }
 
-    @WrapWithCondition(
-        method = "changeDimension",
-        at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;send(Lnet/minecraft/network/protocol/Packet;)V",
-            ordinal = 5
-        )
-    )
-    // Prevent the portal teleportation sound from playing when leaving the atmosphere.
-    private boolean adastra$changeDimension(ServerGamePacketListenerImpl instance, Packet<?> packet) {
-        return getY() > AdAstraConfig.atmosphereLeave + 1 || getY() < AdAstraConfig.atmosphereLeave - 1;
-    }
+    /*
+     * @WrapWithCondition(
+     * method = "changeDimension",
+     * at = @At(
+     * value = "INVOKE",
+     * target =
+     * "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;send(Lnet/minecraft/network/protocol/Packet;)V",
+     * ordinal = 5
+     * )
+     * )
+     * // Prevent the portal teleportation sound from playing when leaving the
+     * atmosphere.
+     * private boolean adastra$changeDimension(ServerGamePacketListenerImpl
+     * instance, Packet<?> packet) {
+     * return getY() > AdAstraConfig.atmosphereLeave + 1 || getY() <
+     * AdAstraConfig.atmosphereLeave - 1;
+     * }
+     */
 }

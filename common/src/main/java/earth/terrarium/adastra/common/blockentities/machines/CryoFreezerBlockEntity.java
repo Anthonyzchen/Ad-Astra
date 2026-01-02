@@ -32,15 +32,19 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class CryoFreezerBlockEntity extends RecipeMachineBlockEntity<CryoFreezingRecipe> implements BotariumFluidBlock<WrappedBlockFluidContainer> {
+public class CryoFreezerBlockEntity extends RecipeMachineBlockEntity<CryoFreezingRecipe>
+        implements BotariumFluidBlock<WrappedBlockFluidContainer> {
 
     public static final List<ConfigurationEntry> SIDE_CONFIG = List.of(
-        new ConfigurationEntry(ConfigurationType.SLOT, Configuration.NONE, ConstantComponents.SIDE_CONFIG_INPUT_SLOTS),
-        new ConfigurationEntry(ConfigurationType.SLOT, Configuration.NONE, ConstantComponents.SIDE_CONFIG_INPUT_SLOTS),
-        new ConfigurationEntry(ConfigurationType.SLOT, Configuration.NONE, ConstantComponents.SIDE_CONFIG_OUTPUT_SLOTS),
-        new ConfigurationEntry(ConfigurationType.ENERGY, Configuration.NONE, ConstantComponents.SIDE_CONFIG_ENERGY),
-        new ConfigurationEntry(ConfigurationType.FLUID, Configuration.NONE, ConstantComponents.SIDE_CONFIG_OUTPUT_FLUID)
-    );
+            new ConfigurationEntry(ConfigurationType.SLOT, Configuration.NONE,
+                    ConstantComponents.SIDE_CONFIG_INPUT_SLOTS),
+            new ConfigurationEntry(ConfigurationType.SLOT, Configuration.NONE,
+                    ConstantComponents.SIDE_CONFIG_INPUT_SLOTS),
+            new ConfigurationEntry(ConfigurationType.SLOT, Configuration.NONE,
+                    ConstantComponents.SIDE_CONFIG_OUTPUT_SLOTS),
+            new ConfigurationEntry(ConfigurationType.ENERGY, Configuration.NONE, ConstantComponents.SIDE_CONFIG_ENERGY),
+            new ConfigurationEntry(ConfigurationType.FLUID, Configuration.NONE,
+                    ConstantComponents.SIDE_CONFIG_OUTPUT_FLUID));
 
     private WrappedBlockFluidContainer fluidContainer;
 
@@ -54,47 +58,54 @@ public class CryoFreezerBlockEntity extends RecipeMachineBlockEntity<CryoFreezin
     }
 
     @Override
-    public WrappedBlockEnergyContainer getEnergyStorage(Level level, BlockPos pos, BlockState state, @Nullable BlockEntity entity, @Nullable Direction direction) {
-        if (this.energyContainer != null) return this.energyContainer;
+    public WrappedBlockEnergyContainer getEnergyStorage(Level level, BlockPos pos, BlockState state,
+            @Nullable BlockEntity entity, @Nullable Direction direction) {
+        if (this.energyContainer != null)
+            return this.energyContainer;
         return this.energyContainer = new WrappedBlockEnergyContainer(
-            this,
-            EnergyUtils.machineInsertOnlyEnergy(MachineConfig.OSTRUM)
-        );
+                this,
+                EnergyUtils.machineInsertOnlyEnergy(MachineConfig.OSTRUM));
     }
 
     @Override
-    public @Nullable WrappedBlockFluidContainer getFluidContainer(Level level, BlockPos pos, BlockState state, @Nullable BlockEntity entity, @Nullable Direction direction) {
+    public @Nullable WrappedBlockFluidContainer getFluidContainer(Level level, BlockPos pos, BlockState state,
+            @Nullable BlockEntity entity, @Nullable Direction direction) {
         return getFluidContainer();
     }
 
     public WrappedBlockFluidContainer getFluidContainer() {
-        if (fluidContainer != null) return fluidContainer;
+        if (fluidContainer != null)
+            return fluidContainer;
         return fluidContainer = new WrappedBlockFluidContainer(
-            this,
-            new ExtractOnlyFluidContainer(
-                i -> FluidConstants.fromMillibuckets(MachineConfig.OSTRUM.fluidCapacity),
-                1,
-                (tank, holder) -> level().getRecipeManager().getAllRecipesFor(ModRecipeTypes.CRYO_FREEZING.get())
-                    .stream()
-                    .anyMatch(r -> r.value().result().matches(holder))));
+                this,
+                new ExtractOnlyFluidContainer(
+                        i -> FluidConstants.fromMillibuckets(MachineConfig.OSTRUM.fluidCapacity),
+                        1,
+                        (tank, holder) -> level().getRecipeManager()
+                                .getAllRecipesFor(ModRecipeTypes.CRYO_FREEZING.get())
+                                .stream()
+                                .anyMatch(r -> r.value().result().matches(holder))));
     }
 
     @Override
     public void tickSideInteractions(BlockPos pos, Predicate<Direction> filter, List<ConfigurationEntry> sideConfig) {
-        TransferUtils.pushItemsNearby(this, pos, new int[]{1}, sideConfig.get(0), filter);
-        TransferUtils.pullItemsNearby(this, pos, new int[]{1}, sideConfig.get(0), filter);
-        TransferUtils.pushItemsNearby(this, pos, new int[]{2}, sideConfig.get(1), filter);
-        TransferUtils.pullItemsNearby(this, pos, new int[]{2}, sideConfig.get(1), filter);
-        TransferUtils.pushItemsNearby(this, pos, new int[]{3}, sideConfig.get(2), filter);
-        TransferUtils.pullItemsNearby(this, pos, new int[]{3}, sideConfig.get(2), filter);
+        TransferUtils.pushItemsNearby(this, pos, new int[] { 1 }, sideConfig.get(0), filter);
+        TransferUtils.pullItemsNearby(this, pos, new int[] { 1 }, sideConfig.get(0), filter);
+        TransferUtils.pushItemsNearby(this, pos, new int[] { 2 }, sideConfig.get(1), filter);
+        TransferUtils.pullItemsNearby(this, pos, new int[] { 2 }, sideConfig.get(1), filter);
+        TransferUtils.pushItemsNearby(this, pos, new int[] { 3 }, sideConfig.get(2), filter);
+        TransferUtils.pullItemsNearby(this, pos, new int[] { 3 }, sideConfig.get(2), filter);
         TransferUtils.pullEnergyNearby(this, pos, getEnergyStorage().maxInsert(), sideConfig.get(3), filter);
-        TransferUtils.pushFluidNearby(this, pos, getFluidContainer(), FluidConstants.fromMillibuckets(200), 0, sideConfig.get(4), filter);
+        TransferUtils.pushFluidNearby(this, pos, getFluidContainer(), FluidConstants.fromMillibuckets(200), 0,
+                sideConfig.get(4), filter);
     }
 
     @Override
     public void recipeTick(ServerLevel level, WrappedBlockEnergyContainer energyStorage) {
-        if (recipe == null) return;
-        if (fluidContainer == null) getFluidContainer();
+        if (recipe == null)
+            return;
+        if (fluidContainer == null)
+            getFluidContainer();
         if (!canCraft()) {
             clearRecipe();
             return;
@@ -103,13 +114,15 @@ public class CryoFreezerBlockEntity extends RecipeMachineBlockEntity<CryoFreezin
         energyStorage.internalExtract(recipe.energy(), false);
 
         cookTime++;
-        if (cookTime < cookTimeTotal) return;
+        if (cookTime < cookTimeTotal)
+            return;
         craft();
     }
 
     @Override
     public void craft() {
-        if (recipe == null) return;
+        if (recipe == null)
+            return;
 
         getItem(1).shrink(1);
         fluidContainer.internalInsert(recipe.result(), false);
@@ -117,16 +130,19 @@ public class CryoFreezerBlockEntity extends RecipeMachineBlockEntity<CryoFreezin
         updateSlots();
 
         cookTime = 0;
-        if (fluidContainer.getFirstFluid().isEmpty()) clearRecipe();
+        if (fluidContainer.getFirstFluid().isEmpty())
+            clearRecipe();
     }
 
     @Override
     public void update() {
-        if (level().isClientSide()) return;
-        quickCheck.getRecipeFor(this, level()).ifPresent(r -> {
-            recipe = r.value();
-            cookTimeTotal = r.value().cookingTime();
-        });
+        if (level().isClientSide())
+            return;
+        quickCheck.getRecipeFor(new earth.terrarium.adastra.common.recipes.ContainerRecipeInput(this), level())
+                .ifPresent(r -> {
+                    recipe = r.value();
+                    cookTimeTotal = r.value().cookingTime();
+                });
         updateSlots();
     }
 
@@ -143,6 +159,6 @@ public class CryoFreezerBlockEntity extends RecipeMachineBlockEntity<CryoFreezin
 
     @Override
     public int @NotNull [] getSlotsForFace(@NotNull Direction side) {
-        return new int[]{1, 2, 3};
+        return new int[] { 1, 2, 3 };
     }
 }

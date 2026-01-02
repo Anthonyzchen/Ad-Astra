@@ -34,9 +34,9 @@ public class MachineBlock extends BasicEntityBlock {
     public MachineBlock(Properties properties) {
         super(properties, true);
         registerDefaultState(stateDefinition.any()
-            .setValue(FACING, Direction.NORTH)
-            .setValue(POWERED, false)
-            .setValue(LIT, false));
+                .setValue(FACING, Direction.NORTH)
+                .setValue(POWERED, false)
+                .setValue(LIT, false));
     }
 
     @Override
@@ -45,7 +45,8 @@ public class MachineBlock extends BasicEntityBlock {
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player,
+            BlockHitResult hit) {
         if (!level.isClientSide()) {
             if (level.getBlockEntity(pos) instanceof ExtraDataMenuProvider provider) {
                 MenuHooks.openMenu((ServerPlayer) player, provider);
@@ -98,12 +99,16 @@ public class MachineBlock extends BasicEntityBlock {
     }
 
     @Override
-    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos neighborPos, boolean movedByPiston) {
+    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos neighborPos,
+            boolean movedByPiston) {
         super.neighborChanged(state, level, pos, neighborBlock, neighborPos, movedByPiston);
-        if (level.isClientSide()) return;
-        if (state.isSignalSource()) return;
+        if (level.isClientSide())
+            return;
+        if (state.isSignalSource())
+            return;
         boolean hasSignal = level.hasNeighborSignal(pos);
-        if (state.getValue(POWERED) == hasSignal) return;
+        if (state.getValue(POWERED) == hasSignal)
+            return;
         level.setBlockAndUpdate(pos, state.setValue(POWERED, hasSignal));
     }
 }

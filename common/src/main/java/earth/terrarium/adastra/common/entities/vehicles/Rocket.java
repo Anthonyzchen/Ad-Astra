@@ -55,25 +55,35 @@ import java.util.Map;
 
 public class Rocket extends Vehicle {
 
-    private static final RocketProperties TIER_1_PROPERTIES = new RocketProperties(1, ModItems.TIER_1_ROCKET.get(), 1.0f, ModFluidTags.TIER_1_ROCKET_FUEL);
-    private static final RocketProperties TIER_2_PROPERTIES = new RocketProperties(2, ModItems.TIER_2_ROCKET.get(), 1.0f, ModFluidTags.TIER_2_ROCKET_FUEL);
-    private static final RocketProperties TIER_3_PROPERTIES = new RocketProperties(3, ModItems.TIER_3_ROCKET.get(), 1.0f, ModFluidTags.TIER_3_ROCKET_FUEL);
-    private static final RocketProperties TIER_4_PROPERTIES = new RocketProperties(4, ModItems.TIER_4_ROCKET.get(), 1.7f, ModFluidTags.TIER_4_ROCKET_FUEL);
+    private static final RocketProperties TIER_1_PROPERTIES = new RocketProperties(1, ModItems.TIER_1_ROCKET.get(),
+            1.0f, ModFluidTags.TIER_1_ROCKET_FUEL);
+    private static final RocketProperties TIER_2_PROPERTIES = new RocketProperties(2, ModItems.TIER_2_ROCKET.get(),
+            1.0f, ModFluidTags.TIER_2_ROCKET_FUEL);
+    private static final RocketProperties TIER_3_PROPERTIES = new RocketProperties(3, ModItems.TIER_3_ROCKET.get(),
+            1.0f, ModFluidTags.TIER_3_ROCKET_FUEL);
+    private static final RocketProperties TIER_4_PROPERTIES = new RocketProperties(4, ModItems.TIER_4_ROCKET.get(),
+            1.7f, ModFluidTags.TIER_4_ROCKET_FUEL);
 
     public static final Map<EntityType<?>, RocketProperties> ROCKET_TO_PROPERTIES = Map.of(
-        ModEntityTypes.TIER_1_ROCKET.get(), TIER_1_PROPERTIES,
-        ModEntityTypes.TIER_2_ROCKET.get(), TIER_2_PROPERTIES,
-        ModEntityTypes.TIER_3_ROCKET.get(), TIER_3_PROPERTIES,
-        ModEntityTypes.TIER_4_ROCKET.get(), TIER_4_PROPERTIES);
+            ModEntityTypes.TIER_1_ROCKET.get(), TIER_1_PROPERTIES,
+            ModEntityTypes.TIER_2_ROCKET.get(), TIER_2_PROPERTIES,
+            ModEntityTypes.TIER_3_ROCKET.get(), TIER_3_PROPERTIES,
+            ModEntityTypes.TIER_4_ROCKET.get(), TIER_4_PROPERTIES);
 
     public static final int COUNTDOWN_LENGTH = 20 * 10; // 10 seconds
-    public static final EntityDataAccessor<Boolean> IS_LAUNCHING = SynchedEntityData.defineId(Rocket.class, EntityDataSerializers.BOOLEAN);
-    public static final EntityDataAccessor<Integer> LAUNCH_TICKS = SynchedEntityData.defineId(Rocket.class, EntityDataSerializers.INT);
-    public static final EntityDataAccessor<Boolean> HAS_LAUNCHED = SynchedEntityData.defineId(Rocket.class, EntityDataSerializers.BOOLEAN);
-    public static final EntityDataAccessor<Boolean> IS_IN_VALID_DIMENSION = SynchedEntityData.defineId(Rocket.class, EntityDataSerializers.BOOLEAN);
+    public static final EntityDataAccessor<Boolean> IS_LAUNCHING = SynchedEntityData.defineId(Rocket.class,
+            EntityDataSerializers.BOOLEAN);
+    public static final EntityDataAccessor<Integer> LAUNCH_TICKS = SynchedEntityData.defineId(Rocket.class,
+            EntityDataSerializers.INT);
+    public static final EntityDataAccessor<Boolean> HAS_LAUNCHED = SynchedEntityData.defineId(Rocket.class,
+            EntityDataSerializers.BOOLEAN);
+    public static final EntityDataAccessor<Boolean> IS_IN_VALID_DIMENSION = SynchedEntityData.defineId(Rocket.class,
+            EntityDataSerializers.BOOLEAN);
 
-    public static final EntityDataAccessor<Long> FUEL = SynchedEntityData.defineId(Rocket.class, EntityDataSerializers.LONG);
-    public static final EntityDataAccessor<String> FUEL_TYPE = SynchedEntityData.defineId(Rocket.class, EntityDataSerializers.STRING);
+    public static final EntityDataAccessor<Long> FUEL = SynchedEntityData.defineId(Rocket.class,
+            EntityDataSerializers.LONG);
+    public static final EntityDataAccessor<String> FUEL_TYPE = SynchedEntityData.defineId(Rocket.class,
+            EntityDataSerializers.STRING);
 
     private final SimpleFluidContainer fluidContainer;
     private final RocketProperties properties;
@@ -92,18 +102,20 @@ public class Rocket extends Vehicle {
     public Rocket(EntityType<?> type, Level level, RocketProperties properties) {
         super(type, level);
         this.properties = properties;
-        fluidContainer = new SimpleFluidContainer(FluidConstants.fromMillibuckets(3000), 1, (amount, fluid) -> fluid.is(properties.fuel));
+        fluidContainer = new SimpleFluidContainer(FluidConstants.fromMillibuckets(3000), 1,
+                (amount, fluid) -> fluid.is(properties.fuel));
     }
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(IS_LAUNCHING, false);
-        this.entityData.define(LAUNCH_TICKS, -1);
-        this.entityData.define(HAS_LAUNCHED, false);
-        this.entityData.define(IS_IN_VALID_DIMENSION, AdAstraConfig.launchFromAnywhere || AdAstraData.canLaunchFrom(this.level().dimension()));
-        this.entityData.define(FUEL, 0L);
-        this.entityData.define(FUEL_TYPE, "air");
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(IS_LAUNCHING, false);
+        builder.define(LAUNCH_TICKS, -1);
+        builder.define(HAS_LAUNCHED, false);
+        builder.define(IS_IN_VALID_DIMENSION,
+                AdAstraConfig.launchFromAnywhere || AdAstraData.canLaunchFrom(this.level().dimension()));
+        builder.define(FUEL, 0L);
+        builder.define(FUEL_TYPE, "air");
     }
 
     @Override
@@ -114,7 +126,7 @@ public class Rocket extends Vehicle {
         entityData.set(HAS_LAUNCHED, compound.getBoolean("HasLaunched"));
         speed = compound.getFloat("Speed");
         angle = compound.getFloat("Angle");
-        fluidContainer.deserialize(compound);
+        fluidContainer.deserialize(compound, level().registryAccess());
     }
 
     @Override
@@ -125,7 +137,7 @@ public class Rocket extends Vehicle {
         compound.putBoolean("HasLaunched", hasLaunched());
         compound.putFloat("Speed", speed);
         compound.putFloat("Angle", angle);
-        fluidContainer.serialize(compound);
+        fluidContainer.serialize(compound, level().registryAccess());
     }
 
     public FluidContainer fluidContainer() {
@@ -144,7 +156,8 @@ public class Rocket extends Vehicle {
     public ItemStack getDropStack() {
         ItemStackHolder stack = new ItemStackHolder(properties.item.getDefaultInstance());
         var container = FluidContainer.of(stack);
-        if (container == null) return stack.getStack();
+        if (container == null)
+            return stack.getStack();
         FluidApi.moveFluid(fluidContainer, container, fluidContainer.getFirstFluid(), false);
         return stack.getStack();
     }
@@ -154,18 +167,19 @@ public class Rocket extends Vehicle {
     }
 
     @Override
-    protected Vector3f getPassengerAttachmentPoint(Entity entity, EntityDimensions dimensions, float scale) {
-        return new Vector3f(0, this.properties.ridingOffset + 0.3f, 0);
+    protected Vec3 getPassengerAttachmentPoint(Entity entity, EntityDimensions dimensions, float scale) {
+        return new Vec3(0, this.properties.ridingOffset + 0.3f, 0);
     }
 
     @Override
     public Vec3 getDismountLocationForPassenger(LivingEntity passenger) {
         Vec3 location = super.getDismountLocationForPassenger(passenger)
-            .add(passenger.getLookAngle().multiply(2, 0, 2).normalize());
+                .add(passenger.getLookAngle().multiply(2, 0, 2).normalize());
         for (int i = 0; i < 6; i++) {
             if (level().getBlockState(BlockPos.containing(location)).isAir()) {
                 location = location.subtract(0, 1, 0);
-            } else break;
+            } else
+                break;
         }
         return location;
     }
@@ -201,7 +215,8 @@ public class Rocket extends Vehicle {
 
     @Override
     public @NotNull InteractionResult interact(Player player, InteractionHand hand) {
-        if (player.equals(getControllingPassenger())) return InteractionResult.PASS;
+        if (player.equals(getControllingPassenger()))
+            return InteractionResult.PASS;
         return super.interact(player, hand);
     }
 
@@ -212,15 +227,18 @@ public class Rocket extends Vehicle {
         if (canLaunch()) {
             initiateLaunchSequence();
             showFuelMessage = false;
-        } else if (showFuelMessage && !level().isClientSide() && passengerHasSpaceDown() && getControllingPassenger() instanceof Player player) {
+        } else if (showFuelMessage && !level().isClientSide() && passengerHasSpaceDown()
+                && getControllingPassenger() instanceof Player player) {
             player.displayClientMessage(ConstantComponents.NOT_ENOUGH_FUEL, true);
         }
 
         if (isLaunching()) {
             entityData.set(LAUNCH_TICKS, launchTicks() - 1);
-            if (launchTicks() <= 0) launch();
+            if (launchTicks() <= 0)
+                launch();
             spawnSmokeParticles();
-        } else if (hasLaunched()) flightTick();
+        } else if (hasLaunched())
+            flightTick();
         if (!level().isClientSide()) {
             FluidUtils.moveItemToContainer(inventory, fluidContainer, 0, 1, 0);
             FluidUtils.moveContainerToItem(inventory, fluidContainer, 0, 1, 0);
@@ -232,8 +250,10 @@ public class Rocket extends Vehicle {
     }
 
     private void launchPadTick() {
-        if (level().isClientSide() || tickCount % 5 != 0) return;
-        if (isLaunching() || hasLaunched()) return;
+        if (level().isClientSide() || tickCount % 5 != 0)
+            return;
+        if (isLaunching() || hasLaunched())
+            return;
         var state = level().getBlockState(blockPosition());
         if (!state.hasProperty(LaunchPadBlock.PART)) {
             if (launchpadBound) {
@@ -244,7 +264,8 @@ public class Rocket extends Vehicle {
         } else {
             launchpadBound = true;
             if (state.getValue(LaunchPadBlock.POWERED)) {
-                if (hasEnoughFuel()) initiateLaunchSequence();
+                if (hasEnoughFuel())
+                    initiateLaunchSequence();
             }
         }
     }
@@ -255,7 +276,8 @@ public class Rocket extends Vehicle {
                 if (!(player.containerMenu instanceof PlanetsMenu)) {
                     openPlanetsScreen(player);
                 }
-            } else explode();
+            } else
+                explode();
             return;
         }
 
@@ -278,10 +300,9 @@ public class Rocket extends Vehicle {
 
         var delta = getDeltaMovement();
         setDeltaMovement(
-            delta.x(),
-            speed,
-            delta.z()
-        );
+                delta.x(),
+                speed,
+                delta.z());
 
         if (level().isClientSide() && !startedRocketSound) {
             startedRocketSound = true;
@@ -290,12 +311,13 @@ public class Rocket extends Vehicle {
 
         spawnRocketParticles();
         burnEntitiesUnderRocket();
-        if (isObstructed()) explode();
+        if (isObstructed())
+            explode();
     }
 
-
     public boolean canLaunch() {
-        if (isLaunching() || hasLaunched()) return false;
+        if (isLaunching() || hasLaunched())
+            return false;
         if (!AdAstraConfig.launchFromAnywhere && !entityData.get(IS_IN_VALID_DIMENSION)) {
             if (getControllingPassenger() instanceof ServerPlayer player) {
                 player.displayClientMessage(ConstantComponents.INVALID_LAUNCHING_DIMENSION, true);
@@ -303,7 +325,8 @@ public class Rocket extends Vehicle {
             this.showFuelMessage = false;
             return false;
         }
-        if (!hasEnoughFuel()) return false;
+        if (!hasEnoughFuel())
+            return false;
         return passengerHasSpaceDown();
     }
 
@@ -333,42 +356,46 @@ public class Rocket extends Vehicle {
     }
 
     public void spawnSmokeParticles() {
-        if (!level().isClientSide()) return;
+        if (!level().isClientSide())
+            return;
         for (int i = 0; i < 6; i++) {
             level().addParticle(ParticleTypes.CAMPFIRE_COSY_SMOKE,
-                getX(), getY(), getZ(),
-                Mth.nextDouble(level().random, -0.05, 0.05),
-                Mth.nextDouble(level().random, -0.05, 0.05),
-                Mth.nextDouble(level().random, -0.05, 0.05));
+                    getX(), getY(), getZ(),
+                    Mth.nextDouble(level().random, -0.05, 0.05),
+                    Mth.nextDouble(level().random, -0.05, 0.05),
+                    Mth.nextDouble(level().random, -0.05, 0.05));
         }
     }
 
     public void spawnRocketParticles() {
-        if (!level().isClientSide()) return;
+        if (!level().isClientSide())
+            return;
         for (int i = 0; i < 20; i++) {
             level().addParticle(ModParticleTypes.LARGE_FLAME.get(),
-                getX(), getY() - 0.75, getZ(),
-                Mth.nextDouble(level().random, -0.05, 0.05),
-                Mth.nextDouble(level().random, -0.05, 0.05),
-                Mth.nextDouble(level().random, -0.05, 0.05));
+                    getX(), getY() - 0.75, getZ(),
+                    Mth.nextDouble(level().random, -0.05, 0.05),
+                    Mth.nextDouble(level().random, -0.05, 0.05),
+                    Mth.nextDouble(level().random, -0.05, 0.05));
         }
 
         for (int i = 0; i < 5; i++) {
             level().addParticle(ModParticleTypes.LARGE_SMOKE.get(),
-                getX(), getY() - 0.75, getZ(),
-                Mth.nextDouble(level().random, -0.05, 0.05),
-                Mth.nextDouble(level().random, -0.05, 0.05),
-                Mth.nextDouble(level().random, -0.05, 0.05));
+                    getX(), getY() - 0.75, getZ(),
+                    Mth.nextDouble(level().random, -0.05, 0.05),
+                    Mth.nextDouble(level().random, -0.05, 0.05),
+                    Mth.nextDouble(level().random, -0.05, 0.05));
         }
     }
 
     public void burnEntitiesUnderRocket() {
-        if (level().isClientSide()) return;
+        if (level().isClientSide())
+            return;
         for (var entity : level().getEntitiesOfClass(LivingEntity.class, getBoundingBox()
-            .inflate(2, 30, 2)
-            .move(0, -37, 0), e -> true)) {
-            if (entity.equals(getControllingPassenger())) continue;
-            entity.setSecondsOnFire(10);
+                .inflate(2, 30, 2)
+                .move(0, -37, 0), e -> true)) {
+            if (entity.equals(getControllingPassenger()))
+                continue;
+            entity.setRemainingFireTicks(200);
             entity.hurt(ModDamageSources.create(level(), ModDamageSources.ROCKET_FLAMES), 10);
         }
     }
@@ -379,18 +406,22 @@ public class Rocket extends Vehicle {
 
     public void explode() {
         level().explode(
-            this,
-            getX(), getY(), getZ(),
-            7 + tier() * 2,
-            OxygenApi.API.hasOxygen(this.level()),
-            Level.ExplosionInteraction.TNT);
+                this,
+                getX(), getY(), getZ(),
+                7 + tier() * 2,
+                OxygenApi.API.hasOxygen(this.level()),
+                Level.ExplosionInteraction.TNT);
         discard();
     }
 
     public boolean consumeFuel(boolean simulate) {
-        if (level().isClientSide()) return false;
-        long buckets = FluidConstants.fromMillibuckets(fluidContainer.getFirstFluid().is(ModFluidTags.EFFICIENT_FUEL) ? AdAstraConfig.launchEfficientFuelCost : AdAstraConfig.launchFuelCost);
-        return fluidContainer.extractFluid(fluidContainer.getFirstFluid().copyWithAmount(buckets), simulate).getFluidAmount() >= buckets;
+        if (level().isClientSide())
+            return false;
+        long buckets = FluidConstants.fromMillibuckets(
+                fluidContainer.getFirstFluid().is(ModFluidTags.EFFICIENT_FUEL) ? AdAstraConfig.launchEfficientFuelCost
+                        : AdAstraConfig.launchFuelCost);
+        return fluidContainer.extractFluid(fluidContainer.getFirstFluid().copyWithAmount(buckets), simulate)
+                .getFluidAmount() >= buckets;
     }
 
     public boolean hasEnoughFuel() {
@@ -409,16 +440,17 @@ public class Rocket extends Vehicle {
 
     public FluidHolder fluid() {
         return FluidHolder.of(
-            BuiltInRegistries.FLUID.get(new ResourceLocation(entityData.get(FUEL_TYPE))),
-            entityData.get(FUEL));
+                BuiltInRegistries.FLUID.get(ResourceLocation.parse(entityData.get(FUEL_TYPE))),
+                entityData.get(FUEL));
     }
 
     public void openPlanetsScreen(ServerPlayer player) {
         MenuHooks.openMenu(player, new PlanetsMenuProvider());
         var packet = new ClientboundStopSoundPacket(BuiltInRegistries.SOUND_EVENT
-            .getKey(ModSoundEvents.ROCKET.get()), SoundSource.AMBIENT);
+                .getKey(ModSoundEvents.ROCKET.get()), SoundSource.AMBIENT);
         player.connection.send(packet);
     }
 
-    public record RocketProperties(int tier, Item item, float ridingOffset, TagKey<Fluid> fuel) {}
+    public record RocketProperties(int tier, Item item, float ridingOffset, TagKey<Fluid> fuel) {
+    }
 }

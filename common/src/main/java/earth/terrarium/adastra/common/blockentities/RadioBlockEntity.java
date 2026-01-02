@@ -6,6 +6,7 @@ import earth.terrarium.adastra.common.network.packets.ClientboundPlayStationPack
 import earth.terrarium.adastra.common.registry.ModBlockEntityTypes;
 import earth.terrarium.adastra.common.utils.radio.RadioHolder;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.protocol.Packet;
@@ -25,21 +26,19 @@ public class RadioBlockEntity extends BlockEntity implements RadioHolder {
     }
 
     @Override
-    public void load(CompoundTag tag) {
-        super.load(tag);
+    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
         if (tag.contains("Station", Tag.TAG_STRING)) {
             this.station = tag.getString("Station");
-
-            if (this.level == null) return;
-            if (!this.level.isClientSide()) return;
-            if (this.station.isBlank()) return;
-            RadioHandler.play(this.station, this.level.random, this.worldPosition);
+            if (this.level != null && this.level.isClientSide() && !this.station.isBlank()) {
+                RadioHandler.play(this.station, this.level.random, this.worldPosition);
+            }
         }
     }
 
     @Override
-    public @NotNull CompoundTag getUpdateTag() {
-        CompoundTag tag = super.getUpdateTag();
+    public @NotNull CompoundTag getUpdateTag(HolderLookup.@NotNull Provider registries) {
+        CompoundTag tag = super.getUpdateTag(registries);
         tag.putString("Station", this.station);
         return tag;
     }
@@ -58,10 +57,10 @@ public class RadioBlockEntity extends BlockEntity implements RadioHolder {
     @Override
     public void setRadioUrl(@NotNull String url) {
         this.station = url;
-        if (this.level == null) return;
+        if (this.level == null)
+            return;
         NetworkHandler.CHANNEL.sendToPlayersInRange(
-            new ClientboundPlayStationPacket(url, this.worldPosition),
-            this.level, this.worldPosition, RadioHolder.RANGE
-        );
+                new ClientboundPlayStationPacket(url, this.worldPosition),
+                this.level, this.worldPosition, RadioHolder.RANGE);
     }
 }

@@ -1,45 +1,37 @@
 package earth.terrarium.adastra.common.compat.cadmus;
 
 import com.teamresourceful.resourcefullib.common.utils.modinfo.ModInfoUtils;
-import earth.terrarium.adastra.AdAstra;
-import earth.terrarium.adastra.common.menus.PlanetsMenu;
-import earth.terrarium.cadmus.api.claims.ClaimApi;
-import earth.terrarium.cadmus.client.ClientClaims;
-import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 
+/**
+ * Stub implementation for Cadmus integration.
+ * Cadmus is not yet available for MC 1.21, so these methods are no-ops.
+ */
 public class CadmusIntegration {
 
     public static boolean cadmusLoaded() {
-        return ModInfoUtils.isModLoaded("cadmus");
+        // Cadmus is not available for 1.21 yet
+        return false;
     }
 
     public static void claim(ServerPlayer player, ChunkPos pos) {
-        ClaimApi.API.claim(player.serverLevel(), pos, false, player);
+        // No-op: Cadmus not available
     }
 
     public static boolean isClaimed(ServerLevel level, ChunkPos pos) {
-        return ClaimApi.API.isClaimed(level, pos);
+        // No-op: Cadmus not available
+        return false;
     }
 
     public static void addClientListeners(ResourceKey<Level> dimension) {
-        ClientClaims.get(dimension).addListener(AdAstra.MOD_ID, claims -> {
-            if (Minecraft.getInstance().player.containerMenu instanceof PlanetsMenu menu) {
-                menu.clearClaimedChunks();
-                claims.forEach((pos, entry) -> {
-                    if (Minecraft.getInstance().player.chunkPosition().equals(pos)) {
-                        menu.setClaimedChunk(dimension, true);
-                    }
-                });
-            }
-        });
+        // No-op: Cadmus not available
     }
 
     public static void removeClientListeners(ResourceKey<Level> dimension) {
-        ClientClaims.get(dimension).removeListener(AdAstra.MOD_ID);
+        // No-op: Cadmus not available
     }
 }

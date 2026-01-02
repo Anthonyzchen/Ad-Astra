@@ -26,8 +26,8 @@ public class Lunarian extends Villager {
 
     public static AttributeSupplier.Builder createMobAttributes() {
         return Mob.createMobAttributes().add(Attributes.MOVEMENT_SPEED, 0.5)
-            .add(Attributes.MAX_HEALTH, 20)
-            .add(Attributes.FOLLOW_RANGE, 48);
+                .add(Attributes.MAX_HEALTH, 20)
+                .add(Attributes.FOLLOW_RANGE, 48);
     }
 
     @Override
@@ -39,7 +39,8 @@ public class Lunarian extends Villager {
     @Override
     public Villager getBreedOffspring(ServerLevel serverWorld, AgeableMob passiveEntity) {
         Lunarian entity = new Lunarian(ModEntityTypes.LUNARIAN.get(), serverWorld);
-        entity.finalizeSpawn(serverWorld, serverWorld.getCurrentDifficultyAt(entity.blockPosition()), MobSpawnType.BREEDING, null, null);
+        entity.finalizeSpawn(serverWorld, serverWorld.getCurrentDifficultyAt(entity.blockPosition()),
+                MobSpawnType.BREEDING, null);
         return entity;
     }
 
@@ -47,7 +48,8 @@ public class Lunarian extends Villager {
     @Override
     protected void updateTrades() {
         VillagerData villagerData = this.getVillagerData();
-        Int2ObjectMap<VillagerTrades.ItemListing[]> int2ObjectMap = LunarianMerchantOffers.PROFESSION_TO_LEVELED_TRADE.get(villagerData.getProfession());
+        Int2ObjectMap<VillagerTrades.ItemListing[]> int2ObjectMap = LunarianMerchantOffers.PROFESSION_TO_LEVELED_TRADE
+                .get(villagerData.getProfession());
         if (int2ObjectMap == null || int2ObjectMap.isEmpty()) {
             return;
         }

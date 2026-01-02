@@ -33,12 +33,14 @@ public class TemperatureApiImpl implements TemperatureApi {
 
     @Override
     public short getTemperature(ResourceKey<Level> level) {
-        return Optionull.mapOrDefault(PlanetApi.API.getPlanet(level), Planet::temperature, PlanetConstants.EARTH_TEMPERATURE);
+        return Optionull.mapOrDefault(PlanetApi.API.getPlanet(level), Planet::temperature,
+                PlanetConstants.EARTH_TEMPERATURE);
     }
 
     @Override
     public short getTemperature(Level level, BlockPos pos) {
-        if (level.isClientSide()) return getTemperature(level);
+        if (level.isClientSide())
+            return getTemperature(level);
         return PlanetHandler.getTemperature((ServerLevel) level, pos);
     }
 
@@ -49,13 +51,15 @@ public class TemperatureApiImpl implements TemperatureApi {
 
     @Override
     public void setTemperature(Level level, BlockPos pos, short temperature) {
-        if (level.isClientSide()) return;
+        if (level.isClientSide())
+            return;
         PlanetHandler.setTemperature((ServerLevel) level, pos, temperature);
     }
 
     @Override
     public void setTemperature(Level level, Collection<BlockPos> positions, short temperature) {
-        if (level.isClientSide()) return;
+        if (level.isClientSide())
+            return;
         PlanetHandler.setTemperature((ServerLevel) level, positions, temperature);
     }
 
@@ -72,7 +76,8 @@ public class TemperatureApiImpl implements TemperatureApi {
     @Override
     public boolean isLiveable(Level level, BlockPos pos) {
         short temperature = getTemperature(level, pos);
-        return temperature >= PlanetConstants.MIN_LIVEABLE_TEMPERATURE && temperature <= PlanetConstants.MAX_LIVEABLE_TEMPERATURE;
+        return temperature >= PlanetConstants.MIN_LIVEABLE_TEMPERATURE
+                && temperature <= PlanetConstants.MAX_LIVEABLE_TEMPERATURE;
     }
 
     @Override
@@ -87,19 +92,27 @@ public class TemperatureApiImpl implements TemperatureApi {
 
     @Override
     public void entityTick(ServerLevel level, LivingEntity entity) {
-        if (AdAstraConfig.disableTemperature) return;
-        if (entity.getType().is(ModEntityTypeTags.CAN_SURVIVE_IN_SPACE)) return;
-        if (SpaceSuitItem.hasFullSet(entity, ModItemTags.SPACE_RESISTANT_ARMOR)) return;
+        if (AdAstraConfig.disableTemperature)
+            return;
+        if (entity.getType().is(ModEntityTypeTags.CAN_SURVIVE_IN_SPACE))
+            return;
+        if (SpaceSuitItem.hasFullSet(entity, ModItemTags.SPACE_RESISTANT_ARMOR))
+            return;
         if (this.isHot(level, entity.blockPosition())) {
-            if (entity.getType().is(ModEntityTypeTags.CAN_SURVIVE_EXTREME_HEAT)) return;
-            if (SpaceSuitItem.hasFullSet(entity, ModItemTags.HEAT_RESISTANT_ARMOR)) return;
-            if (entity.hasEffect(MobEffects.FIRE_RESISTANCE)) return;
+            if (entity.getType().is(ModEntityTypeTags.CAN_SURVIVE_EXTREME_HEAT))
+                return;
+            if (SpaceSuitItem.hasFullSet(entity, ModItemTags.HEAT_RESISTANT_ARMOR))
+                return;
+            if (entity.hasEffect(MobEffects.FIRE_RESISTANCE))
+                return;
             if (AdAstraEvents.HotTemperatureTickEvent.fire(level, entity)) {
                 burnEntity(entity);
             }
         } else if (this.isCold(level, entity.blockPosition())) {
-            if (entity.getType().is(ModEntityTypeTags.CAN_SURVIVE_EXTREME_COLD)) return;
-            if (SpaceSuitItem.hasFullSet(entity, ModItemTags.FREEZE_RESISTANT_ARMOR)) return;
+            if (entity.getType().is(ModEntityTypeTags.CAN_SURVIVE_EXTREME_COLD))
+                return;
+            if (SpaceSuitItem.hasFullSet(entity, ModItemTags.FREEZE_RESISTANT_ARMOR))
+                return;
             if (AdAstraEvents.ColdTemperatureTickEvent.fire(level, entity)) {
                 freezeEntity(entity, level);
             }
@@ -108,26 +121,28 @@ public class TemperatureApiImpl implements TemperatureApi {
 
     private void burnEntity(LivingEntity entity) {
         entity.hurt(entity.damageSources().onFire(), 6);
-        entity.setSecondsOnFire(10);
+        entity.igniteForSeconds(10);
     }
 
     private void freezeEntity(LivingEntity entity, ServerLevel level) {
-        if (entity.getType().is(ModEntityTypeTags.CAN_SURVIVE_EXTREME_COLD)) return;
-        if (SpaceSuitItem.hasFullSet(entity, ModItemTags.FREEZE_RESISTANT_ARMOR)) return;
+        if (entity.getType().is(ModEntityTypeTags.CAN_SURVIVE_EXTREME_COLD))
+            return;
+        if (SpaceSuitItem.hasFullSet(entity, ModItemTags.FREEZE_RESISTANT_ARMOR))
+            return;
         if (AdAstraEvents.ColdTemperatureTickEvent.fire(level, entity)) {
             entity.hurt(entity.damageSources().freeze(), 3);
             entity.setTicksFrozen(Math.min(entity.getTicksRequiredToFreeze() + 20, entity.getTicksFrozen() + 5 * 10));
             ModUtils.sendParticles(level,
-                ParticleTypes.SNOWFLAKE,
-                entity.getX(),
-                entity.getY() + 1,
-                entity.getZ(), 1,
-                Mth.randomBetween(level.random, -1.0f, 1.0f) * 0.085f,
-                0.05,
-                Mth.randomBetween(level.random,
-                    -1.0f,
-                    1.0f) * 0.085,
-                0);
+                    ParticleTypes.SNOWFLAKE,
+                    entity.getX(),
+                    entity.getY() + 1,
+                    entity.getZ(), 1,
+                    Mth.randomBetween(level.random, -1.0f, 1.0f) * 0.085f,
+                    0.05,
+                    Mth.randomBetween(level.random,
+                            -1.0f,
+                            1.0f) * 0.085,
+                    0);
         }
     }
 }

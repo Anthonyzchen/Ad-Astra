@@ -21,7 +21,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
-public sealed class RadioSoundInstance extends AbstractSoundInstance implements TickableSoundInstance permits StaticRadioSoundInstance {
+public sealed class RadioSoundInstance extends AbstractSoundInstance implements TickableSoundInstance
+        permits StaticRadioSoundInstance {
 
     protected final String url;
     protected boolean stopped = false;
@@ -29,10 +30,10 @@ public sealed class RadioSoundInstance extends AbstractSoundInstance implements 
     @SuppressWarnings("deprecation")
     public RadioSoundInstance(String url, RandomSource randomSource) {
         super(
-            new ResourceLocation(AdAstra.MOD_ID, "radio/" + Hashing.sha1().hashUnencodedChars(url)),
-            SoundSource.MASTER,
-            randomSource
-        );
+                ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID,
+                        "radio/" + Hashing.sha1().hashUnencodedChars(url)),
+                SoundSource.MASTER,
+                randomSource);
         this.url = url;
     }
 
@@ -40,15 +41,14 @@ public sealed class RadioSoundInstance extends AbstractSoundInstance implements 
     public WeighedSoundEvents resolve(@NotNull SoundManager manager) {
         WeighedSoundEvents soundEvents = new WeighedSoundEvents(this.getLocation(), null);
         soundEvents.addSound(new Sound(
-            getLocation().toString(),
-            ConstantFloat.of(1f),
-            ConstantFloat.of(1f),
-            1,
-            Sound.Type.FILE,
-            true,
-            false,
-            0
-        ));
+                getLocation(),
+                ConstantFloat.of(1f),
+                ConstantFloat.of(1f),
+                1,
+                Sound.Type.FILE,
+                true,
+                false,
+                0));
         this.sound = soundEvents.getSound(this.random);
         return soundEvents;
     }
@@ -80,19 +80,19 @@ public sealed class RadioSoundInstance extends AbstractSoundInstance implements 
 
     public CompletableFuture<AudioStream> getStream() {
         return RadioHandler.getRadioStream(this.url)
-            .thenApplyAsync(stream -> {
-                try {
-                    return new Mp3AudioStream(stream);
-                } catch (Exception e) {
-                    throw new CompletionException(e);
-                }
-            }, Util.backgroundExecutor())
-            .handleAsync((stream, e) -> {
-                if (e != null) {
-                    e.printStackTrace();
-                }
-                return stream;
-            }, Util.backgroundExecutor());
+                .thenApplyAsync(stream -> {
+                    try {
+                        return new Mp3AudioStream(stream);
+                    } catch (Exception e) {
+                        throw new CompletionException(e);
+                    }
+                }, Util.backgroundExecutor())
+                .handleAsync((stream, e) -> {
+                    if (e != null) {
+                        e.printStackTrace();
+                    }
+                    return stream;
+                }, Util.backgroundExecutor());
     }
 
     public String url() {
@@ -101,7 +101,8 @@ public sealed class RadioSoundInstance extends AbstractSoundInstance implements 
 
     // THIS IS USED BY FABRIC, THIS IS A SOFT OVERRIDE DO NOT REMOVE
     @SuppressWarnings("unused")
-    public CompletableFuture<AudioStream> getAudioStream(SoundBufferLibrary library, ResourceLocation id, boolean loop) {
+    public CompletableFuture<AudioStream> getAudioStream(SoundBufferLibrary library, ResourceLocation id,
+            boolean loop) {
         return getStream();
     }
 

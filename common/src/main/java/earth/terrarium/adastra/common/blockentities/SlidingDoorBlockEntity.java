@@ -2,6 +2,7 @@ package earth.terrarium.adastra.common.blockentities;
 
 import dev.architectury.injectables.annotations.PlatformOnly;
 import earth.terrarium.adastra.common.blockentities.base.TickableBlockEntity;
+import net.minecraft.core.HolderLookup;
 import earth.terrarium.adastra.common.blocks.SlidingDoorBlock;
 import earth.terrarium.adastra.common.registry.ModBlockEntityTypes;
 import earth.terrarium.adastra.common.registry.ModSoundEvents;
@@ -24,14 +25,14 @@ public class SlidingDoorBlockEntity extends BlockEntity implements TickableBlock
     }
 
     @Override
-    public void load(CompoundTag tag) {
-        super.load(tag);
+    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
         slideTicks = tag.getInt("SlideTicks");
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag) {
-        super.saveAdditional(tag);
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
         tag.putInt("SlideTicks", slideTicks);
     }
 
@@ -45,14 +46,17 @@ public class SlidingDoorBlockEntity extends BlockEntity implements TickableBlock
 
     @Override
     public void tick(Level level, long time, BlockState state, BlockPos pos) {
-        boolean isOpen = getBlockState().getValue(SlidingDoorBlock.OPEN) || getBlockState().getValue(SlidingDoorBlock.POWERED);
+        boolean isOpen = getBlockState().getValue(SlidingDoorBlock.OPEN)
+                || getBlockState().getValue(SlidingDoorBlock.POWERED);
         lastSlideTicks = slideTicks;
 
         if (!level.isClientSide()) {
             if (!isOpen && slideTicks == 97) {
-                level.playSound(null, worldPosition, ModSoundEvents.SLIDING_DOOR_CLOSE.get(), SoundSource.BLOCKS, 0.25f, 1);
+                level.playSound(null, worldPosition, ModSoundEvents.SLIDING_DOOR_CLOSE.get(), SoundSource.BLOCKS, 0.25f,
+                        1);
             } else if (isOpen && slideTicks == 3) {
-                level.playSound(null, worldPosition, ModSoundEvents.SLIDING_DOOR_OPEN.get(), SoundSource.BLOCKS, 0.25f, 1);
+                level.playSound(null, worldPosition, ModSoundEvents.SLIDING_DOOR_OPEN.get(), SoundSource.BLOCKS, 0.25f,
+                        1);
             }
         }
         slideTicks = Mth.clamp(slideTicks + (isOpen ? 3 : -3), 0, 100);

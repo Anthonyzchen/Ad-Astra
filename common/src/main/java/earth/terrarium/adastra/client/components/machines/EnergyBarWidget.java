@@ -8,6 +8,8 @@ import earth.terrarium.adastra.client.utils.GuiUtils;
 import earth.terrarium.adastra.common.menus.configuration.EnergyConfiguration;
 import earth.terrarium.adastra.common.utils.TooltipUtils;
 import earth.terrarium.botarium.common.energy.base.EnergyContainer;
+import com.mojang.blaze3d.systems.RenderSystem;
+import java.time.Duration;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Tooltip;
@@ -38,18 +40,19 @@ public class EnergyBarWidget extends ConfigurationWidget implements CursorWidget
         float ratio = energy / (float) capacity;
         int x = this.getX();
         int y = this.getY();
-        try (var ignored = RenderUtils.createScissorBox(Minecraft.getInstance(), graphics.pose(), x, y + GuiUtils.ENERGY_BAR_HEIGHT - (int) (GuiUtils.ENERGY_BAR_HEIGHT * ratio), GuiUtils.ENERGY_BAR_WIDTH, GuiUtils.ENERGY_BAR_HEIGHT)) {
+        try (var ignored = RenderUtils.createScissorBox(Minecraft.getInstance(), graphics.pose(), x,
+                y + GuiUtils.ENERGY_BAR_HEIGHT - (int) (GuiUtils.ENERGY_BAR_HEIGHT * ratio), GuiUtils.ENERGY_BAR_WIDTH,
+                GuiUtils.ENERGY_BAR_HEIGHT)) {
             graphics.blitSprite(GuiUtils.ENERGY_BAR, x, y, GuiUtils.ENERGY_BAR_WIDTH, GuiUtils.ENERGY_BAR_HEIGHT);
         }
 
         if (this.isHoveredOrFocused()) {
             setTooltip(Tooltip.create(CommonComponents.joinLines(
-                TooltipUtils.getEnergyComponent(energy, capacity),
-                TooltipUtils.getEnergyDifferenceComponent(this.difference),
-                TooltipUtils.getMaxEnergyInComponent(container.maxInsert()),
-                TooltipUtils.getMaxEnergyOutComponent(container.maxExtract())
-            )));
-            setTooltipDelay(-1);
+                    TooltipUtils.getEnergyComponent(energy, capacity),
+                    TooltipUtils.getEnergyDifferenceComponent(this.difference),
+                    TooltipUtils.getMaxEnergyInComponent(container.maxInsert()),
+                    TooltipUtils.getMaxEnergyOutComponent(container.maxExtract()))));
+            setTooltipDelay(Duration.ofMillis(-1));
         }
     }
 

@@ -22,7 +22,8 @@ public interface Ti69App {
      * @param level        The client level
      * @param rightHanded  Whether the player is right-handed
      */
-    void render(PoseStack pose, MultiBufferSource bufferSource, Matrix4f matrix4f, Font font, ClientLevel level, boolean rightHanded);
+    void render(PoseStack pose, MultiBufferSource bufferSource, Matrix4f matrix4f, Font font, ClientLevel level,
+            boolean rightHanded);
 
     /**
      * @return The background color of the app
@@ -43,7 +44,8 @@ public interface Ti69App {
      * @param textureWidth  The texture width
      * @param textureHeight The texture height
      */
-    default void renderIcon(Matrix4f matrix4f, ResourceLocation icon, int x, int y, int uOffset, int vOffset, int uWidth, int vHeight, int textureWidth, int textureHeight) {
+    default void renderIcon(Matrix4f matrix4f, ResourceLocation icon, int x, int y, int uOffset, int vOffset,
+            int uWidth, int vHeight, int textureWidth, int textureHeight) {
         int x2 = x + uWidth;
         int y2 = y + vHeight;
         float minU = (float) uOffset / (float) textureWidth;
@@ -53,13 +55,15 @@ public interface Ti69App {
 
         RenderSystem.setShaderTexture(0, icon);
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        BufferBuilder bufferBuilder = Tesselator.getInstance().getBuilder();
-        bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-        bufferBuilder.vertex(matrix4f, (float) x, (float) y, 0).uv(minU, minV).endVertex();
-        bufferBuilder.vertex(matrix4f, (float) x, (float) y2, 0).uv(minU, maxV).endVertex();
-        bufferBuilder.vertex(matrix4f, (float) x2, (float) y2, 0).uv(maxU, maxV).endVertex();
-        bufferBuilder.vertex(matrix4f, (float) x2, (float) y, 0).uv(maxU, minV).endVertex();
-        BufferUploader.drawWithShader(bufferBuilder.end());
+        RenderSystem.setShaderTexture(0, icon);
+        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        BufferBuilder bufferBuilder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS,
+                DefaultVertexFormat.POSITION_TEX);
+        bufferBuilder.addVertex(matrix4f, (float) x, (float) y, 0).setColor(-1).setUv(minU, minV);
+        bufferBuilder.addVertex(matrix4f, (float) x, (float) y2, 0).setColor(-1).setUv(minU, maxV);
+        bufferBuilder.addVertex(matrix4f, (float) x2, (float) y2, 0).setColor(-1).setUv(maxU, maxV);
+        bufferBuilder.addVertex(matrix4f, (float) x2, (float) y, 0).setColor(-1).setUv(maxU, minV);
+        BufferUploader.drawWithShader(bufferBuilder.buildOrThrow());
     }
 
     /**
@@ -77,6 +81,7 @@ public interface Ti69App {
         int hours = dayTime / 1000 == 0 ? 12 : dayTime / 1000;
         int minutes = (int) ((dayTime % 1000) / ratio);
         String timeText = hours + ":" + (minutes < 10 ? "0" + minutes : minutes) + (isPm ? " PM" : " AM");
-        font.drawInBatch(timeText, 0.0f, 5.0f, 0xFFFFFF, false, matrix4f, bufferSource, Font.DisplayMode.NORMAL, 0xFFFFFF, LightTexture.FULL_BRIGHT);
+        font.drawInBatch(timeText, 0.0f, 5.0f, 0xFFFFFF, false, matrix4f, bufferSource, Font.DisplayMode.NORMAL,
+                0xFFFFFF, LightTexture.FULL_BRIGHT);
     }
 }

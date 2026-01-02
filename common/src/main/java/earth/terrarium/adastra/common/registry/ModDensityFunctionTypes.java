@@ -9,9 +9,13 @@ import earth.terrarium.adastra.common.world.biome.CratersDensityFunction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.levelgen.DensityFunction;
 
+import com.mojang.serialization.MapCodec;
+
 public class ModDensityFunctionTypes {
 
-    public static final ResourcefulRegistry<Codec<? extends DensityFunction>> DENSITY_FUNCTION_TYPES = ResourcefulRegistries.create(BuiltInRegistries.DENSITY_FUNCTION_TYPE, AdAstra.MOD_ID);
+    public static final ResourcefulRegistry<MapCodec<? extends DensityFunction>> DENSITY_FUNCTION_TYPES = ResourcefulRegistries
+            .create(BuiltInRegistries.DENSITY_FUNCTION_TYPE, AdAstra.MOD_ID);
 
-    public static final RegistryEntry<Codec<CratersDensityFunction>> CRATERS = DENSITY_FUNCTION_TYPES.register("craters", CratersDensityFunction.CODEC::codec);
+    public static final RegistryEntry<MapCodec<CratersDensityFunction>> CRATERS = DENSITY_FUNCTION_TYPES
+            .register("craters", CratersDensityFunction.CODEC::codec);
 }

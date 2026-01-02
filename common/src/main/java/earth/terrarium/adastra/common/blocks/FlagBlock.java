@@ -50,17 +50,17 @@ public class FlagBlock extends BasicEntityBlock implements SimpleWaterloggedBloc
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
     private static final VoxelShape SHAPE_BOTTOM = Shapes.join(
-        Block.box(7, 8, 7, 9, 16, 9),
-        Block.box(6, 0, 6, 10, 8, 10), BooleanOp.OR);
+            Block.box(7, 8, 7, 9, 16, 9),
+            Block.box(6, 0, 6, 10, 8, 10), BooleanOp.OR);
 
     private static final VoxelShape SHAPE_TOP = Block.box(7, 0, 7, 9, 24, 9);
 
     public FlagBlock(Properties properties) {
         super(properties, false);
         registerDefaultState(defaultBlockState()
-            .setValue(HALF, DoubleBlockHalf.LOWER)
-            .setValue(FACING, EightDirectionProperty.Direction.NORTH)
-            .setValue(WATERLOGGED, false));
+                .setValue(HALF, DoubleBlockHalf.LOWER)
+                .setValue(FACING, EightDirectionProperty.Direction.NORTH)
+                .setValue(WATERLOGGED, false));
     }
 
     @Override
@@ -75,16 +75,19 @@ public class FlagBlock extends BasicEntityBlock implements SimpleWaterloggedBloc
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable BlockGetter level, List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, net.minecraft.world.item.Item.TooltipContext context,
+            List<Component> tooltip, TooltipFlag flag) {
         TooltipUtils.addDescriptionComponent(tooltip, ConstantComponents.FLAG_INFO);
     }
 
     @Override
-    public @NotNull InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    public @NotNull InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player,
+            BlockHitResult hit) {
         if (level.isClientSide() && (AdAstraConfig.allowFlagImages || player.canUseGameMasterBlocks())) {
             if (state.getValue(HALF) == DoubleBlockHalf.LOWER) {
                 return action(level, pos.above(), player);
-            } else return action(level, pos, player);
+            } else
+                return action(level, pos, player);
         }
         return InteractionResult.sidedSuccess(level.isClientSide());
     }
@@ -125,12 +128,17 @@ public class FlagBlock extends BasicEntityBlock implements SimpleWaterloggedBloc
         return RenderShape.INVISIBLE; // Rendering is done in the BER
     }
 
-    public @NotNull BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+    public @NotNull BlockState updateShape(BlockState state, Direction direction, BlockState neighborState,
+            LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
         DoubleBlockHalf half = state.getValue(HALF);
         if (direction.getAxis() == Direction.Axis.Y && half == DoubleBlockHalf.LOWER == (direction == Direction.UP)) {
-            return neighborState.is(this) && neighborState.getValue(HALF) != half ? state.setValue(FACING, neighborState.getValue(FACING)) : Blocks.AIR.defaultBlockState();
+            return neighborState.is(this) && neighborState.getValue(HALF) != half
+                    ? state.setValue(FACING, neighborState.getValue(FACING))
+                    : Blocks.AIR.defaultBlockState();
         } else {
-            return half == DoubleBlockHalf.LOWER && direction == Direction.DOWN && !state.canSurvive(level, pos) ? Blocks.AIR.defaultBlockState() : super.updateShape(state, direction, neighborState, level, pos, neighborPos);
+            return half == DoubleBlockHalf.LOWER && direction == Direction.DOWN && !state.canSurvive(level, pos)
+                    ? Blocks.AIR.defaultBlockState()
+                    : super.updateShape(state, direction, neighborState, level, pos, neighborPos);
         }
     }
 
@@ -139,22 +147,26 @@ public class FlagBlock extends BasicEntityBlock implements SimpleWaterloggedBloc
         BlockPos pos = context.getClickedPos();
         Level level = context.getLevel();
         if (pos.getY() < level.getMaxBuildHeight() - 1 && level.getBlockState(pos.above()).canBeReplaced(context)) {
-            var direction = EightDirectionProperty.Direction.VALUES[Mth.floor((double) (context.getRotation() * 8.0F / 360.0F) + 0.5D) & 7];
+            var direction = EightDirectionProperty.Direction.VALUES[Mth
+                    .floor((double) (context.getRotation() * 8.0F / 360.0F) + 0.5D) & 7];
             return this.defaultBlockState().setValue(FACING, direction);
         }
         return null;
     }
 
     @Override
-    public void setPlacedBy(Level level, BlockPos pos, BlockState state, LivingEntity placer, @NotNull ItemStack stack) {
+    public void setPlacedBy(Level level, BlockPos pos, BlockState state, LivingEntity placer,
+            @NotNull ItemStack stack) {
         level.setBlockAndUpdate(pos.above(), state.setValue(HALF, DoubleBlockHalf.UPPER));
-        if (placer instanceof Player player && level.getBlockEntity(pos.above()) instanceof FlagBlockEntity flagEntity) {
+        if (placer instanceof Player player
+                && level.getBlockEntity(pos.above()) instanceof FlagBlockEntity flagEntity) {
             flagEntity.setOwner(player.getGameProfile());
         }
     }
 
     @Override
     public long getSeed(BlockState state, BlockPos pos) {
-        return Mth.getSeed(pos.getX(), pos.below(state.getValue(HALF) == DoubleBlockHalf.LOWER ? 0 : 1).getY(), pos.getZ());
+        return Mth.getSeed(pos.getX(), pos.below(state.getValue(HALF) == DoubleBlockHalf.LOWER ? 0 : 1).getY(),
+                pos.getZ());
     }
 }

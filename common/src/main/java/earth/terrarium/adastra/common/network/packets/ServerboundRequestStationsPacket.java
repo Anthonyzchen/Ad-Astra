@@ -6,6 +6,7 @@ import com.teamresourceful.resourcefullib.common.network.base.ServerboundPacketT
 import earth.terrarium.adastra.AdAstra;
 import earth.terrarium.adastra.common.network.NetworkHandler;
 import earth.terrarium.adastra.common.utils.radio.StationLoader;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -31,14 +32,15 @@ public record ServerboundRequestStationsPacket() implements Packet<ServerboundRe
 
         @Override
         public ResourceLocation id() {
-            return new ResourceLocation(AdAstra.MOD_ID, "request_stations");
+            return ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "request_stations");
         }
 
         @Override
-        public void encode(ServerboundRequestStationsPacket message, FriendlyByteBuf buffer) {}
+        public void encode(ServerboundRequestStationsPacket message, RegistryFriendlyByteBuf buffer) {
+        }
 
         @Override
-        public ServerboundRequestStationsPacket decode(FriendlyByteBuf buffer) {
+        public ServerboundRequestStationsPacket decode(RegistryFriendlyByteBuf buffer) {
             return new ServerboundRequestStationsPacket();
         }
 
@@ -46,7 +48,8 @@ public record ServerboundRequestStationsPacket() implements Packet<ServerboundRe
         public Consumer<Player> handle(ServerboundRequestStationsPacket packet) {
             return player -> {
                 if (player instanceof ServerPlayer serverPlayer) {
-                    NetworkHandler.CHANNEL.sendToPlayer(new ClientboundSendStationsPacket(StationLoader.stations()), serverPlayer);
+                    NetworkHandler.CHANNEL.sendToPlayer(new ClientboundSendStationsPacket(StationLoader.stations()),
+                            serverPlayer);
                 }
             };
         }

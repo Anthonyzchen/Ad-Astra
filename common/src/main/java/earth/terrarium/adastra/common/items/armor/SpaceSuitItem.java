@@ -37,28 +37,31 @@ public class SpaceSuitItem extends CustomDyeableArmorItem implements BotariumFlu
 
     protected final long tankSize;
 
-    public SpaceSuitItem(ArmorMaterial material, Type type, long tankSize, Properties properties) {
+    public SpaceSuitItem(net.minecraft.core.Holder<ArmorMaterial> material, Type type, long tankSize,
+            Properties properties) {
         super(material, type, properties);
         this.tankSize = tankSize;
     }
 
     @Override
-    public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, @NotNull TooltipFlag isAdvanced) {
+    public void appendHoverText(@NotNull ItemStack stack, @NotNull Item.TooltipContext context,
+            List<Component> tooltipComponents,
+            @NotNull TooltipFlag isAdvanced) {
         tooltipComponents.add(TooltipUtils.getFluidComponent(
-            FluidUtils.getTank(stack),
-            FluidConstants.fromMillibuckets(tankSize),
-            ModFluids.OXYGEN.get()));
+                FluidUtils.getTank(stack),
+                FluidConstants.fromMillibuckets(tankSize),
+                ModFluids.OXYGEN.get()));
         TooltipUtils.addDescriptionComponent(tooltipComponents, ConstantComponents.SPACE_SUIT_INFO);
     }
 
     @Override
     public WrappedItemFluidContainer getFluidContainer(ItemStack holder) {
         return new WrappedItemFluidContainer(
-            holder,
-            new SimpleFluidContainer(
-                FluidConstants.fromMillibuckets(tankSize),
-                1,
-                (t, f) -> f.is(ModFluidTags.OXYGEN)));
+                holder,
+                new SimpleFluidContainer(
+                        FluidConstants.fromMillibuckets(tankSize),
+                        1,
+                        (t, f) -> f.is(ModFluidTags.OXYGEN)));
     }
 
     public static boolean hasFullSet(LivingEntity entity) {
@@ -75,7 +78,8 @@ public class SpaceSuitItem extends CustomDyeableArmorItem implements BotariumFlu
 
     public static boolean hasFullSet(LivingEntity entity, TagKey<Item> spaceSuitTag) {
         for (var stack : entity.getArmorSlots()) {
-            if (!stack.is(spaceSuitTag)) return false;
+            if (!stack.is(spaceSuitTag))
+                return false;
         }
         return true;
     }
@@ -83,10 +87,14 @@ public class SpaceSuitItem extends CustomDyeableArmorItem implements BotariumFlu
     @Override
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
         super.inventoryTick(stack, level, entity, slotId, isSelected);
-        if (level.isClientSide()) return;
-        if (!(entity instanceof LivingEntity livingEntity)) return;
-        if (livingEntity instanceof Player player && (player.isCreative() || player.isSpectator())) return;
-        if (livingEntity.getItemBySlot(EquipmentSlot.CHEST) != stack) return;
+        if (level.isClientSide())
+            return;
+        if (!(entity instanceof LivingEntity livingEntity))
+            return;
+        if (livingEntity instanceof Player player && (player.isCreative() || player.isSpectator()))
+            return;
+        if (livingEntity.getItemBySlot(EquipmentSlot.CHEST) != stack)
+            return;
         livingEntity.setTicksFrozen(0);
         // Every 12 ticks = 10 minutes per 1,000 mB (1 bucket) oxygen
         if (livingEntity.tickCount % 12 == 0 && hasOxygen(entity)) {
@@ -96,7 +104,8 @@ public class SpaceSuitItem extends CustomDyeableArmorItem implements BotariumFlu
             // Allow the entity to breathe in water
             if (entity.isEyeInFluid(FluidTags.WATER)) {
                 consumeOxygen(stack, 1);
-                livingEntity.setAirSupply(Math.min(livingEntity.getMaxAirSupply(), livingEntity.getAirSupply() + 4 * 10));
+                livingEntity
+                        .setAirSupply(Math.min(livingEntity.getMaxAirSupply(), livingEntity.getAirSupply() + 4 * 10));
             }
         }
     }
@@ -104,17 +113,21 @@ public class SpaceSuitItem extends CustomDyeableArmorItem implements BotariumFlu
     public void consumeOxygen(ItemStack stack, long amount) {
         ItemStackHolder holder = new ItemStackHolder(stack);
         var container = FluidContainer.of(holder);
-        if (container == null) return;
-        FluidHolder extracted = container.extractFluid(container.getFirstFluid().copyWithAmount(FluidConstants.fromMillibuckets(amount)), false);
+        if (container == null)
+            return;
+        FluidHolder extracted = container
+                .extractFluid(container.getFirstFluid().copyWithAmount(FluidConstants.fromMillibuckets(amount)), false);
         if (holder.isDirty() || extracted.getFluidAmount() > 0) {
-            stack.setTag(holder.getStack().getTag());
+            stack.applyComponents(holder.getStack().getComponents());
         }
     }
 
     public static long getOxygenAmount(Entity entity) {
-        if (!(entity instanceof LivingEntity livingEntity)) return 0;
+        if (!(entity instanceof LivingEntity livingEntity))
+            return 0;
         var stack = livingEntity.getItemBySlot(EquipmentSlot.CHEST);
-        if (!(stack.getItem() instanceof SpaceSuitItem suit)) return 0;
+        if (!(stack.getItem() instanceof SpaceSuitItem suit))
+            return 0;
         return suit.getFluidContainer(stack).getFirstFluid().getFluidAmount();
     }
 
@@ -130,7 +143,8 @@ public class SpaceSuitItem extends CustomDyeableArmorItem implements BotariumFlu
     @Override
     public int getBarWidth(@NotNull ItemStack stack) {
         var fluidContainer = getFluidContainer(stack);
-        return (int) (((double) fluidContainer.getFirstFluid().getFluidAmount() / fluidContainer.getTankCapacity(0)) * 13);
+        return (int) (((double) fluidContainer.getFirstFluid().getFluidAmount() / fluidContainer.getTankCapacity(0))
+                * 13);
     }
 
     @Override

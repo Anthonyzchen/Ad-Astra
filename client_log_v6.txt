@@ -1,0 +1,626 @@
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::load has been called by net.rubygrapefruit.platform.internal.NativeLibraryLoader in an unnamed module (file:/Users/alextodd/.gradle/wrapper/dists/gradle-8.8-bin/dl7vupf4psengwqhwktix4v1/gradle-8.8/lib/native-platform-0.22-milestone-26.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+Type-safe project accessors is an incubating feature.
+
+> Configure project :
+Architect Plugin: 3.4.162
+Architectury Loom: 1.7.435
+You are using an outdated version of Architectury Loom! This version will not receive any support, please consider updating!
+
+> Task :clean UP-TO-DATE
+> Task :common:clean
+> Task :fabric:clean
+
+> Task :common:compileJava
+warning: unknown enum constant EnvType.CLIENT
+  reason: class file for net.fabricmc.api.EnvType not found
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+warning: unknown enum constant EnvType.CLIENT
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: /Users/alextodd/temp/Github-NOTSYNCED/Ad-Astra/common/src/main/java/earth/terrarium/adastra/common/container/BiFluidContainer.java uses or overrides a deprecated API that is marked for removal.
+120 warnings
+only showing the first 120 warnings, of 484 total; use -Xmaxwarns if you would like to see more
+
+> Task :common:processResources
+> Task :common:classes
+> Task :common:jar
+> Task :fabric:compileJava
+> Task :fabric:processResources
+> Task :fabric:classes
+> Task :fabric:generateLog4jConfig UP-TO-DATE
+> Task :fabric:generateRemapClasspath UP-TO-DATE
+> Task :fabric:generateDLIConfig UP-TO-DATE
+> Task :fabric:prepareArchitecturyTransformer
+> Task :fabric:configureLaunch
+> Task :fabric:downloadAssets UP-TO-DATE
+> Task :fabric:configureClientLaunch
+
+> Task :fabric:runClient
+[Architectury Transformer] Architectury Runtime 5.2.87
+[Architectury Transformer] Read classpath in 1.056 s
+[Architectury Transformer] Listening at /Users/alextodd/temp/Github-NOTSYNCED/Ad-Astra/common/build/devlibs/adastra-common-1.21-1.16.6-dev.jar
+[34m[16:41:10][m [32m[main/INFO][m [36m(FabricLoader/GameProvider)[m [0mLoading Minecraft 1.21 with Fabric Loader 0.16.3
+[m[34m[16:41:10][m [32m[main/INFO][m [36m(FabricLoader)[m [0mLoading 61 mods:
+	- ad_astra 1.16.6
+	- botarium 3.2.5
+	- fabric-api 0.102.0+1.21
+	- fabric-api-base 0.4.42+6573ed8cd1
+	- fabric-api-lookup-api-v1 1.6.68+b5597344d1
+	- fabric-biome-api-v1 13.0.29+5bd9f1bcd1
+	- fabric-block-api-v1 1.0.22+0af3f5a7d1
+	- fabric-block-view-api-v2 1.0.10+6573ed8cd1
+	- fabric-blockrenderlayer-v1 1.1.52+0af3f5a7d1
+	- fabric-client-tags-api-v1 1.1.15+6573ed8cd1
+	- fabric-command-api-v1 1.2.49+f71b366fd1
+	- fabric-command-api-v2 2.2.28+6ced4dd9d1
+	- fabric-commands-v0 0.2.66+df3654b3d1
+	- fabric-content-registries-v0 8.0.16+b5597344d1
+	- fabric-convention-tags-v1 2.0.19+7f945d5bd1
+	- fabric-convention-tags-v2 2.5.0+c5e2b5c6d1
+	- fabric-crash-report-info-v1 0.2.29+0af3f5a7d1
+	- fabric-data-attachment-api-v1 1.1.27+6a6dfa19d1
+	- fabric-data-generation-api-v1 20.2.16+16c4ae25d1
+	- fabric-dimensions-v1 4.0.0+6fc22b99d1
+	- fabric-entity-events-v1 1.6.12+6fc22b99d1
+	- fabric-events-interaction-v0 0.7.12+ba9dae06d1
+	- fabric-game-rule-api-v1 1.0.53+6ced4dd9d1
+	- fabric-gametest-api-v1 2.0.4+6fc22b99d1
+	- fabric-item-api-v1 11.0.0+afdfc921d1
+	- fabric-item-group-api-v1 4.1.4+78017270d1
+	- fabric-key-binding-api-v1 1.0.47+0af3f5a7d1
+	- fabric-keybindings-v0 0.2.45+df3654b3d1
+	- fabric-lifecycle-events-v1 2.3.12+6c1df360d1
+	- fabric-loot-api-v2 3.0.14+3f89f5a5d1
+	- fabric-loot-api-v3 1.0.2+3f89f5a5d1
+	- fabric-message-api-v1 6.0.13+6573ed8cd1
+	- fabric-model-loading-api-v1 2.0.0+fe474d6bd1
+	- fabric-networking-api-v1 4.2.2+60c3209bd1
+	- fabric-object-builder-api-v1 15.2.0+a551f7a4d1
+	- fabric-particles-v1 4.0.2+6573ed8cd1
+	- fabric-recipe-api-v1 5.0.12+65089712d1
+	- fabric-registry-sync-v0 5.1.2+60c3209bd1
+	- fabric-renderer-api-v1 3.4.0+c705a49cd1
+	- fabric-renderer-indigo 1.7.0+c705a49cd1
+	- fabric-renderer-registries-v1 3.2.68+df3654b3d1
+	- fabric-rendering-data-attachment-v1 0.3.48+73761d2ed1
+	- fabric-rendering-fluids-v1 3.1.6+b5597344d1
+	- fabric-rendering-v0 1.1.71+df3654b3d1
+	- fabric-rendering-v1 5.0.5+df16efd0d1
+	- fabric-resource-conditions-api-v1 4.3.0+8dc279b1d1
+	- fabric-resource-loader-v0 1.3.0+56599129d1
+	- fabric-screen-api-v1 2.0.24+b5597344d1
+	- fabric-screen-handler-api-v1 1.3.86+b5597344d1
+	- fabric-sound-api-v1 1.0.23+6573ed8cd1
+	- fabric-transfer-api-v1 5.1.16+3dccd343d1
+	- fabric-transitive-access-wideners-v1 6.1.0+176f9036d1
+	- fabricloader 0.16.3
+	- generated_dae75eb 1.0.0
+	- java 21
+	- minecraft 1.21
+	- mixinextras 0.4.1
+	- modmenu 11.0.1
+	- resourcefulconfig 3.0.0
+	- resourcefullib 3.0.0
+	- team_reborn_energy 4.1.0
+[m[34m[16:41:10][m [32m[main/INFO][m [36m(FabricLoader/Mixin)[m [0mSpongePowered MIXIN Subsystem Version=0.8.7 Source=file:/Users/alextodd/.gradle/caches/modules-2/files-2.1/net.fabricmc/sponge-mixin/0.15.2+mixin.0.8.7/2af2f021d8e02a0220dc27a7a72b4666d66d44ca/sponge-mixin-0.15.2+mixin.0.8.7.jar Service=Knot/Fabric Env=CLIENT
+[m[34m[16:41:10][m [32m[main/INFO][m [36m(FabricLoader/Mixin)[m [0mLoaded Fabric development mappings for mixin remapper!
+[m[34m[16:41:10][m [32m[main/INFO][m [36m(FabricLoader/Mixin)[m [0mCompatibility level set to JAVA_17
+[m[34m[16:41:10][m [32m[main/INFO][m [36m(FabricLoader/Mixin)[m [0mCompatibility level set to JAVA_21
+[m[34m[16:41:11][m [32m[main/INFO][m [36m(FabricLoader/MixinExtras|Service)[m [0mInitializing MixinExtras via com.llamalad7.mixinextras.service.MixinExtrasServiceImpl(version=0.4.1).
+[m[34m[16:41:11][m [32m[Datafixer Bootstrap/INFO][m [36m(Minecraft)[m [0m226 Datafixer optimizations took 147 milliseconds
+[m[34m[16:41:15][m [32m[Render thread/INFO][m [36m(Minecraft)[m [0mEnvironment: Environment[sessionHost=https://sessionserver.mojang.com, servicesHost=https://api.minecraftservices.com, name=PROD]
+[m[34m[16:41:15][m [32m[Render thread/INFO][m [36m(Minecraft)[m [0mSetting user: Player75
+[m[34m[16:41:15][m [32m[Render thread/INFO][m [36m(Constants)[m [0mLoading stations from stations.json
+[m[34m[16:41:16][m [31m[Render thread/ERROR][m [36m(Minecraft)[m [31mNo data fixer registered for tier_1_rover
+[m[34m[16:41:16][m [31m[Render thread/ERROR][m [36m(Minecraft)[m [31mNo data fixer registered for tier_1_rocket
+[m[34m[16:41:16][m [31m[Render thread/ERROR][m [36m(Minecraft)[m [31mNo data fixer registered for tier_2_rocket
+[m[34m[16:41:16][m [31m[Render thread/ERROR][m [36m(Minecraft)[m [31mNo data fixer registered for tier_3_rocket
+[m[34m[16:41:16][m [31m[Render thread/ERROR][m [36m(Minecraft)[m [31mNo data fixer registered for tier_4_rocket
+[m[34m[16:41:16][m [31m[Render thread/ERROR][m [36m(Minecraft)[m [31mNo data fixer registered for lander
+[m[34m[16:41:16][m [31m[Render thread/ERROR][m [36m(Minecraft)[m [31mNo data fixer registered for lunarian
+[m[34m[16:41:16][m [31m[Render thread/ERROR][m [36m(Minecraft)[m [31mNo data fixer registered for corrupted_lunarian
+[m[34m[16:41:16][m [31m[Render thread/ERROR][m [36m(Minecraft)[m [31mNo data fixer registered for star_crawler
+[m[34m[16:41:16][m [31m[Render thread/ERROR][m [36m(Minecraft)[m [31mNo data fixer registered for martian_raptor
+[m[34m[16:41:16][m [31m[Render thread/ERROR][m [36m(Minecraft)[m [31mNo data fixer registered for pygro
+[m[34m[16:41:16][m [31m[Render thread/ERROR][m [36m(Minecraft)[m [31mNo data fixer registered for zombified_pygro
+[m[34m[16:41:16][m [31m[Render thread/ERROR][m [36m(Minecraft)[m [31mNo data fixer registered for pygro_brute
+[m[34m[16:41:16][m [31m[Render thread/ERROR][m [36m(Minecraft)[m [31mNo data fixer registered for mogler
+[m[34m[16:41:16][m [31m[Render thread/ERROR][m [36m(Minecraft)[m [31mNo data fixer registered for zombified_mogler
+[m[34m[16:41:16][m [31m[Render thread/ERROR][m [36m(Minecraft)[m [31mNo data fixer registered for lunarian_wandering_trader
+[m[34m[16:41:16][m [31m[Render thread/ERROR][m [36m(Minecraft)[m [31mNo data fixer registered for sulfur_creeper
+[m[34m[16:41:16][m [31m[Render thread/ERROR][m [36m(Minecraft)[m [31mNo data fixer registered for glacian_ram
+[m[34m[16:41:16][m [31m[Render thread/ERROR][m [36m(Minecraft)[m [31mNo data fixer registered for ice_spit
+[m[34m[16:41:16][m [32m[Render thread/INFO][m [36m(Mod Menu/Update Checker)[m [0mChecking mod updates...
+[m[34m[16:41:16][m [32m[Render thread/INFO][m [36m(Indigo)[m [0m[Indigo] Registering Indigo renderer!
+[m[34m[16:41:16][m [32m[Render thread/INFO][m [36m(Minecraft)[m [0m[STDOUT]: Resourceful Config Demo is enabled!
+[m[34m[16:41:16][m [32m[Render thread/INFO][m [36m(Minecraft)[m [0m[STDOUT]: Old Value: true New Value: true
+[m[34m[16:41:16][m [32m[ModMenu/Update Checker/Fabric Loader/INFO][m [36m(Mod Menu/Update Checker)[m [0mUpdate available for 'fabricloader@0.16.3'
+[m[34m[16:41:16][m [32m[Render thread/INFO][m [36m(Minecraft)[m [0mBackend library: LWJGL version 3.3.3-snapshot
+[m[34m[16:41:17][m [32m[Render thread/INFO][m [36m(Minecraft)[m [0mReloading ResourceManager: vanilla, fabric, fabric-api, fabric-api-base, fabric-api-lookup-api-v1, fabric-biome-api-v1, fabric-block-api-v1, fabric-block-view-api-v2, fabric-blockrenderlayer-v1, fabric-client-tags-api-v1, fabric-command-api-v1, fabric-command-api-v2, fabric-commands-v0, fabric-content-registries-v0, fabric-convention-tags-v1, fabric-convention-tags-v2, fabric-crash-report-info-v1, fabric-data-attachment-api-v1, fabric-data-generation-api-v1, fabric-dimensions-v1, fabric-entity-events-v1, fabric-events-interaction-v0, fabric-game-rule-api-v1, fabric-gametest-api-v1, fabric-item-api-v1, fabric-item-group-api-v1, fabric-key-binding-api-v1, fabric-keybindings-v0, fabric-lifecycle-events-v1, fabric-loot-api-v2, fabric-loot-api-v3, fabric-message-api-v1, fabric-model-loading-api-v1, fabric-networking-api-v1, fabric-object-builder-api-v1, fabric-particles-v1, fabric-recipe-api-v1, fabric-registry-sync-v0, fabric-renderer-api-v1, fabric-renderer-indigo, fabric-renderer-registries-v1, fabric-rendering-data-attachment-v1, fabric-rendering-fluids-v1, fabric-rendering-v0, fabric-rendering-v1, fabric-resource-conditions-api-v1, fabric-resource-loader-v0, fabric-screen-api-v1, fabric-screen-handler-api-v1, fabric-sound-api-v1, fabric-transfer-api-v1, fabric-transitive-access-wideners-v1, fabricloader, generated_dae75eb, modmenu, resourcefulconfig, team_reborn_energy
+[m[34m[16:41:17][m [32m[Worker-Main-5/INFO][m [36m(Minecraft)[m [0mFound unifont_all_no_pua-15.1.05.hex, loading
+[m[34m[16:41:17][m [32m[Worker-Main-3/INFO][m [36m(Minecraft)[m [0mFound unifont_jp_patch-15.1.05.hex, loading
+[m[34m[16:41:19][m [33m[Render thread/WARN][m [36m(Minecraft)[m [0mMissing sound for event: minecraft:item.goat_horn.play
+[m[34m[16:41:19][m [33m[Render thread/WARN][m [36m(Minecraft)[m [0mMissing sound for event: minecraft:entity.goat.screaming.horn_break
+[m[34m[16:41:20][m [32m[Render thread/INFO][m [36m(Minecraft)[m [0mOpenAL initialized on device BlackShark V3 Pro BT
+[m[34m[16:41:20][m [32m[Render thread/INFO][m [36m(Minecraft)[m [0mSound engine started
+[m[34m[16:41:20][m [32m[Render thread/INFO][m [36m(Minecraft)[m [0mCreated: 1024x1024x4 minecraft:textures/atlas/blocks.png-atlas
+[m[34m[16:41:20][m [32m[Render thread/INFO][m [36m(Minecraft)[m [0mCreated: 256x256x4 minecraft:textures/atlas/signs.png-atlas
+[m[34m[16:41:20][m [32m[Render thread/INFO][m [36m(Minecraft)[m [0mCreated: 512x512x4 minecraft:textures/atlas/banner_patterns.png-atlas
+[m[34m[16:41:20][m [32m[Render thread/INFO][m [36m(Minecraft)[m [0mCreated: 512x512x4 minecraft:textures/atlas/shield_patterns.png-atlas
+[m[34m[16:41:20][m [32m[Render thread/INFO][m [36m(Minecraft)[m [0mCreated: 1024x1024x4 minecraft:textures/atlas/armor_trims.png-atlas
+[m[34m[16:41:20][m [32m[Render thread/INFO][m [36m(Minecraft)[m [0mCreated: 256x256x4 minecraft:textures/atlas/chest.png-atlas
+[m[34m[16:41:20][m [32m[Render thread/INFO][m [36m(Minecraft)[m [0mCreated: 128x64x4 minecraft:textures/atlas/decorated_pot.png-atlas
+[m[34m[16:41:20][m [32m[Render thread/INFO][m [36m(Minecraft)[m [0mCreated: 512x256x4 minecraft:textures/atlas/beds.png-atlas
+[m[34m[16:41:20][m [32m[Render thread/INFO][m [36m(Minecraft)[m [0mCreated: 512x256x4 minecraft:textures/atlas/shulker_boxes.png-atlas
+[m[34m[16:41:20][m [32m[Render thread/INFO][m [36m(Minecraft)[m [0mCreated: 512x256x0 minecraft:textures/atlas/particles.png-atlas
+[m[34m[16:41:20][m [32m[Render thread/INFO][m [36m(Minecraft)[m [0mCreated: 512x256x0 minecraft:textures/atlas/paintings.png-atlas
+[m[34m[16:41:20][m [32m[Render thread/INFO][m [36m(Minecraft)[m [0mCreated: 256x128x0 minecraft:textures/atlas/mob_effects.png-atlas
+[m[34m[16:41:20][m [32m[Render thread/INFO][m [36m(Minecraft)[m [0mCreated: 64x64x0 minecraft:textures/atlas/map_decorations.png-atlas
+[m[34m[16:41:20][m [32m[Render thread/INFO][m [36m(Minecraft)[m [0mCreated: 1024x1024x0 minecraft:textures/atlas/gui.png-atlas
+[m[34m[16:41:20][m [33m[Render thread/WARN][m [36m(Minecraft)[m [0mShader rendertype_entity_translucent_emissive could not find sampler named Sampler2 in the specified shader program.
+[m[34m[16:41:59][m [33m[Render thread/WARN][m [36m(Minecraft)[m [0mMissing data pack generated_8253a3d
+[m[34m[16:41:59][m [32m[Render thread/INFO][m [36m(Minecraft)[m [0mFound new data pack generated_dae75eb, loading it automatically
+[m[34m[16:41:59][m [31m[Worker-Main-3/ERROR][m [36m(Minecraft)[m [31mCouldn't load tag ad_astra:space_paintings as it is missing following references: ad_astra:mercury (from generated_dae75eb), ad_astra:moon (from generated_dae75eb), ad_astra:pluto (from generated_dae75eb), ad_astra:earth (from generated_dae75eb), ad_astra:glacio (from generated_dae75eb), ad_astra:mars (from generated_dae75eb), ad_astra:venus (from generated_dae75eb), ad_astra:jupiter (from generated_dae75eb), ad_astra:neptune (from generated_dae75eb), ad_astra:uranus (from generated_dae75eb), ad_astra:saturn (from generated_dae75eb), ad_astra:the_milky_way (from generated_dae75eb), ad_astra:alpha_centauri (from generated_dae75eb), ad_astra:sun (from generated_dae75eb)
+[m[34m[16:41:59][m [32m[Render thread/INFO][m [36m(Minecraft)[m [0mLoaded 1290 recipes
+[m[34m[16:41:59][m [32m[Render thread/INFO][m [36m(Minecraft)[m [0mLoaded 1399 advancements
+[m[34m[16:41:59][m [33m[Render thread/WARN][m [36m(Minecraft)[m [0mNot all defined tags for registry ResourceKey[minecraft:root / minecraft:block] are present in data pack: ad_astra:moon_stone_replaceables
+[m[34m[16:42:01][m [32m[Render thread/INFO][m [36m(BiomeModificationImpl)[m [0mApplied 0 biome modifications to 0 of 74 new biomes in 716.5 μs
+[m[34m[16:42:01][m [32m[Server thread/INFO][m [36m(Minecraft)[m [0mStarting integrated minecraft server version 1.21
+[m[34m[16:42:01][m [32m[Server thread/INFO][m [36m(Minecraft)[m [0mGenerating keypair
+[m[34m[16:42:02][m [32m[Server thread/INFO][m [36m(Minecraft)[m [0mPreparing start region for dimension minecraft:overworld
+[m[34m[16:42:02][m [32m[Render thread/INFO][m [36m(Minecraft)[m [0mPreparing spawn area: 0%
+[m[34m[16:42:02][m [32m[Render thread/INFO][m [36m(Minecraft)[m [0mTime elapsed: 219 ms
+[m[34m[16:42:02][m [32m[Server thread/INFO][m [36m(Minecraft)[m [0mChanging view distance to 12, from 10
+[m[34m[16:42:02][m [32m[Server thread/INFO][m [36m(Minecraft)[m [0mChanging simulation distance to 12, from 0
+[m[34m[16:42:03][m [32m[Server thread/INFO][m [36m(Minecraft)[m [0mPlayer75[local:E:fe1b963b] logged in with entity id 57 at (-5.5, 95.0, -0.5)
+[m[34m[16:42:03][m [32m[Server thread/INFO][m [36m(Minecraft)[m [0mPlayer75 joined the game
+[m[34m[16:42:03][m [32m[Render thread/INFO][m [36m(Minecraft)[m [0mLoaded 2 advancements
+[m[34m[16:42:04][m [31m[Render thread/ERROR][m [36m(Minecraft)[m [31mUnreported exception thrown!
+[m java.lang.NullPointerException: Cannot invoke "java.util.Optional.orElse(Object)" because the return value of "net.minecraft.core.component.DataComponentPatch.get(net.minecraft.core.component.DataComponentType)" is null
+	at earth.terrarium.botarium.fabric.fluid.holder.FabricFluidHolder.getCompound(FabricFluidHolder.java:99) ~[botarium-fabric-1.21-3.2.7.jar:?]
+	at earth.terrarium.botarium.fabric.fluid.holder.FabricFluidHolder.of(FabricFluidHolder.java:37) ~[botarium-fabric-1.21-3.2.7.jar:?]
+	at earth.terrarium.botarium.fabric.fluid.storage.PlatformFluidItemHandler.insertFluid(PlatformFluidItemHandler.java:39) ~[botarium-fabric-1.21-3.2.7.jar:?]
+	at earth.terrarium.adastra.common.utils.FluidUtils.fluidFilledItem(FluidUtils.java:49) ~[15574429968929691533.jar:?]
+	at earth.terrarium.adastra.common.registry.ModCreativeTab.getCustomNbtItems(ModCreativeTab.java:37) ~[15574429968929691533.jar:?]
+	at earth.terrarium.adastra.common.registry.ModCreativeTab.lambda$static$2(ModCreativeTab.java:29) ~[15574429968929691533.jar:?]
+	at net.minecraft.world.item.CreativeModeTab.buildContents(CreativeModeTab.java:102) ~[minecraft-merged-c2b31d572c-1.21-loom.mappings.1_21.layered+hash.317000953-v2.jar:?]
+	at net.minecraft.world.item.CreativeModeTabs.method_47338(CreativeModeTabs.java:2166) ~[minecraft-merged-c2b31d572c-1.21-loom.mappings.1_21.layered+hash.317000953-v2.jar:?]
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:184) ~[?:?]
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179) ~[?:?]
+	at java.base/java.util.Iterator.forEachRemaining(Iterator.java:133) ~[?:?]
+	at java.base/java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1939) ~[?:?]
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:509) ~[?:?]
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:499) ~[?:?]
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:151) ~[?:?]
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:174) ~[?:?]
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234) ~[?:?]
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596) ~[?:?]
+	at net.minecraft.world.item.CreativeModeTabs.buildAllTabContents(CreativeModeTabs.java:2166) ~[minecraft-merged-c2b31d572c-1.21-loom.mappings.1_21.layered+hash.317000953-v2.jar:?]
+	at net.minecraft.world.item.CreativeModeTabs.tryRebuildTabContents(CreativeModeTabs.java:2177) ~[minecraft-merged-c2b31d572c-1.21-loom.mappings.1_21.layered+hash.317000953-v2.jar:?]
+	at net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen.tryRebuildTabContents(CreativeModeInventoryScreen.java:245) ~[minecraft-merged-c2b31d572c-1.21-loom.mappings.1_21.layered+hash.317000953-v2.jar:?]
+	at net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen.<init>(CreativeModeInventoryScreen.java:221) ~[minecraft-merged-c2b31d572c-1.21-loom.mappings.1_21.layered+hash.317000953-v2.jar:?]
+	at net.minecraft.client.gui.screens.inventory.InventoryScreen.init(InventoryScreen.java:50) ~[minecraft-merged-c2b31d572c-1.21-loom.mappings.1_21.layered+hash.317000953-v2.jar:?]
+	at net.minecraft.client.gui.screens.Screen.init(Screen.java:309) ~[minecraft-merged-c2b31d572c-1.21-loom.mappings.1_21.layered+hash.317000953-v2.jar:?]
+	at net.minecraft.client.Minecraft.setScreen(Minecraft.java:1143) ~[minecraft-merged-c2b31d572c-1.21-loom.mappings.1_21.layered+hash.317000953-v2.jar:?]
+	at net.minecraft.client.Minecraft.handleKeybinds(Minecraft.java:2068) ~[minecraft-merged-c2b31d572c-1.21-loom.mappings.1_21.layered+hash.317000953-v2.jar:?]
+	at net.minecraft.client.Minecraft.tick(Minecraft.java:1938) ~[minecraft-merged-c2b31d572c-1.21-loom.mappings.1_21.layered+hash.317000953-v2.jar:?]
+	at net.minecraft.client.Minecraft.runTick(Minecraft.java:1246) ~[minecraft-merged-c2b31d572c-1.21-loom.mappings.1_21.layered+hash.317000953-v2.jar:?]
+	at net.minecraft.client.Minecraft.run(Minecraft.java:882) [minecraft-merged-c2b31d572c-1.21-loom.mappings.1_21.layered+hash.317000953-v2.jar:?]
+	at net.minecraft.client.main.Main.main(Main.java:256) [minecraft-merged-c2b31d572c-1.21-loom.mappings.1_21.layered+hash.317000953-v2.jar:?]
+	at net.fabricmc.loader.impl.game.minecraft.MinecraftGameProvider.launch(MinecraftGameProvider.java:480) [fabric-loader-0.16.3.jar:?]
+	at net.fabricmc.loader.impl.launch.knot.Knot.launch(Knot.java:74) [fabric-loader-0.16.3.jar:?]
+	at net.fabricmc.loader.impl.launch.knot.KnotClient.main(KnotClient.java:23) [fabric-loader-0.16.3.jar:?]
+	at net.fabricmc.devlaunchinjector.Main.main(Main.java:86) [dev-launch-injector-0.2.1+build.8.jar:?]
+	at dev.architectury.transformer.TransformerRuntime.main(TransformerRuntime.java:220) [architectury-transformer-5.2.87-runtime.jar:5.2.87]
+[34m[16:42:04][m [32m[Server thread/INFO][m [36m(Minecraft)[m [0mStopping server
+[m[34m[16:42:04][m [32m[Server thread/INFO][m [36m(Minecraft)[m [0mSaving players
+[m[34m[16:42:04][m [32m[Server thread/INFO][m [36m(Minecraft)[m [0mSaving worlds
+[m[34m[16:42:05][m [32m[Server thread/INFO][m [36m(Minecraft)[m [0mSaving chunks for level 'ServerLevel[New World]'/minecraft:overworld
+[m[34m[16:42:05][m [32m[Server thread/INFO][m [36m(Minecraft)[m [0mSaving chunks for level 'ServerLevel[New World]'/ad_astra:mars
+[m[34m[16:42:05][m [32m[Server thread/INFO][m [36m(Minecraft)[m [0mSaving chunks for level 'ServerLevel[New World]'/minecraft:the_nether
+[m[34m[16:42:05][m [32m[Server thread/INFO][m [36m(Minecraft)[m [0mSaving chunks for level 'ServerLevel[New World]'/ad_astra:moon_orbit
+[m[34m[16:42:05][m [32m[Server thread/INFO][m [36m(Minecraft)[m [0mSaving chunks for level 'ServerLevel[New World]'/ad_astra:venus
+[m[34m[16:42:05][m [32m[Server thread/INFO][m [36m(Minecraft)[m [0mSaving chunks for level 'ServerLevel[New World]'/ad_astra:mercury_orbit
+[m[34m[16:42:05][m [32m[Server thread/INFO][m [36m(Minecraft)[m [0mSaving chunks for level 'ServerLevel[New World]'/ad_astra:venus_orbit
+[m[34m[16:42:05][m [32m[Server thread/INFO][m [36m(Minecraft)[m [0mSaving chunks for level 'ServerLevel[New World]'/ad_astra:glacio_orbit
+[m[34m[16:42:05][m [32m[Server thread/INFO][m [36m(Minecraft)[m [0mSaving chunks for level 'ServerLevel[New World]'/ad_astra:glacio
+[m[34m[16:42:05][m [32m[Server thread/INFO][m [36m(Minecraft)[m [0mSaving chunks for level 'ServerLevel[New World]'/ad_astra:mercury
+[m[34m[16:42:05][m [32m[Server thread/INFO][m [36m(Minecraft)[m [0mSaving chunks for level 'ServerLevel[New World]'/minecraft:the_end
+[m[34m[16:42:05][m [32m[Server thread/INFO][m [36m(Minecraft)[m [0mSaving chunks for level 'ServerLevel[New World]'/ad_astra:earth_orbit
+[m[34m[16:42:05][m [32m[Server thread/INFO][m [36m(Minecraft)[m [0mSaving chunks for level 'ServerLevel[New World]'/ad_astra:mars_orbit
+[m[34m[16:42:05][m [32m[Server thread/INFO][m [36m(Minecraft)[m [0mSaving chunks for level 'ServerLevel[New World]'/ad_astra:moon
+[m[34m[16:42:05][m [32m[Server thread/INFO][m [36m(Minecraft)[m [0mThreadedAnvilChunkStorage (New World (2)): All chunks are saved
+[m[34m[16:42:05][m [32m[Server thread/INFO][m [36m(Minecraft)[m [0mThreadedAnvilChunkStorage (mars): All chunks are saved
+[m[34m[16:42:05][m [32m[Server thread/INFO][m [36m(Minecraft)[m [0mThreadedAnvilChunkStorage (DIM-1): All chunks are saved
+[m[34m[16:42:05][m [32m[Server thread/INFO][m [36m(Minecraft)[m [0mThreadedAnvilChunkStorage (moon_orbit): All chunks are saved
+[m[34m[16:42:05][m [32m[Server thread/INFO][m [36m(Minecraft)[m [0mThreadedAnvilChunkStorage (venus): All chunks are saved
+[m[34m[16:42:05][m [32m[Server thread/INFO][m [36m(Minecraft)[m [0mThreadedAnvilChunkStorage (mercury_orbit): All chunks are saved
+[m[34m[16:42:05][m [32m[Server thread/INFO][m [36m(Minecraft)[m [0mThreadedAnvilChunkStorage (venus_orbit): All chunks are saved
+[m[34m[16:42:05][m [32m[Server thread/INFO][m [36m(Minecraft)[m [0mThreadedAnvilChunkStorage (glacio_orbit): All chunks are saved
+[m[34m[16:42:05][m [32m[Server thread/INFO][m [36m(Minecraft)[m [0mThreadedAnvilChunkStorage (glacio): All chunks are saved
+[m[34m[16:42:05][m [32m[Server thread/INFO][m [36m(Minecraft)[m [0mThreadedAnvilChunkStorage (mercury): All chunks are saved
+[m[34m[16:42:05][m [32m[Server thread/INFO][m [36m(Minecraft)[m [0mThreadedAnvilChunkStorage (DIM1): All chunks are saved
+[m[34m[16:42:05][m [32m[Server thread/INFO][m [36m(Minecraft)[m [0mThreadedAnvilChunkStorage (earth_orbit): All chunks are saved
+[m[34m[16:42:05][m [32m[Server thread/INFO][m [36m(Minecraft)[m [0mThreadedAnvilChunkStorage (mars_orbit): All chunks are saved
+[m[34m[16:42:05][m [32m[Server thread/INFO][m [36m(Minecraft)[m [0mThreadedAnvilChunkStorage (moon): All chunks are saved
+[m[34m[16:42:05][m [32m[Server thread/INFO][m [36m(Minecraft)[m [0mThreadedAnvilChunkStorage: All dimensions are saved
+[m---- Minecraft Crash Report ----
+// Shall we play a game?
+
+Time: 2026-01-01 16:42:05
+Description: Unexpected error
+
+java.lang.NullPointerException: Cannot invoke "java.util.Optional.orElse(Object)" because the return value of "net.minecraft.core.component.DataComponentPatch.get(net.minecraft.core.component.DataComponentType)" is null
+	at earth.terrarium.botarium.fabric.fluid.holder.FabricFluidHolder.getCompound(FabricFluidHolder.java:99)
+	at earth.terrarium.botarium.fabric.fluid.holder.FabricFluidHolder.of(FabricFluidHolder.java:37)
+	at earth.terrarium.botarium.fabric.fluid.storage.PlatformFluidItemHandler.insertFluid(PlatformFluidItemHandler.java:39)
+	at earth.terrarium.adastra.common.utils.FluidUtils.fluidFilledItem(FluidUtils.java:49)
+	at earth.terrarium.adastra.common.registry.ModCreativeTab.getCustomNbtItems(ModCreativeTab.java:37)
+	at earth.terrarium.adastra.common.registry.ModCreativeTab.lambda$static$2(ModCreativeTab.java:29)
+	at net.minecraft.world.item.CreativeModeTab.buildContents(CreativeModeTab.java:102)
+	at net.minecraft.world.item.CreativeModeTabs.method_47338(CreativeModeTabs.java:2166)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:184)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179)
+	at java.base/java.util.Iterator.forEachRemaining(Iterator.java:133)
+	at java.base/java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1939)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:509)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:499)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:151)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:174)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+	at net.minecraft.world.item.CreativeModeTabs.buildAllTabContents(CreativeModeTabs.java:2166)
+	at net.minecraft.world.item.CreativeModeTabs.tryRebuildTabContents(CreativeModeTabs.java:2177)
+	at net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen.tryRebuildTabContents(CreativeModeInventoryScreen.java:245)
+	at net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen.<init>(CreativeModeInventoryScreen.java:221)
+	at net.minecraft.client.gui.screens.inventory.InventoryScreen.init(InventoryScreen.java:50)
+	at net.minecraft.client.gui.screens.Screen.init(Screen.java:309)
+	at net.minecraft.client.Minecraft.setScreen(Minecraft.java:1143)
+	at net.minecraft.client.Minecraft.handleKeybinds(Minecraft.java:2068)
+	at net.minecraft.client.Minecraft.tick(Minecraft.java:1938)
+	at net.minecraft.client.Minecraft.runTick(Minecraft.java:1246)
+	at net.minecraft.client.Minecraft.run(Minecraft.java:882)
+	at net.minecraft.client.main.Main.main(Main.java:256)
+	at net.fabricmc.loader.impl.game.minecraft.MinecraftGameProvider.launch(MinecraftGameProvider.java:480)
+	at net.fabricmc.loader.impl.launch.knot.Knot.launch(Knot.java:74)
+	at net.fabricmc.loader.impl.launch.knot.KnotClient.main(KnotClient.java:23)
+	at net.fabricmc.devlaunchinjector.Main.main(Main.java:86)
+	at dev.architectury.transformer.TransformerRuntime.main(TransformerRuntime.java:220)
+
+
+A detailed walkthrough of the error, its code path and all known details is as follows:
+---------------------------------------------------------------------------------------
+
+-- Head --
+Thread: Render thread
+Stacktrace:
+	at earth.terrarium.botarium.fabric.fluid.holder.FabricFluidHolder.getCompound(FabricFluidHolder.java:99)
+	at earth.terrarium.botarium.fabric.fluid.holder.FabricFluidHolder.of(FabricFluidHolder.java:37)
+	at earth.terrarium.botarium.fabric.fluid.storage.PlatformFluidItemHandler.insertFluid(PlatformFluidItemHandler.java:39)
+	at earth.terrarium.adastra.common.utils.FluidUtils.fluidFilledItem(FluidUtils.java:49)
+	at earth.terrarium.adastra.common.registry.ModCreativeTab.getCustomNbtItems(ModCreativeTab.java:37)
+	at earth.terrarium.adastra.common.registry.ModCreativeTab.lambda$static$2(ModCreativeTab.java:29)
+	at net.minecraft.world.item.CreativeModeTab.buildContents(CreativeModeTab.java:102)
+	at net.minecraft.world.item.CreativeModeTabs.method_47338(CreativeModeTabs.java:2166)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:184)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179)
+	at java.base/java.util.Iterator.forEachRemaining(Iterator.java:133)
+	at java.base/java.util.Spliterators$IteratorSpliterator.forEachRemaining(Spliterators.java:1939)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:509)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:499)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:151)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:174)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+	at net.minecraft.world.item.CreativeModeTabs.buildAllTabContents(CreativeModeTabs.java:2166)
+	at net.minecraft.world.item.CreativeModeTabs.tryRebuildTabContents(CreativeModeTabs.java:2177)
+	at net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen.tryRebuildTabContents(CreativeModeInventoryScreen.java:245)
+	at net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen.<init>(CreativeModeInventoryScreen.java:221)
+	at net.minecraft.client.gui.screens.inventory.InventoryScreen.init(InventoryScreen.java:50)
+	at net.minecraft.client.gui.screens.Screen.init(Screen.java:309)
+	at net.minecraft.client.Minecraft.setScreen(Minecraft.java:1143)
+	at net.minecraft.client.Minecraft.handleKeybinds(Minecraft.java:2068)
+
+-- Uptime --
+Details:
+	JVM uptime: 57.033s
+	Wall uptime: 49.661s
+	High-res time: 47.924s
+	Client ticks: 887 ticks / 44.350s
+Stacktrace:
+	at net.minecraft.client.Minecraft.fillReport(Minecraft.java:2501)
+	at net.minecraft.client.Minecraft.emergencySaveAndCrash(Minecraft.java:949)
+	at net.minecraft.client.Minecraft.run(Minecraft.java:905)
+	at net.minecraft.client.main.Main.main(Main.java:256)
+	at net.fabricmc.loader.impl.game.minecraft.MinecraftGameProvider.launch(MinecraftGameProvider.java:480)
+	at net.fabricmc.loader.impl.launch.knot.Knot.launch(Knot.java:74)
+	at net.fabricmc.loader.impl.launch.knot.KnotClient.main(KnotClient.java:23)
+	at net.fabricmc.devlaunchinjector.Main.main(Main.java:86)
+	at dev.architectury.transformer.TransformerRuntime.main(TransformerRuntime.java:220)
+
+-- Affected level --
+Details:
+	All players: 1 total; [LocalPlayer['Player75'/57, l='ClientLevel', x=-5.50, y=95.00, z=-0.50]]
+	Chunk stats: 961, 55
+	Level dimension: minecraft:overworld
+	Level spawn location: World: (0,92,0), Section: (at 0,12,0 in 0,5,0; chunk contains blocks 0,-64,0 to 15,319,15), Region: (0,0; contains chunks 0,0 to 31,31, blocks 0,-64,0 to 511,319,511)
+	Level time: 83 game time, 83 day time
+	Server brand: fabric
+	Server type: Integrated singleplayer server
+	Tracked entity count: 64
+
+-- Last reload --
+Details:
+	Reload number: 1
+	Reload reason: initial
+	Finished: Yes
+	Packs: vanilla, fabric, fabric-api, fabric-api-base, fabric-api-lookup-api-v1, fabric-biome-api-v1, fabric-block-api-v1, fabric-block-view-api-v2, fabric-blockrenderlayer-v1, fabric-client-tags-api-v1, fabric-command-api-v1, fabric-command-api-v2, fabric-commands-v0, fabric-content-registries-v0, fabric-convention-tags-v1, fabric-convention-tags-v2, fabric-crash-report-info-v1, fabric-data-attachment-api-v1, fabric-data-generation-api-v1, fabric-dimensions-v1, fabric-entity-events-v1, fabric-events-interaction-v0, fabric-game-rule-api-v1, fabric-gametest-api-v1, fabric-item-api-v1, fabric-item-group-api-v1, fabric-key-binding-api-v1, fabric-keybindings-v0, fabric-lifecycle-events-v1, fabric-loot-api-v2, fabric-loot-api-v3, fabric-message-api-v1, fabric-model-loading-api-v1, fabric-networking-api-v1, fabric-object-builder-api-v1, fabric-particles-v1, fabric-recipe-api-v1, fabric-registry-sync-v0, fabric-renderer-api-v1, fabric-renderer-indigo, fabric-renderer-registries-v1, fabric-rendering-data-attachment-v1, fabric-rendering-fluids-v1, fabric-rendering-v0, fabric-rendering-v1, fabric-resource-conditions-api-v1, fabric-resource-loader-v0, fabric-screen-api-v1, fabric-screen-handler-api-v1, fabric-sound-api-v1, fabric-transfer-api-v1, fabric-transitive-access-wideners-v1, fabricloader, generated_dae75eb, modmenu, resourcefulconfig, team_reborn_energy
+
+-- System Details --
+Details:
+	Minecraft Version: 1.21
+	Minecraft Version ID: 1.21
+	Operating System: Mac OS X (aarch64) version 26.2
+	Java Version: 21.0.7, Oracle Corporation
+	Java VM Version: Java HotSpot(TM) 64-Bit Server VM (mixed mode, sharing), Oracle Corporation
+	Memory: 999440000 bytes (953 MiB) / 2315255808 bytes (2208 MiB) up to 8589934592 bytes (8192 MiB)
+	CPUs: 12
+	Processor Vendor: Apple Inc.
+	Processor Name: Apple M2 Max
+	Identifier: Apple Inc. Family 0xda33d83d Model 0 Stepping 0
+	Microarchitecture: ARM64 SoC: Avalanche + Blizzard
+	Frequency (GHz): 3.70
+	Number of physical packages: 1
+	Number of physical CPUs: 12
+	Number of logical CPUs: 12
+	Graphics card #0 name: Apple M2 Max
+	Graphics card #0 vendor: Apple (0x106b)
+	Graphics card #0 VRAM (MiB): 0.00
+	Graphics card #0 deviceId: unknown
+	Graphics card #0 versionInfo: unknown
+	Memory slot #0 capacity (MiB): 0.00
+	Memory slot #0 clockSpeed (GHz): 0.00
+	Memory slot #0 type: unknown
+	Virtual memory max (MiB): 35840.00
+	Virtual memory used (MiB): 27086.34
+	Swap memory total (MiB): 3072.00
+	Swap memory used (MiB): 2568.19
+	Space in storage for jna.tmpdir (MiB): <path not set>
+	Space in storage for org.lwjgl.system.SharedLibraryExtractPath (MiB): <path not set>
+	Space in storage for io.netty.native.workdir (MiB): <path not set>
+	Space in storage for java.io.tmpdir (MiB): available: 67016.65, total: 1902758.38
+	Space in storage for workdir (MiB): available: 67016.65, total: 1902758.38
+	JVM Flags: 0 total; 
+	Fabric Mods: 
+		ad_astra: Ad Astra 1.16.6
+		botarium: Botarium 3.2.5
+		fabric-api: Fabric API 0.102.0+1.21
+		fabric-api-base: Fabric API Base 0.4.42+6573ed8cd1
+		fabric-api-lookup-api-v1: Fabric API Lookup API (v1) 1.6.68+b5597344d1
+		fabric-biome-api-v1: Fabric Biome API (v1) 13.0.29+5bd9f1bcd1
+		fabric-block-api-v1: Fabric Block API (v1) 1.0.22+0af3f5a7d1
+		fabric-block-view-api-v2: Fabric BlockView API (v2) 1.0.10+6573ed8cd1
+		fabric-blockrenderlayer-v1: Fabric BlockRenderLayer Registration (v1) 1.1.52+0af3f5a7d1
+		fabric-client-tags-api-v1: Fabric Client Tags 1.1.15+6573ed8cd1
+		fabric-command-api-v1: Fabric Command API (v1) 1.2.49+f71b366fd1
+		fabric-command-api-v2: Fabric Command API (v2) 2.2.28+6ced4dd9d1
+		fabric-commands-v0: Fabric Commands (v0) 0.2.66+df3654b3d1
+		fabric-content-registries-v0: Fabric Content Registries (v0) 8.0.16+b5597344d1
+		fabric-convention-tags-v1: Fabric Convention Tags 2.0.19+7f945d5bd1
+		fabric-convention-tags-v2: Fabric Convention Tags (v2) 2.5.0+c5e2b5c6d1
+		fabric-crash-report-info-v1: Fabric Crash Report Info (v1) 0.2.29+0af3f5a7d1
+		fabric-data-attachment-api-v1: Fabric Data Attachment API (v1) 1.1.27+6a6dfa19d1
+		fabric-data-generation-api-v1: Fabric Data Generation API (v1) 20.2.16+16c4ae25d1
+		fabric-dimensions-v1: Fabric Dimensions API (v1) 4.0.0+6fc22b99d1
+		fabric-entity-events-v1: Fabric Entity Events (v1) 1.6.12+6fc22b99d1
+		fabric-events-interaction-v0: Fabric Events Interaction (v0) 0.7.12+ba9dae06d1
+		fabric-game-rule-api-v1: Fabric Game Rule API (v1) 1.0.53+6ced4dd9d1
+		fabric-gametest-api-v1: Fabric Game Test API (v1) 2.0.4+6fc22b99d1
+		fabric-item-api-v1: Fabric Item API (v1) 11.0.0+afdfc921d1
+		fabric-item-group-api-v1: Fabric Item Group API (v1) 4.1.4+78017270d1
+		fabric-key-binding-api-v1: Fabric Key Binding API (v1) 1.0.47+0af3f5a7d1
+		fabric-keybindings-v0: Fabric Key Bindings (v0) 0.2.45+df3654b3d1
+		fabric-lifecycle-events-v1: Fabric Lifecycle Events (v1) 2.3.12+6c1df360d1
+		fabric-loot-api-v2: Fabric Loot API (v2) 3.0.14+3f89f5a5d1
+		fabric-loot-api-v3: Fabric Loot API (v3) 1.0.2+3f89f5a5d1
+		fabric-message-api-v1: Fabric Message API (v1) 6.0.13+6573ed8cd1
+		fabric-model-loading-api-v1: Fabric Model Loading API (v1) 2.0.0+fe474d6bd1
+		fabric-networking-api-v1: Fabric Networking API (v1) 4.2.2+60c3209bd1
+		fabric-object-builder-api-v1: Fabric Object Builder API (v1) 15.2.0+a551f7a4d1
+		fabric-particles-v1: Fabric Particles (v1) 4.0.2+6573ed8cd1
+		fabric-recipe-api-v1: Fabric Recipe API (v1) 5.0.12+65089712d1
+		fabric-registry-sync-v0: Fabric Registry Sync (v0) 5.1.2+60c3209bd1
+		fabric-renderer-api-v1: Fabric Renderer API (v1) 3.4.0+c705a49cd1
+		fabric-renderer-indigo: Fabric Renderer - Indigo 1.7.0+c705a49cd1
+		fabric-renderer-registries-v1: Fabric Renderer Registries (v1) 3.2.68+df3654b3d1
+		fabric-rendering-data-attachment-v1: Fabric Rendering Data Attachment (v1) 0.3.48+73761d2ed1
+		fabric-rendering-fluids-v1: Fabric Rendering Fluids (v1) 3.1.6+b5597344d1
+		fabric-rendering-v0: Fabric Rendering (v0) 1.1.71+df3654b3d1
+		fabric-rendering-v1: Fabric Rendering (v1) 5.0.5+df16efd0d1
+		fabric-resource-conditions-api-v1: Fabric Resource Conditions API (v1) 4.3.0+8dc279b1d1
+		fabric-resource-loader-v0: Fabric Resource Loader (v0) 1.3.0+56599129d1
+		fabric-screen-api-v1: Fabric Screen API (v1) 2.0.24+b5597344d1
+		fabric-screen-handler-api-v1: Fabric Screen Handler API (v1) 1.3.86+b5597344d1
+		fabric-sound-api-v1: Fabric Sound API (v1) 1.0.23+6573ed8cd1
+		fabric-transfer-api-v1: Fabric Transfer API (v1) 5.1.16+3dccd343d1
+		fabric-transitive-access-wideners-v1: Fabric Transitive Access Wideners (v1) 6.1.0+176f9036d1
+		fabricloader: Fabric Loader 0.16.3
+		generated_dae75eb: Generated Mod (Please Ignore) 1.0.0
+		java: Java HotSpot(TM) 64-Bit Server VM 21
+		minecraft: Minecraft 1.21
+		mixinextras: MixinExtras 0.4.1
+		modmenu: Mod Menu 11.0.1
+		resourcefulconfig: Resourcefulconfig 3.0.0
+		resourcefullib: Resourceful Lib 3.0.0
+		team_reborn_energy: Energy 4.1.0
+	Launched Version: Fabric
+	Backend library: LWJGL version 3.3.3-snapshot
+	Backend API: Apple M2 Max GL version 4.1 Metal - 90.5, Apple
+	Window size: 1708x960
+	GFLW Platform: cocoa
+	GL Caps: Using framebuffer using OpenGL 3.2
+	GL debug messages: <disabled>
+	Is Modded: Definitely; Client brand changed to 'fabric'; Server brand changed to 'fabric'
+	Universe: 400921fb54442d18
+	Type: Integrated Server (map_client.txt)
+	GPU Warnings: version: Metal
+	Graphics mode: fancy
+	Render Distance: 12/12 chunks
+	Resource Packs: vanilla, fabric, fabric-api, fabric-api-base, fabric-api-lookup-api-v1, fabric-biome-api-v1, fabric-block-api-v1, fabric-block-view-api-v2, fabric-blockrenderlayer-v1, fabric-client-tags-api-v1, fabric-command-api-v1, fabric-command-api-v2, fabric-commands-v0, fabric-content-registries-v0, fabric-convention-tags-v1, fabric-convention-tags-v2, fabric-crash-report-info-v1, fabric-data-attachment-api-v1, fabric-data-generation-api-v1, fabric-dimensions-v1, fabric-entity-events-v1, fabric-events-interaction-v0, fabric-game-rule-api-v1, fabric-gametest-api-v1, fabric-item-api-v1, fabric-item-group-api-v1, fabric-key-binding-api-v1, fabric-keybindings-v0, fabric-lifecycle-events-v1, fabric-loot-api-v2, fabric-loot-api-v3, fabric-message-api-v1, fabric-model-loading-api-v1, fabric-networking-api-v1, fabric-object-builder-api-v1, fabric-particles-v1, fabric-recipe-api-v1, fabric-registry-sync-v0, fabric-renderer-api-v1, fabric-renderer-indigo, fabric-renderer-registries-v1, fabric-rendering-data-attachment-v1, fabric-rendering-fluids-v1, fabric-rendering-v0, fabric-rendering-v1, fabric-resource-conditions-api-v1, fabric-resource-loader-v0, fabric-screen-api-v1, fabric-screen-handler-api-v1, fabric-sound-api-v1, fabric-transfer-api-v1, fabric-transitive-access-wideners-v1, fabricloader, generated_dae75eb, modmenu, resourcefulconfig, team_reborn_energy
+	Current Language: en_us
+	Locale: en_US
+	System encoding: UTF-8
+	File encoding: UTF-8
+	CPU: 12x Apple M2 Max
+	Server Running: true
+	Player Count: 1 / 8; [ServerPlayer['Player75'/57, l='ServerLevel[New World]', x=-5.50, y=95.00, z=-0.50]]
+	Active Data Packs: vanilla, fabric, ad_astra, fabric-convention-tags-v2, fabric-gametest-api-v1, generated_dae75eb
+	Available Data Packs: ad_astra, bundle, fabric, fabric-convention-tags-v2, fabric-gametest-api-v1, generated_dae75eb, trade_rebalance, vanilla
+	Enabled Feature Flags: minecraft:vanilla
+	World Generation: Experimental
+	World Seed: 8622124760609362378
+#@!@# Game crashed! Crash report saved to: #@!@# /Users/alextodd/temp/Github-NOTSYNCED/Ad-Astra/fabric/run/crash-reports/crash-2026-01-01_16.42.05-client.txt
+
+> Task :fabric:runClient FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':fabric:runClient'.
+> Process 'command '/Library/Java/JavaVirtualMachines/jdk-21.jdk/Contents/Home/bin/java'' finished with non-zero exit value 255
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.8/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD FAILED in 1m 8s
+14 actionable tasks: 9 executed, 5 up-to-date

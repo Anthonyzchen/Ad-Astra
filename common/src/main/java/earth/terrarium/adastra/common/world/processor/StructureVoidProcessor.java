@@ -1,6 +1,6 @@
 package earth.terrarium.adastra.common.world.processor;
 
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import earth.terrarium.adastra.common.registry.ModStructures;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.LevelReader;
@@ -13,14 +13,16 @@ import org.jetbrains.annotations.Nullable;
 
 public class StructureVoidProcessor extends StructureProcessor {
 
-    public static final Codec<StructureVoidProcessor> CODEC = Codec.unit(StructureVoidProcessor::new);
+    public static final MapCodec<StructureVoidProcessor> CODEC = MapCodec.unit(StructureVoidProcessor::new);
 
     private StructureVoidProcessor() {
     }
 
     @Nullable
     @Override
-    public StructureTemplate.StructureBlockInfo processBlock(LevelReader level, BlockPos pos, BlockPos pivot, StructureTemplate.StructureBlockInfo structureBlockInfo, StructureTemplate.StructureBlockInfo structureBlockInfo2, StructurePlaceSettings data) {
+    public StructureTemplate.StructureBlockInfo processBlock(LevelReader level, BlockPos pos, BlockPos pivot,
+            StructureTemplate.StructureBlockInfo structureBlockInfo,
+            StructureTemplate.StructureBlockInfo structureBlockInfo2, StructurePlaceSettings data) {
         if (structureBlockInfo2.state().getBlock().equals(Blocks.STRUCTURE_VOID)) {
             return null;
         }

@@ -2,6 +2,7 @@ package earth.terrarium.adastra.common.world.biome;
 
 import com.google.common.collect.Streams;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.Holder;
 import net.minecraft.util.ExtraCodecs;
@@ -16,13 +17,13 @@ import java.util.stream.Stream;
 
 public class CratersBiomeSource extends BiomeSource {
 
-    public static final Codec<CratersBiomeSource> CODEC = RecordCodecBuilder.create(instance ->
-        instance.group(
+    public static final MapCodec<CratersBiomeSource> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
             Biome.CODEC.fieldOf("default_biome").forGetter(source -> source.defaultBiome),
-            ExtraCodecs.nonEmptyList(DepthBiome.CODEC.listOf()).listOf().fieldOf("biomes").forGetter(source -> source.allowedBiomes),
-            Codec.doubleRange(Double.MIN_VALUE, 1).fieldOf("erosion_threshold").orElse(0.5).forGetter(source -> source.erosionThreshold)
-        ).apply(instance, CratersBiomeSource::new)
-    );
+            ExtraCodecs.nonEmptyList(DepthBiome.CODEC.listOf()).listOf().fieldOf("biomes")
+                    .forGetter(source -> source.allowedBiomes),
+            Codec.doubleRange(Double.MIN_VALUE, 1).fieldOf("erosion_threshold").orElse(0.5)
+                    .forGetter(source -> source.erosionThreshold))
+            .apply(instance, CratersBiomeSource::new));
 
     private final Holder<Biome> defaultBiome;
     private final List<List<DepthBiome>> allowedBiomes;
@@ -35,45 +36,49 @@ public class CratersBiomeSource extends BiomeSource {
     }
 
     @Override
-    protected Codec<? extends BiomeSource> codec() {
+    protected MapCodec<? extends BiomeSource> codec() {
         return CODEC;
     }
 
     @Override
     protected Stream<Holder<Biome>> collectPossibleBiomes() {
-        return Streams.concat(Stream.of(defaultBiome), this.allowedBiomes.stream().flatMap(List::stream).map(DepthBiome::biome));
+        return Streams.concat(Stream.of(defaultBiome),
+                this.allowedBiomes.stream().flatMap(List::stream).map(DepthBiome::biome));
     }
 
     @Override
     public Holder<Biome> getNoiseBiome(int x, int y, int z, Climate.Sampler climateSampler) {
-        if (allowedBiomes.isEmpty()) return defaultBiome;
+        if (allowedBiomes.isEmpty())
+            return defaultBiome;
 
         DensityFunction.SinglePointContext context = new DensityFunction.SinglePointContext(x, y, z);
 
         // Only include values deemed high enough by the config
-        if (climateSampler.erosion().compute(context) <= erosionThreshold) return defaultBiome;
+        if (climateSampler.erosion().compute(context) <= erosionThreshold)
+            return defaultBiome;
 
         // Calculate an evaluation cube that only includes one biome index
         int cubeX = x - 8 >> 6;
         int cubeZ = z - 8 >> 6;
-        int biomeIndex = (int) ((cubeX * 31 ^ cubeZ + Climate.quantizeCoord((float) climateSampler.humidity().compute(context))) % allowedBiomes.size());
+        int biomeIndex = (int) ((cubeX * 31
+                ^ cubeZ + Climate.quantizeCoord((float) climateSampler.humidity().compute(context)))
+                % allowedBiomes.size());
 
         List<DepthBiome> biomes = allowedBiomes.get(biomeIndex);
 
         // Compare depth of biomes and see which is closest to the current point
         long depth = Climate.quantizeCoord((float) climateSampler.depth().compute(context));
 
-        return biomes.stream().min(Comparator.comparingDouble(depthBiome -> depthBiome.depth().distance(depth))).map(DepthBiome::biome).orElse(defaultBiome);
+        return biomes.stream().min(Comparator.comparingDouble(depthBiome -> depthBiome.depth().distance(depth)))
+                .map(DepthBiome::biome).orElse(defaultBiome);
     }
 
     // Holder<Biome> with depth parameter
     public record DepthBiome(Holder<Biome> biome, Climate.Parameter depth) {
 
-        public static final Codec<DepthBiome> CODEC = RecordCodecBuilder.create(instance ->
-            instance.group(
+        public static final Codec<DepthBiome> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                 Biome.CODEC.fieldOf("biome").forGetter(DepthBiome::biome),
-                Climate.Parameter.CODEC.fieldOf("depth").forGetter(DepthBiome::depth)
-            ).apply(instance, DepthBiome::new)
-        );
+                Climate.Parameter.CODEC.fieldOf("depth").forGetter(DepthBiome::depth))
+                .apply(instance, DepthBiome::new));
     }
 }

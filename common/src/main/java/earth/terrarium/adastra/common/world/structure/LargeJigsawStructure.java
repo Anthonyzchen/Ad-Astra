@@ -1,6 +1,7 @@
 package earth.terrarium.adastra.common.world.structure;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import earth.terrarium.adastra.common.registry.ModStructures;
@@ -19,7 +20,9 @@ import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool;
 import net.minecraft.world.level.levelgen.structure.pools.alias.PoolAliasBinding;
 import net.minecraft.world.level.levelgen.structure.pools.alias.PoolAliasLookup;
 import net.minecraft.world.level.levelgen.structure.structures.JigsawStructure;
+import net.minecraft.world.level.levelgen.structure.templatesystem.LiquidSettings;
 
+import net.minecraft.world.level.levelgen.structure.pools.DimensionPadding;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,83 +32,93 @@ import java.util.Optional;
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class LargeJigsawStructure extends Structure {
 
-    public static final int MAX_DEPTH = 50;
-    public static final Codec<LargeJigsawStructure> CODEC = ExtraCodecs.validate(
-        RecordCodecBuilder.mapCodec(instance -> instance.group(
-                settingsCodec(instance),
-                StructureTemplatePool.CODEC.fieldOf("start_pool").forGetter(jigsawStructure -> jigsawStructure.startPool),
-                ResourceLocation.CODEC.optionalFieldOf("start_jigsaw_name").forGetter(jigsawStructure -> jigsawStructure.startJigsawName),
-                Codec.intRange(0, MAX_DEPTH).fieldOf("size").forGetter(jigsawStructure -> jigsawStructure.maxDepth),
-                HeightProvider.CODEC.fieldOf("start_height").forGetter(jigsawStructure -> jigsawStructure.startHeight),
-                Codec.BOOL.fieldOf("use_expansion_hack").forGetter(jigsawStructure -> jigsawStructure.useExpansionHack),
-                Heightmap.Types.CODEC.optionalFieldOf("project_start_to_heightmap").forGetter(jigsawStructure -> jigsawStructure.projectStartToHeightmap),
-                Codec.intRange(1, JigsawStructure.MAX_TOTAL_STRUCTURE_RANGE).fieldOf("max_distance_from_center").forGetter(jigsawStructure -> jigsawStructure.maxDistanceFromCenter),
-                Codec.list(PoolAliasBinding.CODEC).optionalFieldOf("pool_aliases", List.of()).forGetter(jigsawStructure -> jigsawStructure.poolAliases)
-            ).apply(instance, LargeJigsawStructure::new)
-        ), LargeJigsawStructure::verifyRange
-    ).codec();
+        public static final int MAX_DEPTH = 50;
+        public static final MapCodec<LargeJigsawStructure> CODEC = RecordCodecBuilder
+                        .mapCodec((RecordCodecBuilder.Instance<LargeJigsawStructure> instance) -> instance.group(
+                                        settingsCodec(instance),
+                                        StructureTemplatePool.CODEC.fieldOf("start_pool")
+                                                        .forGetter((LargeJigsawStructure jigsawStructure) -> jigsawStructure.startPool),
+                                        ResourceLocation.CODEC.optionalFieldOf("start_jigsaw_name")
+                                                        .forGetter((LargeJigsawStructure jigsawStructure) -> jigsawStructure.startJigsawName),
+                                        Codec.intRange(0, MAX_DEPTH).fieldOf("size").forGetter((
+                                                        LargeJigsawStructure jigsawStructure) -> jigsawStructure.maxDepth),
+                                        HeightProvider.CODEC.fieldOf("start_height")
+                                                        .forGetter((LargeJigsawStructure jigsawStructure) -> jigsawStructure.startHeight),
+                                        Codec.BOOL.fieldOf("use_expansion_hack")
+                                                        .forGetter((LargeJigsawStructure jigsawStructure) -> jigsawStructure.useExpansionHack),
+                                        Heightmap.Types.CODEC.optionalFieldOf("project_start_to_heightmap")
+                                                        .forGetter((LargeJigsawStructure jigsawStructure) -> jigsawStructure.projectStartToHeightmap),
+                                        Codec.intRange(1, JigsawStructure.MAX_TOTAL_STRUCTURE_RANGE)
+                                                        .fieldOf("max_distance_from_center")
+                                                        .forGetter((LargeJigsawStructure jigsawStructure) -> jigsawStructure.maxDistanceFromCenter),
+                                        Codec.list(PoolAliasBinding.CODEC).optionalFieldOf("pool_aliases", List.of())
+                                                        .forGetter((LargeJigsawStructure jigsawStructure) -> jigsawStructure.poolAliases))
+                                        .apply(instance, LargeJigsawStructure::new))
+                        .validate(LargeJigsawStructure::verifyRange);
 
-    private final Holder<StructureTemplatePool> startPool;
-    private final Optional<ResourceLocation> startJigsawName;
-    private final int maxDepth;
-    private final HeightProvider startHeight;
-    private final boolean useExpansionHack;
-    private final Optional<Heightmap.Types> projectStartToHeightmap;
-    private final int maxDistanceFromCenter;
-    private final List<PoolAliasBinding> poolAliases;
+        private final Holder<StructureTemplatePool> startPool;
+        private final Optional<ResourceLocation> startJigsawName;
+        private final int maxDepth;
+        private final HeightProvider startHeight;
+        private final boolean useExpansionHack;
+        private final Optional<Heightmap.Types> projectStartToHeightmap;
+        private final int maxDistanceFromCenter;
+        private final List<PoolAliasBinding> poolAliases;
 
-    private static DataResult<LargeJigsawStructure> verifyRange(LargeJigsawStructure structure) {
-        int i = switch (structure.terrainAdaptation()) {
-            case NONE -> 0;
-            case BURY, BEARD_THIN, BEARD_BOX -> 12;
-        };
-        return structure.maxDistanceFromCenter + i > 128
-            ? DataResult.error(() -> "Structure size including terrain adaptation must not exceed 128")
-            : DataResult.success(structure);
-    }
+        private static DataResult<LargeJigsawStructure> verifyRange(LargeJigsawStructure structure) {
+                int i = switch (structure.terrainAdaptation()) {
+                        case NONE -> 0;
+                        default -> 12;
+                };
+                return structure.maxDistanceFromCenter + i > 128
+                                ? DataResult.error(
+                                                () -> "Structure size including terrain adaptation must not exceed 128")
+                                : DataResult.success(structure);
+        }
 
-    public LargeJigsawStructure(
-        Structure.StructureSettings settings,
-        Holder<StructureTemplatePool> startPool,
-        Optional<ResourceLocation> startJigsawName,
-        int maxDepth,
-        HeightProvider startHeight,
-        boolean useExpansionHack,
-        Optional<Heightmap.Types> projectStartToHeightmap,
-        int maxDistanceFromCenter,
-        List<PoolAliasBinding> poolAliases
-    ) {
-        super(settings);
-        this.startPool = startPool;
-        this.startJigsawName = startJigsawName;
-        this.maxDepth = maxDepth;
-        this.startHeight = startHeight;
-        this.useExpansionHack = useExpansionHack;
-        this.projectStartToHeightmap = projectStartToHeightmap;
-        this.maxDistanceFromCenter = maxDistanceFromCenter;
-        this.poolAliases = poolAliases;
-    }
+        public LargeJigsawStructure(
+                        Structure.StructureSettings settings,
+                        Holder<StructureTemplatePool> startPool,
+                        Optional<ResourceLocation> startJigsawName,
+                        int maxDepth,
+                        HeightProvider startHeight,
+                        boolean useExpansionHack,
+                        Optional<Heightmap.Types> projectStartToHeightmap,
+                        int maxDistanceFromCenter,
+                        List<PoolAliasBinding> poolAliases) {
+                super(settings);
+                this.startPool = startPool;
+                this.startJigsawName = startJigsawName;
+                this.maxDepth = maxDepth;
+                this.startHeight = startHeight;
+                this.useExpansionHack = useExpansionHack;
+                this.projectStartToHeightmap = projectStartToHeightmap;
+                this.maxDistanceFromCenter = maxDistanceFromCenter;
+                this.poolAliases = poolAliases;
+        }
 
-    @Override
-    public Optional<Structure.GenerationStub> findGenerationPoint(Structure.GenerationContext context) {
-        ChunkPos chunkPos = context.chunkPos();
-        int i = this.startHeight.sample(context.random(), new WorldGenerationContext(context.chunkGenerator(), context.heightAccessor()));
-        BlockPos blockPos = new BlockPos(chunkPos.getMinBlockX(), i, chunkPos.getMinBlockZ());
-        return JigsawPlacement.addPieces(
-            context,
-            this.startPool,
-            this.startJigsawName,
-            this.maxDepth,
-            blockPos,
-            this.useExpansionHack,
-            this.projectStartToHeightmap,
-            this.maxDistanceFromCenter,
-            PoolAliasLookup.create(this.poolAliases, blockPos, context.seed())
-        );
-    }
+        @Override
+        public Optional<Structure.GenerationStub> findGenerationPoint(Structure.GenerationContext context) {
+                ChunkPos chunkPos = context.chunkPos();
+                int i = this.startHeight.sample(context.random(),
+                                new WorldGenerationContext(context.chunkGenerator(), context.heightAccessor()));
+                BlockPos blockPos = new BlockPos(chunkPos.getMinBlockX(), i, chunkPos.getMinBlockZ());
+                return JigsawPlacement.addPieces(
+                                context,
+                                this.startPool,
+                                this.startJigsawName,
+                                this.maxDepth,
+                                blockPos,
+                                this.useExpansionHack,
+                                this.projectStartToHeightmap,
+                                this.maxDistanceFromCenter,
+                                PoolAliasLookup.create(this.poolAliases, blockPos, context.seed()),
+                                DimensionPadding.ZERO,
+                                LiquidSettings.APPLY_WATERLOGGING);
+        }
 
-    @Override
-    public StructureType<?> type() {
-        return ModStructures.LARGE_JIGSAW_STRUCTURE.get();
-    }
+        @Override
+        public StructureType<?> type() {
+                return ModStructures.LARGE_JIGSAW_STRUCTURE.get();
+        }
 }

@@ -50,7 +50,8 @@ public class SlidingDoorBlock extends BasicEntityBlock implements Wrenchable {
     public static final BooleanProperty OPEN = BlockStateProperties.OPEN;
     public static final BooleanProperty LOCKED = BlockStateProperties.LOCKED;
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
-    public static final EnumProperty<SlidingDoorPartProperty> PART = EnumProperty.create("part", SlidingDoorPartProperty.class);
+    public static final EnumProperty<SlidingDoorPartProperty> PART = EnumProperty.create("part",
+            SlidingDoorPartProperty.class);
 
     private static final VoxelShape NORTH_SHAPE = Block.box(0, 0, 1, 16, 16, 4);
     private static final VoxelShape EAST_SHAPE = Block.box(12, 0, 0, 15, 16, 16);
@@ -60,11 +61,11 @@ public class SlidingDoorBlock extends BasicEntityBlock implements Wrenchable {
     public SlidingDoorBlock(Properties properties) {
         super(properties.pushReaction(PushReaction.BLOCK), true);
         registerDefaultState(stateDefinition.any()
-            .setValue(FACING, Direction.NORTH)
-            .setValue(OPEN, false)
-            .setValue(LOCKED, false)
-            .setValue(POWERED, false)
-            .setValue(PART, SlidingDoorPartProperty.BOTTOM));
+                .setValue(FACING, Direction.NORTH)
+                .setValue(OPEN, false)
+                .setValue(LOCKED, false)
+                .setValue(POWERED, false)
+                .setValue(PART, SlidingDoorPartProperty.BOTTOM));
     }
 
     @Override
@@ -88,7 +89,8 @@ public class SlidingDoorBlock extends BasicEntityBlock implements Wrenchable {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable BlockGetter level, List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, net.minecraft.world.item.Item.TooltipContext context,
+            List<Component> tooltip, TooltipFlag flag) {
         TooltipUtils.addDescriptionComponent(tooltip, ConstantComponents.SLIDING_DOOR_INFO);
     }
 
@@ -98,13 +100,12 @@ public class SlidingDoorBlock extends BasicEntityBlock implements Wrenchable {
         if (!controllerState.getValues().containsKey(PART)) {
             return super.getCollisionShape(state, level, pos, context);
         }
-        return controllerState.getValue(OPEN) || controllerState.getValue(POWERED) ?
-            Shapes.empty() :
-            super.getCollisionShape(state, level, pos, context);
+        return controllerState.getValue(OPEN) || controllerState.getValue(POWERED) ? Shapes.empty()
+                : super.getCollisionShape(state, level, pos, context);
     }
 
     @Override
-    public boolean isPathfindable(BlockState state, BlockGetter level, BlockPos pos, PathComputationType type) {
+    public boolean isPathfindable(BlockState state, PathComputationType type) {
         return switch (type) {
             case LAND, AIR -> state.getValue(OPEN) || state.getValue(POWERED);
             case WATER -> false;
@@ -137,13 +138,17 @@ public class SlidingDoorBlock extends BasicEntityBlock implements Wrenchable {
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player,
+            BlockHitResult hit) {
         var controllerPos = getController(state, pos);
         var controllerState = level.getBlockState(controllerPos);
-        if (controllerState.isAir()) return InteractionResult.PASS;
+        if (controllerState.isAir())
+            return InteractionResult.PASS;
         boolean locked = controllerState.getValue(LOCKED);
-        if (level.isClientSide()) return locked ? InteractionResult.PASS : InteractionResult.SUCCESS;
-        if (locked) return InteractionResult.PASS;
+        if (level.isClientSide())
+            return locked ? InteractionResult.PASS : InteractionResult.SUCCESS;
+        if (locked)
+            return InteractionResult.PASS;
 
         // set all parts to the same state
         var direction = state.getValue(FACING).getClockWise();
@@ -165,23 +170,27 @@ public class SlidingDoorBlock extends BasicEntityBlock implements Wrenchable {
     }
 
     @Override
-    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos neighborPos, boolean movedByPiston) {
+    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos neighborPos,
+            boolean movedByPiston) {
         if (!level.isClientSide()) {
             BlockPos controllerPos = getController(state, pos);
             BlockState controllerState = level.getBlockState(controllerPos);
             if (controllerState.getBlock() instanceof SlidingDoorBlock) {
-                level.setBlock(controllerPos, controllerState.setValue(POWERED, level.hasNeighborSignal(pos)), Block.UPDATE_CLIENTS);
+                level.setBlock(controllerPos, controllerState.setValue(POWERED, level.hasNeighborSignal(pos)),
+                        Block.UPDATE_CLIENTS);
             }
         }
     }
 
     @Override
     public boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
-        if (!Block.canSupportRigidBlock(level, pos.below())) return false;
+        if (!Block.canSupportRigidBlock(level, pos.below()))
+            return false;
         Direction direction = state.getValue(FACING).getClockWise();
         for (var part : SlidingDoorPartProperty.values()) {
             BlockPos offset = pos.relative(direction, part.xOffset()).above(part.yOffset());
-            if (!level.getBlockState(offset).isAir()) return false;
+            if (!level.getBlockState(offset).isAir())
+                return false;
         }
         return true;
     }
@@ -237,6 +246,7 @@ public class SlidingDoorBlock extends BasicEntityBlock implements Wrenchable {
                 user.displayClientMessage(ConstantComponents.DOOR_LOCKED, true);
             }
         }
-        level.playSound(null, pos, ModSoundEvents.WRENCH.get(), SoundSource.BLOCKS, 1, level.random.nextFloat() * 0.2f + 0.9f);
+        level.playSound(null, pos, ModSoundEvents.WRENCH.get(), SoundSource.BLOCKS, 1,
+                level.random.nextFloat() * 0.2f + 0.9f);
     }
 }

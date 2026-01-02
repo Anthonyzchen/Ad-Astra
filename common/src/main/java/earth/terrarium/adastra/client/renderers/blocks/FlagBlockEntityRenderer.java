@@ -27,13 +27,17 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.SkullBlock;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
+import net.minecraft.world.item.component.ResolvableProfile;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
 
 public class FlagBlockEntityRenderer implements BlockEntityRenderer<FlagBlockEntity> {
 
     @Override
-    public void render(FlagBlockEntity entity, float partialTick, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay) {
+    public void render(FlagBlockEntity entity, float partialTick, PoseStack poseStack, MultiBufferSource buffer,
+            int packedLight, int packedOverlay) {
         var state = entity.getBlockState();
         var direction = state.getValue(FlagBlock.FACING);
         var minecraft = Minecraft.getInstance();
@@ -46,18 +50,20 @@ public class FlagBlockEntityRenderer implements BlockEntityRenderer<FlagBlockEnt
             if (state.getValue(FlagBlock.HALF).equals(DoubleBlockHalf.LOWER)) {
                 var model = minecraft.getBlockRenderer().getBlockModel(state);
                 minecraft.getBlockRenderer().getModelRenderer().renderModel(poseStack.last(),
-                    buffer.getBuffer(Sheets.cutoutBlockSheet()),
-                    state,
-                    model,
-                    1f, 1f, 1f,
-                    packedLight, packedOverlay);
+                        buffer.getBuffer(Sheets.cutoutBlockSheet()),
+                        state,
+                        model,
+                        1f, 1f, 1f,
+                        packedLight, packedOverlay);
             } else {
                 FlagContent content = entity.getContent();
                 if (content == null) {
                     pose.translate(-0.75, 0.19, 0.495);
                     pose.scale(1, 1, 0.1f / 16f);
-                    SkullModelBase model = new SkullModel(minecraft.getEntityModels().bakeLayer(ModelLayers.PLAYER_HEAD));
-                    RenderType renderType = SkullBlockRenderer.getRenderType(SkullBlock.Types.PLAYER, entity.getOwner());
+                    SkullModelBase model = new SkullModel(
+                            minecraft.getEntityModels().bakeLayer(ModelLayers.PLAYER_HEAD));
+                    RenderType renderType = SkullBlockRenderer.getRenderType(SkullBlock.Types.PLAYER,
+                            new ResolvableProfile(entity.getOwner()));
                     SkullBlockRenderer.renderSkull(null, 0, 0, pose, buffer, packedLight, model, renderType);
 
                     pose.translate(0.5, 0, 0.5);
@@ -79,7 +85,8 @@ public class FlagBlockEntityRenderer implements BlockEntityRenderer<FlagBlockEnt
                     pose.scale(1 + 5.8f / 16f, 1, 1);
 
                     pose.translate(-11 / 16f, -15 / 16f, 0.495);
-                    renderQuad(matrix4f, matrix3fNormal, normal, consumer, 1, 1, 0, 0, 1, 1, packedLight, packedOverlay);
+                    renderQuad(matrix4f, matrix3fNormal, normal, consumer, 1, 1, 0, 0, 1, 1, packedLight,
+                            packedOverlay);
 
                     pose.translate(0.5, 0, 0.5);
                     pose.mulPose(Axis.YP.rotationDegrees(180));
@@ -87,17 +94,29 @@ public class FlagBlockEntityRenderer implements BlockEntityRenderer<FlagBlockEnt
 
                     pose.translate(0, 0, 0.99);
 
-                    renderQuad(matrix4f, matrix3fNormal, normal, consumer, 1, 1, 0, 0, 1, 1, packedLight, packedOverlay);
+                    renderQuad(matrix4f, matrix3fNormal, normal, consumer, 1, 1, 0, 0, 1, 1, packedLight,
+                            packedOverlay);
                 }
             }
         }
     }
 
-    private static void renderQuad(Matrix4f pose, Matrix3f matrix3fNormal, Vec3i normal, VertexConsumer consumer, float width, float height, float u, float v, float uWidth, float vHeight, int light, int overlay) {
-        consumer.vertex(pose, 0, 0, 0).color(255, 255, 255, 255).uv(u, v).overlayCoords(overlay).uv2(light).normal(matrix3fNormal, normal.getX(), normal.getY(), normal.getZ()).endVertex();
-        consumer.vertex(pose, 0, height, 0).color(255, 255, 255, 255).uv(u, v + vHeight).overlayCoords(overlay).uv2(light).normal(matrix3fNormal, normal.getX(), normal.getY(), normal.getZ()).endVertex();
-        consumer.vertex(pose, width, height, 0).color(255, 255, 255, 255).uv(u + uWidth, v + vHeight).overlayCoords(overlay).uv2(light).normal(matrix3fNormal, normal.getX(), normal.getY(), normal.getZ()).endVertex();
-        consumer.vertex(pose, width, 0, 0).color(255, 255, 255, 255).uv(u + uWidth, v).overlayCoords(overlay).uv2(light).normal(matrix3fNormal, normal.getX(), normal.getY(), normal.getZ()).endVertex();
+    private static void renderQuad(Matrix4f pose, Matrix3f matrix3fNormal, Vec3i normal, VertexConsumer consumer,
+            float width, float height, float u, float v, float uWidth, float vHeight, int light, int overlay) {
+        Vector4f v0 = new Vector4f(0, 0, 0, 1.0F).mul(pose);
+        Vector4f v1 = new Vector4f(0, height, 0, 1.0F).mul(pose);
+        Vector4f v2 = new Vector4f(width, height, 0, 1.0F).mul(pose);
+        Vector4f v3 = new Vector4f(width, 0, 0, 1.0F).mul(pose);
+
+        Vector3f n = new Vector3f(normal.getX(), normal.getY(), normal.getZ()).mul(matrix3fNormal);
+        consumer.addVertex(v0.x, v0.y, v0.z).setColor(255, 255, 255, 255).setUv(u, v).setOverlay(overlay)
+                .setLight(light).setNormal(n.x, n.y, n.z);
+        consumer.addVertex(v1.x, v1.y, v1.z).setColor(255, 255, 255, 255).setUv(u, v + vHeight).setOverlay(overlay)
+                .setLight(light).setNormal(n.x, n.y, n.z);
+        consumer.addVertex(v2.x, v2.y, v2.z).setColor(255, 255, 255, 255).setUv(u + uWidth, v + vHeight)
+                .setOverlay(overlay).setLight(light).setNormal(n.x, n.y, n.z);
+        consumer.addVertex(v3.x, v3.y, v3.z).setColor(255, 255, 255, 255).setUv(u + uWidth, v).setOverlay(overlay)
+                .setLight(light).setNormal(n.x, n.y, n.z);
     }
 
     private static RenderType getFlagImage(FlagContent content) {

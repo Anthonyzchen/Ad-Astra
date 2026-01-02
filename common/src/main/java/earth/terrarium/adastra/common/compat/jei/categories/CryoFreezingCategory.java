@@ -26,7 +26,7 @@ import net.minecraft.world.item.crafting.Ingredient;
 
 public record CryoFreezingCategory(IGuiHelper guiHelper) implements IRecipeCategory<CryoFreezingRecipe> {
 
-    public static final ResourceLocation ID = new ResourceLocation(AdAstra.MOD_ID, "cryo_freezing");
+    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "cryo_freezing");
     public static final RecipeType<CryoFreezingRecipe> RECIPE = new RecipeType<>(ID, CryoFreezingRecipe.class);
 
     @Override

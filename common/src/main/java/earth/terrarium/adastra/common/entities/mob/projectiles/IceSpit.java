@@ -31,11 +31,6 @@ public class IceSpit extends ThrowableItemProjectile {
     }
 
     @Override
-    public Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return new ClientboundAddEntityPacket(this);
-    }
-
-    @Override
     public void tick() {
         super.tick();
         double x = this.getX();

@@ -18,6 +18,7 @@ import earth.terrarium.botarium.common.energy.impl.WrappedBlockEnergyContainer;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
@@ -38,8 +39,8 @@ import java.util.function.Predicate;
 public class GravityNormalizerBlockEntity extends EnergyContainerMachineBlockEntity {
 
     public static final List<ConfigurationEntry> SIDE_CONFIG = List.of(
-        new ConfigurationEntry(ConfigurationType.ENERGY, Configuration.NONE, ConstantComponents.SIDE_CONFIG_ENERGY)
-    );
+            new ConfigurationEntry(ConfigurationType.ENERGY, Configuration.NONE,
+                    ConstantComponents.SIDE_CONFIG_ENERGY));
 
     private final Set<BlockPos> lastDistributedBlocks = new HashSet<>();
     private long energyPerTick;
@@ -56,10 +57,9 @@ public class GravityNormalizerBlockEntity extends EnergyContainerMachineBlockEnt
         super(pos, state, 1);
     }
 
-
     @Override
-    public void load(@NotNull CompoundTag tag) {
-        super.load(tag);
+    public void loadAdditional(@NotNull CompoundTag tag, HolderLookup.@NotNull Provider registries) {
+        super.loadAdditional(tag, registries);
         if (tag.contains("LastDistributedBlocks")) {
             lastDistributedBlocks.clear();
             for (var pos : tag.getLongArray("LastDistributedBlocks")) {
@@ -73,8 +73,8 @@ public class GravityNormalizerBlockEntity extends EnergyContainerMachineBlockEnt
     }
 
     @Override
-    protected void saveAdditional(@NotNull CompoundTag tag) {
-        super.saveAdditional(tag);
+    protected void saveAdditional(@NotNull CompoundTag tag, HolderLookup.@NotNull Provider registries) {
+        super.saveAdditional(tag, registries);
         tag.putLong("EnergyPerTick", energyPerTick);
         tag.putInt("DistributedBlocksCount", distributedBlocksCount);
         tag.putInt("Limit", limit);
@@ -87,12 +87,13 @@ public class GravityNormalizerBlockEntity extends EnergyContainerMachineBlockEnt
     }
 
     @Override
-    public WrappedBlockEnergyContainer getEnergyStorage(Level level, BlockPos pos, BlockState state, @Nullable BlockEntity entity, @Nullable Direction direction) {
-        if (this.energyContainer != null) return this.energyContainer;
+    public WrappedBlockEnergyContainer getEnergyStorage(Level level, BlockPos pos, BlockState state,
+            @Nullable BlockEntity entity, @Nullable Direction direction) {
+        if (this.energyContainer != null)
+            return this.energyContainer;
         return this.energyContainer = new WrappedBlockEnergyContainer(
-            this,
-            EnergyUtils.machineInsertOnlyEnergy(MachineConfig.DESH)
-        );
+                this,
+                EnergyUtils.machineInsertOnlyEnergy(MachineConfig.DESH));
     }
 
     @Override
@@ -108,7 +109,8 @@ public class GravityNormalizerBlockEntity extends EnergyContainerMachineBlockEnt
             getEnergyStorage().internalExtract(calculateEnergyPerTick(), false);
             setLit(true);
 
-            if (time % MachineConfig.distributionRefreshRate == 0) tickGravity(level, pos);
+            if (time % MachineConfig.distributionRefreshRate == 0)
+                tickGravity(level, pos);
 
             if (time % 200 == 0) {
                 level.playSound(null, pos, ModSoundEvents.GRAVITY_NORMALIZER_IDLE.get(), SoundSource.BLOCKS, 0.3f, 1);
@@ -117,7 +119,8 @@ public class GravityNormalizerBlockEntity extends EnergyContainerMachineBlockEnt
             clearGravityBlocks();
             shutDownTicks = 60;
             setLit(false);
-        } else if (time % 10 == 0) setLit(false);
+        } else if (time % 10 == 0)
+            setLit(false);
 
         energyPerTick = canDistribute ? calculateEnergyPerTick() : 0;
         distributedBlocksCount = canDistribute ? lastDistributedBlocks.size() : 0;
@@ -164,11 +167,12 @@ public class GravityNormalizerBlockEntity extends EnergyContainerMachineBlockEnt
             if (AdAstraConfigClient.showGravityNormalizerArea) {
                 AdAstraClient.GRAVITY_OVERLAY_RENDERER.removePositions(pos);
                 if (AdAstraClient.GRAVITY_OVERLAY_RENDERER.canAdd(pos)
-                    && canFunction()
-                    && canCraftDistribution()) {
+                        && canFunction()
+                        && canCraftDistribution()) {
                     AdAstraClient.GRAVITY_OVERLAY_RENDERER.addPositions(pos, lastDistributedBlocks);
                 }
-            } else AdAstraClient.GRAVITY_OVERLAY_RENDERER.clearPositions();
+            } else
+                AdAstraClient.GRAVITY_OVERLAY_RENDERER.clearPositions();
         }
 
         lastAnimation = animation;
@@ -216,16 +220,16 @@ public class GravityNormalizerBlockEntity extends EnergyContainerMachineBlockEnt
 
     @Override
     public int @NotNull [] getSlotsForFace(@NotNull Direction side) {
-        return new int[]{};
+        return new int[] {};
     }
 
     // Only sync positions when recalculating the distributed blocks.
     @Override
-    public @NotNull CompoundTag getUpdateTag() {
-        var tag = super.getUpdateTag();
+    public @NotNull CompoundTag getUpdateTag(HolderLookup.@NotNull Provider registries) {
+        var tag = super.getUpdateTag(registries);
         if (shouldSyncPositions) {
             tag.putLongArray("LastDistributedBlocks", lastDistributedBlocks.stream()
-                .mapToLong(BlockPos::asLong).toArray());
+                    .mapToLong(BlockPos::asLong).toArray());
             shouldSyncPositions = false;
         }
         return tag;

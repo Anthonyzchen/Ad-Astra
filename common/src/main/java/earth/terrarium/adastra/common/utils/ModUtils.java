@@ -28,7 +28,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.portal.PortalInfo;
+import net.minecraft.world.level.portal.DimensionTransition;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.Locale;
@@ -36,33 +36,40 @@ import java.util.Optional;
 
 public final class ModUtils {
 
-    public static <T extends ParticleOptions> void sendParticles(ServerLevel level, T particle, double x, double y, double z, int count, double deltaX, double deltaY, double deltaZ, double speed) {
+    public static <T extends ParticleOptions> void sendParticles(ServerLevel level, T particle, double x, double y,
+            double z, int count, double deltaX, double deltaY, double deltaZ, double speed) {
         for (ServerPlayer player : level.players()) {
             level.sendParticles(player, particle, true, x, y, z, count, deltaX, deltaY, deltaZ, speed);
         }
     }
 
     /**
-     * Gets the machine from a menu packet, if the player is within 8 blocks of the machine and has the menu open.
+     * Gets the machine from a menu packet, if the player is within 8 blocks of the
+     * machine and has the menu open.
      *
      * @param pos    the position of the machine
      * @param player the player sending the packet
      * @param level  the level the machine is in
-     * @return the machine, if the player is within 8 blocks of the machine and has the menu open
+     * @return the machine, if the player is within 8 blocks of the machine and has
+     *         the menu open
      */
-    public static Optional<ContainerMachineBlockEntity> getMachineFromMenuPacket(BlockPos pos, Player player, Level level) {
+    public static Optional<ContainerMachineBlockEntity> getMachineFromMenuPacket(BlockPos pos, Player player,
+            Level level) {
         if (!(player.containerMenu instanceof BaseContainerMenu<?>))
             return Optional.empty(); // ensure the sender has the menu open
         if (player.distanceToSqr(pos.getCenter()) > 64)
             return Optional.empty(); // ensure the sender within 8 blocks of the machine
         BlockEntity blockEntity = level.getBlockEntity(pos);
-        if (!(blockEntity instanceof ContainerMachineBlockEntity container)) return Optional.empty();
+        if (!(blockEntity instanceof ContainerMachineBlockEntity container))
+            return Optional.empty();
         return Optional.of(container);
     }
 
     /**
-     * Checks if the player is able to teleport to a planet. This is successful if the player is in creative, spectator,
-     * OP, or is in a rocket that is above the atmosphere leave config value and with a high enough tier to reach the
+     * Checks if the player is able to teleport to a planet. This is successful if
+     * the player is in creative, spectator,
+     * OP, or is in a rocket that is above the atmosphere leave config value and
+     * with a high enough tier to reach the
      * target planet.
      *
      * @param player       the player to check
@@ -70,16 +77,21 @@ public final class ModUtils {
      * @return true if the player can teleport to the planet, false otherwise
      */
     public static boolean canTeleportToPlanet(Player player, Planet targetPlanet) {
-        if (!(player.containerMenu instanceof PlanetsMenu)) return false;
-        if (player.isCreative() || player.isSpectator() || player.hasPermissions(2)) return true;
+        if (!(player.containerMenu instanceof PlanetsMenu))
+            return false;
+        if (player.isCreative() || player.isSpectator() || player.hasPermissions(2))
+            return true;
 
         String[] planets = AdAstraConfig.disabledPlanets.split(",");
         for (var planet : planets) {
-            if (planet.equals(targetPlanet.dimension().location().toString())) return false;
+            if (planet.equals(targetPlanet.dimension().location().toString()))
+                return false;
         }
 
-        if (!(player.getVehicle() instanceof Rocket rocket)) return false;
-        if (rocket.getY() < AdAstraConfig.atmosphereLeave) return false;
+        if (!(player.getVehicle() instanceof Rocket rocket))
+            return false;
+        if (rocket.getY() < AdAstraConfig.atmosphereLeave)
+            return false;
         return rocket.tier() >= targetPlanet.tier();
     }
 
@@ -92,7 +104,8 @@ public final class ModUtils {
     }
 
     public static Direction relative(Direction from, Direction to) {
-        if (to.getAxis().isVertical()) return to;
+        if (to.getAxis().isVertical())
+            return to;
         return switch (from) {
             case EAST -> to.getClockWise();
             case SOUTH -> to.getOpposite();
@@ -102,7 +115,8 @@ public final class ModUtils {
     }
 
     public static Entity teleportToDimension(Entity entity, ServerLevel level) {
-        PortalInfo target = new PortalInfo(entity.position(), entity.getDeltaMovement(), entity.getYRot(), entity.getXRot());
+        DimensionTransition target = new DimensionTransition(level, entity.position(), entity.getDeltaMovement(),
+                entity.getYRot(), entity.getXRot(), DimensionTransition.DO_NOTHING);
         return PlatformUtils.teleportToDimension(entity, level, target);
     }
 
@@ -112,9 +126,11 @@ public final class ModUtils {
         player.moveTo(pos);
         var teleportedPlayer = teleportToDimension(player, targetLevel);
 
-        if (!(vehicle instanceof Rocket rocket)) return;
+        if (!(vehicle instanceof Rocket rocket))
+            return;
         Lander lander = ModEntityTypes.LANDER.get().create(targetLevel);
-        if (lander == null) return;
+        if (lander == null)
+            return;
         lander.setPos(pos);
         targetLevel.addFreshEntity(lander);
         teleportedPlayer.startRiding(lander);
@@ -134,7 +150,8 @@ public final class ModUtils {
 
     public static <B> ByteCodec<B> toByteCodec(Codec<B> codec, String notFound, String failedToParse) {
         return ByteCodec.passthrough((buf, item) -> {
-            DataResult<YabnElement> result = codec.encodeStart(RegistryOps.create(YabnOps.COMPRESSED, AdAstra.getRegistryAccess()), item);
+            DataResult<YabnElement> result = codec
+                    .encodeStart(RegistryOps.create(YabnOps.COMPRESSED, AdAstra.getRegistryAccess()), item);
             Optional<YabnElement> optional = result.result();
             optional.ifPresentOrElse(element -> {
                 byte[] bytes = element.toFullData();
@@ -147,9 +164,11 @@ public final class ModUtils {
                 int length = ByteBufUtils.readVarInt(buf);
                 byte[] bytes = new byte[length];
                 buf.readBytes(bytes);
-                return codec.parse(RegistryOps.create(YabnOps.COMPRESSED, AdAstra.getRegistryAccess()), YabnParser.parse(new ArrayByteReader(bytes)))
-                    .result()
-                    .orElseThrow(() -> new RuntimeException(failedToParse));
+                return codec
+                        .parse(RegistryOps.create(YabnOps.COMPRESSED, AdAstra.getRegistryAccess()),
+                                YabnParser.parse(new ArrayByteReader(bytes)))
+                        .result()
+                        .orElseThrow(() -> new RuntimeException(failedToParse));
             }
             throw new RuntimeException(notFound);
         });

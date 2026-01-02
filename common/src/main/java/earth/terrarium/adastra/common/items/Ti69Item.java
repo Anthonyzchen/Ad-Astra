@@ -23,7 +23,8 @@ public class Ti69Item extends Item {
     }
 
     @Override
-    public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, @NotNull List<Component> tooltipComponents, @NotNull TooltipFlag isAdvanced) {
+    public void appendHoverText(@NotNull ItemStack stack, @NotNull Item.TooltipContext context,
+            @NotNull List<Component> tooltipComponents, @NotNull TooltipFlag isAdvanced) {
         TooltipUtils.addDescriptionComponent(tooltipComponents, ConstantComponents.TI_69_INFO);
     }
 }

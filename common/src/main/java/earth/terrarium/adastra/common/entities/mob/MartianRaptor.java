@@ -5,7 +5,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.MobType;
+// import net.minecraft.world.entity.MobType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
@@ -26,8 +26,8 @@ public class MartianRaptor extends Monster {
 
     public static AttributeSupplier.Builder createMobAttributes() {
         return Monster.createMonsterAttributes().add(Attributes.MOVEMENT_SPEED, 0.3)
-            .add(Attributes.MAX_HEALTH, 26)
-            .add(Attributes.ATTACK_DAMAGE, 8);
+                .add(Attributes.MAX_HEALTH, 26)
+                .add(Attributes.ATTACK_DAMAGE, 8);
     }
 
     @Override
@@ -41,10 +41,10 @@ public class MartianRaptor extends Monster {
         this.goalSelector.addGoal(7, new WaterAvoidingRandomStrollGoal(this, 1.0));
     }
 
-    @Override
-    public MobType getMobType() {
-        return MobType.UNDEAD;
-    }
+    // @Override
+    // public MobType getMobType() {
+    // return MobType.UNDEAD;
+    // }
 
     @Override
     protected SoundEvent getHurtSound(DamageSource source) {

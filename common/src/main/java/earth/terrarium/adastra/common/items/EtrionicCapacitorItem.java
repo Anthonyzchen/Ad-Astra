@@ -23,6 +23,9 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
+
 import java.util.List;
 
 public class EtrionicCapacitorItem extends Item implements BotariumEnergyItem<WrappedItemEnergyContainer> {
@@ -35,55 +38,62 @@ public class EtrionicCapacitorItem extends Item implements BotariumEnergyItem<Wr
     }
 
     public static boolean active(ItemStack stack) {
-        var tag = stack.getOrCreateTag();
-        if (tag.contains(ACTIVE_TAG)) {
-            return tag.getBoolean(ACTIVE_TAG);
+        try {
+            net.minecraft.world.item.component.CustomData customData = stack.get(DataComponents.CUSTOM_DATA);
+            if (customData != null && customData.contains(ACTIVE_TAG)) {
+                return customData.copyTag().getBoolean(ACTIVE_TAG);
+            }
+        } catch (Exception e) {
         }
         return true;
     }
 
     public static boolean toggleActive(ItemStack stack) {
-        var tag = stack.getOrCreateTag();
-        var active = active(stack);
-        tag.putBoolean(ACTIVE_TAG, !active);
+        boolean active = active(stack);
+        net.minecraft.world.item.component.CustomData.update(DataComponents.CUSTOM_DATA, stack,
+                tag -> tag.putBoolean(ACTIVE_TAG, !active));
         return !active;
     }
 
     public static DistributionMode mode(ItemStack stack) {
-        var tag = stack.getOrCreateTag();
-        if (tag.contains(MODE_TAG)) {
-            return DistributionMode.values()[tag.getByte(MODE_TAG)];
+        try {
+            net.minecraft.world.item.component.CustomData customData = stack.get(DataComponents.CUSTOM_DATA);
+            if (customData != null && customData.contains(MODE_TAG)) {
+                return DistributionMode.values()[customData.copyTag().getByte(MODE_TAG)];
+            }
+        } catch (Exception e) {
         }
         return DistributionMode.SEQUENTIAL;
     }
 
     public static DistributionMode toggleMode(ItemStack stack) {
-        var tag = stack.getOrCreateTag();
         var mode = mode(stack);
         var toggled = mode == DistributionMode.SEQUENTIAL ? DistributionMode.ROUND_ROBIN : DistributionMode.SEQUENTIAL;
-        tag.putByte(MODE_TAG, (byte) toggled.ordinal());
+        net.minecraft.world.item.component.CustomData.update(DataComponents.CUSTOM_DATA, stack,
+                tag -> tag.putByte(MODE_TAG, (byte) toggled.ordinal()));
         return toggled;
     }
 
     @Override
     public WrappedItemEnergyContainer getEnergyStorage(ItemStack holder) {
         return new WrappedItemEnergyContainer(
-            holder,
-            new SimpleEnergyContainer(250_000) {
-                @Override
-                public long maxInsert() {
-                    return 250;
-                }
+                holder,
+                new SimpleEnergyContainer(250_000) {
+                    @Override
+                    public long maxInsert() {
+                        return 250;
+                    }
 
-                @Override
-                public long maxExtract() {
-                    return 500;
-                }
-            });
+                    @Override
+                    public long maxExtract() {
+                        return 500;
+                    }
+                });
     }
 
     @Override
-    public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, @NotNull List<Component> tooltipComponents, @NotNull TooltipFlag isAdvanced) {
+    public void appendHoverText(@NotNull ItemStack stack, @NotNull Item.TooltipContext context,
+            @NotNull List<Component> tooltipComponents, @NotNull TooltipFlag isAdvanced) {
         var energy = getEnergyStorage(stack);
         tooltipComponents.add(TooltipUtils.getEnergyComponent(energy.getStoredEnergy(), energy.getMaxCapacity()));
         tooltipComponents.add(TooltipUtils.getActiveInactiveComponent(active(stack)));
@@ -94,7 +104,8 @@ public class EtrionicCapacitorItem extends Item implements BotariumEnergyItem<Wr
     }
 
     @Override
-    public @NotNull InteractionResultHolder<ItemStack> use(Level level, @NotNull Player player, @NotNull InteractionHand usedHand) {
+    public @NotNull InteractionResultHolder<ItemStack> use(Level level, @NotNull Player player,
+            @NotNull InteractionHand usedHand) {
         if (level.isClientSide()) {
             return InteractionResultHolder.pass(player.getItemInHand(usedHand));
         }
@@ -102,24 +113,32 @@ public class EtrionicCapacitorItem extends Item implements BotariumEnergyItem<Wr
 
         if (player.isShiftKeyDown()) {
             var mode = toggleMode(stack);
-            player.displayClientMessage(mode == DistributionMode.SEQUENTIAL ? ConstantComponents.CHANGE_MODE_SEQUENTIAL : ConstantComponents.CHANGE_MODE_ROUND_ROBIN, true);
+            player.displayClientMessage(mode == DistributionMode.SEQUENTIAL ? ConstantComponents.CHANGE_MODE_SEQUENTIAL
+                    : ConstantComponents.CHANGE_MODE_ROUND_ROBIN, true);
         } else {
             boolean active = toggleActive(stack);
-            player.displayClientMessage(active ? ConstantComponents.CAPACITOR_ENABLED : ConstantComponents.CAPACITOR_DISABLED, true);
+            player.displayClientMessage(
+                    active ? ConstantComponents.CAPACITOR_ENABLED : ConstantComponents.CAPACITOR_DISABLED, true);
         }
 
         return InteractionResultHolder.pass(stack);
     }
 
     @Override
-    public void inventoryTick(@NotNull ItemStack stack, @NotNull Level level, @NotNull Entity entity, int slotId, boolean isSelected) {
-        if (level.isClientSide()) return;
-        if (entity.tickCount % 5 == 0) return;
-        if (!active(stack)) return;
-        if (!(entity instanceof Player player)) return;
+    public void inventoryTick(@NotNull ItemStack stack, @NotNull Level level, @NotNull Entity entity, int slotId,
+            boolean isSelected) {
+        if (level.isClientSide())
+            return;
+        if (entity.tickCount % 5 == 0)
+            return;
+        if (!active(stack))
+            return;
+        if (!(entity instanceof Player player))
+            return;
         Inventory inventory = player.getInventory();
         var container = getEnergyStorage(stack);
-        if (container.getStoredEnergy() == 0) return;
+        if (container.getStoredEnergy() == 0)
+            return;
         ItemStackHolder from = new ItemStackHolder(stack);
         switch (mode(stack)) {
             case SEQUENTIAL -> distributeSequential(from, container.maxExtract() * 5, inventory);
@@ -131,26 +150,32 @@ public class EtrionicCapacitorItem extends Item implements BotariumEnergyItem<Wr
     public void distributeSequential(ItemStackHolder from, long maxExtract, Inventory inventory) {
         for (int i = inventory.getContainerSize() - 1; i >= 0; i--) {
             var stack = inventory.getItem(i);
-            if (stack.isEmpty() || stack.is(this)) continue;
+            if (stack.isEmpty() || stack.is(this))
+                continue;
             ItemStackHolder to = new ItemStackHolder(stack);
             long moved = EnergyApi.moveEnergy(from, to, maxExtract, false);
             inventory.setItem(i, to.getStack());
-            if (moved > 0) return;
+            if (moved > 0)
+                return;
         }
     }
 
     public void distributeRoundRobin(ItemStackHolder from, long maxExtract, Inventory inventory) {
         int energyItems = 0;
         for (int i = 0; i < inventory.getContainerSize(); i++) {
-            if (!EnergyContainer.holdsEnergy(inventory.getItem(i))) continue;
-            if (inventory.getItem(i).is(this)) continue;
+            if (!EnergyContainer.holdsEnergy(inventory.getItem(i)))
+                continue;
+            if (inventory.getItem(i).is(this))
+                continue;
             energyItems++;
         }
-        if (energyItems == 0) return;
+        if (energyItems == 0)
+            return;
 
         for (int i = 0; i < inventory.getContainerSize(); i++) {
             var stack = inventory.getItem(i);
-            if (stack.isEmpty() || stack.is(this)) continue;
+            if (stack.isEmpty() || stack.is(this))
+                continue;
             ItemStackHolder to = new ItemStackHolder(stack);
             EnergyApi.moveEnergy(from, to, maxExtract / energyItems, false);
             inventory.setItem(i, to.getStack());
@@ -176,7 +201,8 @@ public class EtrionicCapacitorItem extends Item implements BotariumEnergyItem<Wr
     // Fabric disabling of nbt change animation
     @SuppressWarnings("unused")
     @PlatformOnly(PlatformOnly.FABRIC)
-    public boolean allowNbtUpdateAnimation(Player player, InteractionHand hand, ItemStack oldStack, ItemStack newStack) {
+    public boolean allowNbtUpdateAnimation(Player player, InteractionHand hand, ItemStack oldStack,
+            ItemStack newStack) {
         return false;
     }
 

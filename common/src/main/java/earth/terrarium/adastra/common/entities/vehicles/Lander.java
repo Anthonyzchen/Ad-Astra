@@ -44,8 +44,8 @@ public class Lander extends Vehicle {
     }
 
     @Override
-    protected Vector3f getPassengerAttachmentPoint(Entity entity, EntityDimensions dimensions, float scale) {
-        return new Vector3f(0, 2.5f, 0);
+    protected Vec3 getPassengerAttachmentPoint(Entity entity, EntityDimensions dimensions, float scale) {
+        return new Vec3(0, 2.5f, 0);
     }
 
     @Override
@@ -61,9 +61,9 @@ public class Lander extends Vehicle {
     @Override
     public Vec3 getDismountLocationForPassenger(LivingEntity passenger) {
         return super.getDismountLocationForPassenger(passenger)
-            .add(passenger.getLookAngle().multiply(1, 0, 1)
-                .normalize()
-                .subtract(0, 2, 0));
+                .add(passenger.getLookAngle().multiply(1, 0, 1)
+                        .normalize()
+                        .subtract(0, 2, 0));
     }
 
     @Override
@@ -88,8 +88,10 @@ public class Lander extends Vehicle {
     @Override
     public void tick() {
         super.tick();
-        if (!onGround()) flightTick();
-        else angle = 0;
+        if (!onGround())
+            flightTick();
+        else
+            angle = 0;
     }
 
     private void flightTick() {
@@ -120,11 +122,10 @@ public class Lander extends Vehicle {
         setYRot(getYRot() + angle);
 
         setDeltaMovement(
-            delta.x(),
+                delta.x(),
 
-            speed,
-            delta.z()
-        );
+                speed,
+                delta.z());
 
         if (isInWater()) {
             setDeltaMovement(delta.x(), Math.min(0.06, delta.y() + 0.15), delta.z());
@@ -133,19 +134,21 @@ public class Lander extends Vehicle {
     }
 
     public void explode() {
-        if (level().isClientSide()) return;
+        if (level().isClientSide())
+            return;
         level().explode(
-            this,
-            getX(), getY(), getZ(),
-            10,
-            OxygenApi.API.hasOxygen(this.level()),
-            Level.ExplosionInteraction.TNT);
+                this,
+                getX(), getY(), getZ(),
+                10,
+                OxygenApi.API.hasOxygen(this.level()),
+                Level.ExplosionInteraction.TNT);
         discard();
     }
 
     @Override
     public boolean causeFallDamage(float fallDistance, float damageMultiplier, DamageSource damageSource) {
-        if (level().isClientSide()) return false;
+        if (level().isClientSide())
+            return false;
         if (fallDistance > 40 && onGround()) {
             explode();
             return true;
@@ -154,21 +157,22 @@ public class Lander extends Vehicle {
     }
 
     public void spawnLanderParticles() {
-        if (!level().isClientSide()) return;
+        if (!level().isClientSide())
+            return;
         for (int i = 0; i < 10; i++) {
             level().addParticle(ModParticleTypes.LARGE_FLAME.get(),
-                getX(), getY() - 0.2, getZ(),
-                Mth.nextDouble(level().random, -0.05, 0.05),
-                Mth.nextDouble(level().random, -0.05, 0.05),
-                Mth.nextDouble(level().random, -0.05, 0.05));
+                    getX(), getY() - 0.2, getZ(),
+                    Mth.nextDouble(level().random, -0.05, 0.05),
+                    Mth.nextDouble(level().random, -0.05, 0.05),
+                    Mth.nextDouble(level().random, -0.05, 0.05));
         }
 
         for (int i = 0; i < 10; i++) {
             level().addParticle(ModParticleTypes.LARGE_SMOKE.get(),
-                getX(), getY() - 0.2, getZ(),
-                Mth.nextDouble(level().random, -0.05, 0.05),
-                Mth.nextDouble(level().random, -0.05, 0.05),
-                Mth.nextDouble(level().random, -0.05, 0.05));
+                    getX(), getY() - 0.2, getZ(),
+                    Mth.nextDouble(level().random, -0.05, 0.05),
+                    Mth.nextDouble(level().random, -0.05, 0.05),
+                    Mth.nextDouble(level().random, -0.05, 0.05));
         }
     }
 

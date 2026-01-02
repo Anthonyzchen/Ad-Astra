@@ -8,7 +8,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.MobType;
+// import net.minecraft.world.entity.MobType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
@@ -33,8 +33,8 @@ public class CorruptedLunarian extends Monster implements RangedAttackMob {
 
     public static AttributeSupplier.Builder createMobAttributes() {
         return Monster.createMonsterAttributes().add(Attributes.MOVEMENT_SPEED, 0.3)
-            .add(Attributes.MAX_HEALTH, 20)
-            .add(Attributes.ATTACK_DAMAGE, 2);
+                .add(Attributes.MAX_HEALTH, 20)
+                .add(Attributes.ATTACK_DAMAGE, 2);
     }
 
     @Override
@@ -55,10 +55,10 @@ public class CorruptedLunarian extends Monster implements RangedAttackMob {
         });
     }
 
-    @Override
-    public MobType getMobType() {
-        return MobType.UNDEAD;
-    }
+    // @Override
+    // public MobType getMobType() {
+    // return MobType.UNDEAD;
+    // }
 
     @Override
     protected SoundEvent getHurtSound(DamageSource source) {
@@ -78,7 +78,8 @@ public class CorruptedLunarian extends Monster implements RangedAttackMob {
         double targetY = target.getY(0.33) - projectile.getY() - 1.1f;
         double targetZ = target.getZ() - this.getZ();
         double calculated = Math.sqrt(targetX * targetX + targetZ * targetZ);
-        projectile.shoot(targetX, targetY + calculated * (double) 0.2f, targetZ, 1.6f, 14 - this.level().getDifficulty().getId() * 4);
+        projectile.shoot(targetX, targetY + calculated * (double) 0.2f, targetZ, 1.6f,
+                14 - this.level().getDifficulty().getId() * 4);
 
         projectile.setSilent(true);
         this.level().addFreshEntity(projectile);

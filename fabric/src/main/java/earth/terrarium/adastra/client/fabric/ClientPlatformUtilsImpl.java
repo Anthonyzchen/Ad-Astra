@@ -23,7 +23,8 @@ public class ClientPlatformUtilsImpl {
         return dispatcher.getModel(id);
     }
 
-    public static void registerArmor(ResourceLocation texture, ModelLayerLocation layer, ClientPlatformUtils.ArmorFactory factory, Item... items) {
+    public static void registerArmor(ResourceLocation texture, ModelLayerLocation layer,
+            ClientPlatformUtils.ArmorFactory factory, Item... items) {
         ArmorRenderer.register((poseStack, buffer, stack, entity, slot, packedLight, original) -> {
             var root = Minecraft.getInstance().getEntityModels().bakeLayer(layer);
             var model = factory.create(root, slot, stack, original);
@@ -32,7 +33,8 @@ public class ClientPlatformUtilsImpl {
                 suit.spawnParticles(entity.level(), entity, original, stack);
             }
 
-            model.renderToBuffer(poseStack, buffer.getBuffer(RenderType.entityTranslucent(texture)), packedLight, OverlayTexture.NO_OVERLAY, 1, 1, 1, 1);
+            model.renderToBuffer(poseStack, buffer.getBuffer(RenderType.entityTranslucent(texture)), packedLight,
+                    OverlayTexture.NO_OVERLAY);
         }, items);
     }
 

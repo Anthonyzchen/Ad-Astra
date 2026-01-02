@@ -9,12 +9,14 @@ import net.minecraft.client.renderer.entity.layers.EnergySwirlLayer;
 import net.minecraft.resources.ResourceLocation;
 
 // LEGACY ENTITY. WILL BE REPLACED IN THE FUTURE.
-public class SulfurCreeperChargeFeatureRenderer extends EnergySwirlLayer<SulfurCreeper, SulfurCreeperModel<SulfurCreeper>> {
+public class SulfurCreeperChargeFeatureRenderer
+        extends EnergySwirlLayer<SulfurCreeper, SulfurCreeperModel<SulfurCreeper>> {
 
-    private static final ResourceLocation SKIN = new ResourceLocation("textures/entity/creeper/creeper_armor.png");
+    private static final ResourceLocation SKIN = ResourceLocation.parse("textures/entity/creeper/creeper_armor.png");
     private final SulfurCreeperModel<SulfurCreeper> model;
 
-    public SulfurCreeperChargeFeatureRenderer(RenderLayerParent<SulfurCreeper, SulfurCreeperModel<SulfurCreeper>> context, EntityModelSet loader) {
+    public SulfurCreeperChargeFeatureRenderer(
+            RenderLayerParent<SulfurCreeper, SulfurCreeperModel<SulfurCreeper>> context, EntityModelSet loader) {
         super(context);
         this.model = new SulfurCreeperModel<>(loader.bakeLayer(SulfurCreeperModel.LAYER_LOCATION));
     }

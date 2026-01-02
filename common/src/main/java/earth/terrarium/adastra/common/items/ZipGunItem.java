@@ -39,7 +39,8 @@ public class ZipGunItem extends Item implements BotariumFluidItem<WrappedItemFlu
     }
 
     @Override
-    public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level level, Player player, @NotNull InteractionHand usedHand) {
+    public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level level, Player player,
+            @NotNull InteractionHand usedHand) {
         ItemStack stack = player.getItemInHand(usedHand);
         if (FluidUtils.hasFluid(stack) || player.isCreative()) {
             player.startUsingItem(usedHand);
@@ -48,9 +49,11 @@ public class ZipGunItem extends Item implements BotariumFluidItem<WrappedItemFlu
     }
 
     @Override
-    public void onUseTick(@NotNull Level level, @NotNull LivingEntity entity, @NotNull ItemStack stack, int remainingUseDuration) {
+    public void onUseTick(@NotNull Level level, @NotNull LivingEntity entity, @NotNull ItemStack stack,
+            int remainingUseDuration) {
         super.onUseTick(level, entity, stack, remainingUseDuration);
-        if (!(entity instanceof Player player)) return;
+        if (!(entity instanceof Player player))
+            return;
 
         ItemStack mainHandItem = entity.getMainHandItem();
         ItemStack offhandItem = entity.getOffhandItem();
@@ -96,25 +99,28 @@ public class ZipGunItem extends Item implements BotariumFluidItem<WrappedItemFlu
 
         if (level.random.nextInt(particleChance) == 0) {
             level.addParticle(
-                ParticleTypes.SNOWFLAKE,
-                entity.getX(),
-                entity.getY() + 1.0,
-                entity.getZ(),
-                lookAngle.x * particleSpeed + level.random.nextGaussian() * 0.03,
-                lookAngle.y * particleSpeed + level.random.nextGaussian() * 0.03,
-                lookAngle.z * particleSpeed + level.random.nextGaussian() * 0.03
-            );
+                    ParticleTypes.SNOWFLAKE,
+                    entity.getX(),
+                    entity.getY() + 1.0,
+                    entity.getZ(),
+                    lookAngle.x * particleSpeed + level.random.nextGaussian() * 0.03,
+                    lookAngle.y * particleSpeed + level.random.nextGaussian() * 0.03,
+                    lookAngle.z * particleSpeed + level.random.nextGaussian() * 0.03);
         }
     }
 
     public boolean consumeFuel(Player player, ItemStack stack, long amount) {
-        if (!(stack.getItem() instanceof ZipGunItem)) return false;
-        if (player.isCreative()) return true;
+        if (!(stack.getItem() instanceof ZipGunItem))
+            return false;
+        if (player.isCreative())
+            return true;
         ItemStackHolder holder = new ItemStackHolder(stack);
         var container = FluidContainer.of(holder);
-        if (container == null) return false;
-        FluidHolder extracted = container.extractFluid(FluidHolder.ofMillibuckets(container.getFirstFluid().getFluid(), FluidConstants.fromMillibuckets(amount)), false);
-        stack.setTag(holder.getStack().getTag());
+        if (container == null)
+            return false;
+        FluidHolder extracted = container.extractFluid(FluidHolder.ofMillibuckets(container.getFirstFluid().getFluid(),
+                FluidConstants.fromMillibuckets(amount)), false);
+        stack.applyComponents(holder.getStack().getComponents());
         return extracted.getFluidAmount() > 0;
     }
 
@@ -130,12 +136,12 @@ public class ZipGunItem extends Item implements BotariumFluidItem<WrappedItemFlu
     @Override
     public WrappedItemFluidContainer getFluidContainer(ItemStack holder) {
         return new WrappedItemFluidContainer(
-            holder,
-            new SimpleFluidContainer(
-                getCapacity(),
-                1,
-                (t, f) -> f.is(ModFluidTags.ZIP_GUN_PROPELLANTS)) {
-            });
+                holder,
+                new SimpleFluidContainer(
+                        getCapacity(),
+                        1,
+                        (t, f) -> f.is(ModFluidTags.ZIP_GUN_PROPELLANTS)) {
+                });
     }
 
     public long getCapacity() {
@@ -143,11 +149,13 @@ public class ZipGunItem extends Item implements BotariumFluidItem<WrappedItemFlu
     }
 
     @Override
-    public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, @NotNull TooltipFlag isAdvanced) {
+    public void appendHoverText(@NotNull ItemStack stack, @NotNull Item.TooltipContext context,
+            List<Component> tooltipComponents,
+            @NotNull TooltipFlag isAdvanced) {
         tooltipComponents.add(TooltipUtils.getFluidComponent(
-            FluidUtils.getTank(stack),
-            FluidUtils.getTankCapacity(stack),
-            ModFluids.OXYGEN.get()));
+                FluidUtils.getTank(stack),
+                FluidUtils.getTankCapacity(stack),
+                ModFluids.OXYGEN.get()));
         TooltipUtils.addDescriptionComponent(tooltipComponents, ConstantComponents.ZIP_GUN_INFO);
     }
 
@@ -159,7 +167,8 @@ public class ZipGunItem extends Item implements BotariumFluidItem<WrappedItemFlu
     @Override
     public int getBarWidth(@NotNull ItemStack stack) {
         var fluidContainer = getFluidContainer(stack);
-        return (int) (((double) fluidContainer.getFirstFluid().getFluidAmount() / fluidContainer.getTankCapacity(0)) * 13);
+        return (int) (((double) fluidContainer.getFirstFluid().getFluidAmount() / fluidContainer.getTankCapacity(0))
+                * 13);
     }
 
     @Override
@@ -170,7 +179,8 @@ public class ZipGunItem extends Item implements BotariumFluidItem<WrappedItemFlu
     // Fabric disabling of nbt change animation
     @SuppressWarnings("unused")
     @PlatformOnly(PlatformOnly.FABRIC)
-    public boolean allowNbtUpdateAnimation(Player player, InteractionHand hand, ItemStack oldStack, ItemStack newStack) {
+    public boolean allowNbtUpdateAnimation(Player player, InteractionHand hand, ItemStack oldStack,
+            ItemStack newStack) {
         return false;
     }
 

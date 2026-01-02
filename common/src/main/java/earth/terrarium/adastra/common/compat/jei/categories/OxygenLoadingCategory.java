@@ -24,7 +24,7 @@ import net.minecraft.world.item.crafting.Ingredient;
 
 public record OxygenLoadingCategory(IGuiHelper guiHelper) implements IRecipeCategory<OxygenLoadingRecipe> {
 
-    public static final ResourceLocation ID = new ResourceLocation(AdAstra.MOD_ID, "oxygen_loading");
+    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "oxygen_loading");
     public static final RecipeType<OxygenLoadingRecipe> RECIPE = new RecipeType<>(ID, OxygenLoadingRecipe.class);
 
     @Override

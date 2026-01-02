@@ -42,27 +42,31 @@ public class AirVortex extends Entity {
     @Override
     public void tick() {
         super.tick();
-        if (!(this.level() instanceof ServerLevel level)) return;
+        if (!(this.level() instanceof ServerLevel level))
+            return;
         if (this.source == null
-            || this.positions == null
-            || this.tickCount >= LIFE
-            || level.getBlockState(this.source).isAir()) {
+                || this.positions == null
+                || this.tickCount >= LIFE
+                || level.getBlockState(this.source).isAir()) {
             this.discard();
             return;
         }
-        if (level.getBlockEntity(this.source) instanceof OxygenDistributorBlockEntity e && e.distributedBlocksCount() < e.distributedBlocksLimit()) {
+        if (level.getBlockEntity(this.source) instanceof OxygenDistributorBlockEntity e
+                && e.distributedBlocksCount() < e.distributedBlocksLimit()) {
             this.discard();
             return;
         }
         level.getAllEntities().forEach(entity -> {
-            if (entity != null && !entity.getType().is(ModEntityTypeTags.IGNORES_AIR_VORTEX) && this.positions.contains(entity.blockPosition())) {
+            if (entity != null && !entity.getType().is(ModEntityTypeTags.IGNORES_AIR_VORTEX)
+                    && this.positions.contains(entity.blockPosition())) {
                 this.applyForce(entity);
             }
         });
     }
 
     protected void applyForce(Entity entity) {
-        if (entity instanceof ServerPlayer player && player.getAbilities().flying) return;
+        if (entity instanceof ServerPlayer player && player.getAbilities().flying)
+            return;
         int time = this.tickCount;
         BlockPos targetPosition = this.blockPosition().below(2);
         double altitude = 1000 * Math.exp(-0.005 * time) + LIFE;
@@ -87,7 +91,7 @@ public class AirVortex extends Entity {
     }
 
     @Override
-    protected void defineSynchedData() {
+    protected void defineSynchedData(net.minecraft.network.syncher.SynchedEntityData.Builder builder) {
     }
 
     @Override

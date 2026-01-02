@@ -31,10 +31,12 @@ import java.util.function.Predicate;
 public class CompressorBlockEntity extends RecipeMachineBlockEntity<CompressingRecipe> {
 
     public static final List<ConfigurationEntry> SIDE_CONFIG = List.of(
-        new ConfigurationEntry(ConfigurationType.SLOT, Configuration.NONE, ConstantComponents.SIDE_CONFIG_INPUT_SLOTS),
-        new ConfigurationEntry(ConfigurationType.SLOT, Configuration.NONE, ConstantComponents.SIDE_CONFIG_OUTPUT_SLOTS),
-        new ConfigurationEntry(ConfigurationType.ENERGY, Configuration.NONE, ConstantComponents.SIDE_CONFIG_ENERGY)
-    );
+            new ConfigurationEntry(ConfigurationType.SLOT, Configuration.NONE,
+                    ConstantComponents.SIDE_CONFIG_INPUT_SLOTS),
+            new ConfigurationEntry(ConfigurationType.SLOT, Configuration.NONE,
+                    ConstantComponents.SIDE_CONFIG_OUTPUT_SLOTS),
+            new ConfigurationEntry(ConfigurationType.ENERGY, Configuration.NONE,
+                    ConstantComponents.SIDE_CONFIG_ENERGY));
 
     public CompressorBlockEntity(BlockPos pos, BlockState state) {
         super(pos, state, 3, ModRecipeTypes.COMPRESSING);
@@ -46,24 +48,26 @@ public class CompressorBlockEntity extends RecipeMachineBlockEntity<CompressingR
     }
 
     @Override
-    public WrappedBlockEnergyContainer getEnergyStorage(Level level, BlockPos pos, BlockState state, @Nullable BlockEntity entity, @Nullable Direction direction) {
-        if (energyContainer != null) return energyContainer;
+    public WrappedBlockEnergyContainer getEnergyStorage(Level level, BlockPos pos, BlockState state,
+            @Nullable BlockEntity entity, @Nullable Direction direction) {
+        if (energyContainer != null)
+            return energyContainer;
         return energyContainer = new WrappedBlockEnergyContainer(
-            this,
-            EnergyUtils.machineInsertOnlyEnergy(MachineConfig.IRON)
-        );
+                this,
+                EnergyUtils.machineInsertOnlyEnergy(MachineConfig.IRON));
     }
 
     @Override
     public void tickSideInteractions(BlockPos pos, Predicate<Direction> filter, List<ConfigurationEntry> sideConfig) {
-        TransferUtils.pullItemsNearby(this, pos, new int[]{1}, sideConfig.get(0), filter);
-        TransferUtils.pushItemsNearby(this, pos, new int[]{2}, sideConfig.get(1), filter);
+        TransferUtils.pullItemsNearby(this, pos, new int[] { 1 }, sideConfig.get(0), filter);
+        TransferUtils.pushItemsNearby(this, pos, new int[] { 2 }, sideConfig.get(1), filter);
         TransferUtils.pullEnergyNearby(this, pos, getEnergyStorage().maxInsert(), sideConfig.get(2), filter);
     }
 
     @Override
     public void recipeTick(ServerLevel level, WrappedBlockEnergyContainer energyStorage) {
-        if (recipe == null) return;
+        if (recipe == null)
+            return;
         if (!canCraft()) {
             clearRecipe();
             return;
@@ -72,28 +76,33 @@ public class CompressorBlockEntity extends RecipeMachineBlockEntity<CompressingR
         energyStorage.internalExtract(recipe.energy(), false);
 
         cookTime++;
-        if (cookTime < cookTimeTotal) return;
+        if (cookTime < cookTimeTotal)
+            return;
         craft();
     }
 
     @Override
     public void craft() {
-        if (recipe == null) return;
+        if (recipe == null)
+            return;
 
         getItem(1).shrink(1);
         ItemUtils.addItem(this, recipe.result(), 2);
 
         cookTime = 0;
-        if (getItem(1).isEmpty()) clearRecipe();
+        if (getItem(1).isEmpty())
+            clearRecipe();
     }
 
     @Override
     public void update() {
-        if (level().isClientSide()) return;
-        quickCheck.getRecipeFor(this, level()).ifPresent(r -> {
-            recipe = r.value();
-            cookTimeTotal = r.value().cookingTime();
-        });
+        if (level().isClientSide())
+            return;
+        quickCheck.getRecipeFor(new earth.terrarium.adastra.common.recipes.ContainerRecipeInput(this), level())
+                .ifPresent(r -> {
+                    recipe = r.value();
+                    cookTimeTotal = r.value().cookingTime();
+                });
     }
 
     @Override
@@ -103,6 +112,6 @@ public class CompressorBlockEntity extends RecipeMachineBlockEntity<CompressingR
 
     @Override
     public int @NotNull [] getSlotsForFace(@NotNull Direction side) {
-        return new int[]{1, 2};
+        return new int[] { 1, 2 };
     }
 }

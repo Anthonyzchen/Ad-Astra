@@ -28,12 +28,16 @@ public class PipeDuctBlock extends PipeBlock {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, BlockGetter level, List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, net.minecraft.world.item.Item.TooltipContext context,
+            List<Component> tooltip, TooltipFlag flag) {
         if (type() == Type.ENERGY) {
-            tooltip.add(Component.translatable("tooltip.ad_astra.energy_transfer_tick", transferRate()).withStyle(ChatFormatting.GOLD));
+            tooltip.add(Component.translatable("tooltip.ad_astra.energy_transfer_tick", transferRate())
+                    .withStyle(ChatFormatting.GOLD));
             TooltipUtils.addDescriptionComponent(tooltip, ConstantComponents.CABLE_DUCT);
         } else {
-            tooltip.add(Component.translatable("tooltip.ad_astra.fluid_transfer_tick", FluidConstants.toMillibuckets(transferRate())).withStyle(ChatFormatting.GOLD));
+            tooltip.add(Component
+                    .translatable("tooltip.ad_astra.fluid_transfer_tick", FluidConstants.toMillibuckets(transferRate()))
+                    .withStyle(ChatFormatting.GOLD));
             TooltipUtils.addDescriptionComponent(tooltip, ConstantComponents.FLUID_DUCT_INFO);
         }
     }

@@ -24,6 +24,7 @@ import earth.terrarium.botarium.common.fluid.FluidConstants;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
@@ -45,12 +46,15 @@ import java.util.function.Predicate;
 public class OxygenDistributorBlockEntity extends OxygenLoaderBlockEntity {
 
     public static final List<ConfigurationEntry> SIDE_CONFIG = List.of(
-        new ConfigurationEntry(ConfigurationType.SLOT, Configuration.NONE, ConstantComponents.SIDE_CONFIG_INPUT_SLOTS),
-        new ConfigurationEntry(ConfigurationType.SLOT, Configuration.NONE, ConstantComponents.SIDE_CONFIG_OUTPUT_SLOTS),
-        new ConfigurationEntry(ConfigurationType.ENERGY, Configuration.NONE, ConstantComponents.SIDE_CONFIG_ENERGY),
-        new ConfigurationEntry(ConfigurationType.FLUID, Configuration.NONE, ConstantComponents.SIDE_CONFIG_INPUT_FLUID),
-        new ConfigurationEntry(ConfigurationType.FLUID, Configuration.NONE, ConstantComponents.SIDE_CONFIG_OUTPUT_FLUID)
-    );
+            new ConfigurationEntry(ConfigurationType.SLOT, Configuration.NONE,
+                    ConstantComponents.SIDE_CONFIG_INPUT_SLOTS),
+            new ConfigurationEntry(ConfigurationType.SLOT, Configuration.NONE,
+                    ConstantComponents.SIDE_CONFIG_OUTPUT_SLOTS),
+            new ConfigurationEntry(ConfigurationType.ENERGY, Configuration.NONE, ConstantComponents.SIDE_CONFIG_ENERGY),
+            new ConfigurationEntry(ConfigurationType.FLUID, Configuration.NONE,
+                    ConstantComponents.SIDE_CONFIG_INPUT_FLUID),
+            new ConfigurationEntry(ConfigurationType.FLUID, Configuration.NONE,
+                    ConstantComponents.SIDE_CONFIG_OUTPUT_FLUID));
 
     private final Set<BlockPos> lastDistributedBlocks = new HashSet<>();
     private long energyPerTick;
@@ -68,10 +72,9 @@ public class OxygenDistributorBlockEntity extends OxygenLoaderBlockEntity {
         super(pos, state, 3);
     }
 
-
     @Override
-    public void load(@NotNull CompoundTag tag) {
-        super.load(tag);
+    public void loadAdditional(@NotNull CompoundTag tag, HolderLookup.@NotNull Provider registries) {
+        super.loadAdditional(tag, registries);
         if (tag.contains("LastDistributedBlocks")) {
             lastDistributedBlocks.clear();
             for (var pos : tag.getLongArray("LastDistributedBlocks")) {
@@ -86,8 +89,8 @@ public class OxygenDistributorBlockEntity extends OxygenLoaderBlockEntity {
     }
 
     @Override
-    protected void saveAdditional(@NotNull CompoundTag tag) {
-        super.saveAdditional(tag);
+    protected void saveAdditional(@NotNull CompoundTag tag, HolderLookup.@NotNull Provider registries) {
+        super.saveAdditional(tag, registries);
         tag.putLong("EnergyPerTick", energyPerTick);
         tag.putFloat("FluidPerTick", fluidPerTick);
         tag.putInt("DistributedBlocksCount", distributedBlocksCount);
@@ -101,12 +104,13 @@ public class OxygenDistributorBlockEntity extends OxygenLoaderBlockEntity {
     }
 
     @Override
-    public WrappedBlockEnergyContainer getEnergyStorage(Level level, BlockPos pos, BlockState state, @Nullable BlockEntity entity, @Nullable Direction direction) {
-        if (this.energyContainer != null) return this.energyContainer;
+    public WrappedBlockEnergyContainer getEnergyStorage(Level level, BlockPos pos, BlockState state,
+            @Nullable BlockEntity entity, @Nullable Direction direction) {
+        if (this.energyContainer != null)
+            return this.energyContainer;
         return this.energyContainer = new WrappedBlockEnergyContainer(
-            this,
-            EnergyUtils.machineInsertOnlyEnergy(MachineConfig.DESH)
-        );
+                this,
+                EnergyUtils.machineInsertOnlyEnergy(MachineConfig.DESH));
     }
 
     @Override
@@ -129,7 +133,8 @@ public class OxygenDistributorBlockEntity extends OxygenLoaderBlockEntity {
                 accumulatedFluid -= wholeBuckets;
             }
 
-            if (time % MachineConfig.distributionRefreshRate == 0) tickOxygen(level, pos);
+            if (time % MachineConfig.distributionRefreshRate == 0)
+                tickOxygen(level, pos);
 
             if (time % 200 == 0) {
                 level.playSound(null, pos, ModSoundEvents.OXYGEN_OUTTAKE.get(), SoundSource.BLOCKS, 0.2f, 1);
@@ -140,20 +145,24 @@ public class OxygenDistributorBlockEntity extends OxygenLoaderBlockEntity {
             clearOxygenBlocks();
             shutDownTicks = 60;
             setLit(false);
-        } else if (time % 10 == 0) setLit(false);
+        } else if (time % 10 == 0)
+            setLit(false);
 
-        energyPerTick = (recipe != null && canCraft() ? recipe.energy() : 0) + (canDistribute ? calculateEnergyPerTick() : 0);
+        energyPerTick = (recipe != null && canCraft() ? recipe.energy() : 0)
+                + (canDistribute ? calculateEnergyPerTick() : 0);
         this.fluidPerTick = canDistribute ? fluidPerTick : 0;
         distributedBlocksCount = canDistribute ? lastDistributedBlocks.size() : 0;
     }
 
     @Override
     public void tickSideInteractions(BlockPos pos, Predicate<Direction> filter, List<ConfigurationEntry> sideConfig) {
-        TransferUtils.pullItemsNearby(this, pos, new int[]{1}, sideConfig.get(0), filter);
-        TransferUtils.pushItemsNearby(this, pos, new int[]{2}, sideConfig.get(1), filter);
+        TransferUtils.pullItemsNearby(this, pos, new int[] { 1 }, sideConfig.get(0), filter);
+        TransferUtils.pushItemsNearby(this, pos, new int[] { 2 }, sideConfig.get(1), filter);
         TransferUtils.pullEnergyNearby(this, pos, getEnergyStorage().maxInsert(), sideConfig.get(2), filter);
-        TransferUtils.pullFluidNearby(this, pos, getFluidContainer(), FluidConstants.fromMillibuckets(200), 0, sideConfig.get(3), filter);
-        TransferUtils.pushFluidNearby(this, pos, getFluidContainer(), FluidConstants.fromMillibuckets(200), 1, sideConfig.get(4), filter);
+        TransferUtils.pullFluidNearby(this, pos, getFluidContainer(), FluidConstants.fromMillibuckets(200), 0,
+                sideConfig.get(3), filter);
+        TransferUtils.pushFluidNearby(this, pos, getFluidContainer(), FluidConstants.fromMillibuckets(200), 1,
+                sideConfig.get(4), filter);
     }
 
     @Override
@@ -163,13 +172,16 @@ public class OxygenDistributorBlockEntity extends OxygenLoaderBlockEntity {
 
     private boolean canCraftDistribution(long fluidAmount) {
         long energy = calculateEnergyPerTick();
-        if (getEnergyStorage().internalExtract(energy, true) < energy) return false;
+        if (getEnergyStorage().internalExtract(energy, true) < energy)
+            return false;
         return ((BiFluidContainer) getFluidContainer().container()).output()
-            .internalExtract(getFluidContainer().getFluids().get(1).copyWithAmount(fluidAmount), true).getFluidAmount() >= fluidAmount;
+                .internalExtract(getFluidContainer().getFluids().get(1).copyWithAmount(fluidAmount), true)
+                .getFluidAmount() >= fluidAmount;
     }
 
     protected void consumeDistribution(long fluidAmount) {
-        ((BiFluidContainer) getFluidContainer().container()).output().internalExtract(getFluidContainer().getFluids().get(1).copyWithAmount(fluidAmount), false);
+        ((BiFluidContainer) getFluidContainer().container()).output()
+                .internalExtract(getFluidContainer().getFluids().get(1).copyWithAmount(fluidAmount), false);
     }
 
     protected void tickOxygen(ServerLevel level, BlockPos pos) {
@@ -177,22 +189,30 @@ public class OxygenDistributorBlockEntity extends OxygenLoaderBlockEntity {
         Set<BlockPos> positions = FloodFill3D.run(level, pos.above(), limit, FloodFill3D.TEST_FULL_SEAL, true);
 
         OxygenApi.API.setOxygen(level, positions, true);
-        TemperatureApi.API.setTemperature(level, positions, PlanetConstants.COMFY_EARTH_TEMPERATURE); // TODO: move to Temperature Regulator machine
+        TemperatureApi.API.setTemperature(level, positions, PlanetConstants.COMFY_EARTH_TEMPERATURE); // TODO: move to
+                                                                                                      // Temperature
+                                                                                                      // Regulator
+                                                                                                      // machine
 
         Set<BlockPos> lastPositionsCopy = new HashSet<>(lastDistributedBlocks);
         this.resetLastDistributedBlocks(positions);
 
-        if (AdAstraConfig.disableAirVortexes) return;
-        if (positions.size() < limit) return;
-        if (lastPositionsCopy.size() >= limit) return;
-        if (OxygenApi.API.hasOxygen(level)) return;
+        if (AdAstraConfig.disableAirVortexes)
+            return;
+        if (positions.size() < limit)
+            return;
+        if (lastPositionsCopy.size() >= limit)
+            return;
+        if (OxygenApi.API.hasOxygen(level))
+            return;
 
         positions.removeAll(lastPositionsCopy);
         BlockPos target = positions.stream()
-            .skip(1)
-            .findFirst()
-            .orElse(positions.stream().findFirst().orElse(null));
-        if (target == null) return;
+                .skip(1)
+                .findFirst()
+                .orElse(positions.stream().findFirst().orElse(null));
+        if (target == null)
+            return;
         AirVortex vortex = new AirVortex(level, pos, lastPositionsCopy);
         vortex.setPos(Vec3.atCenterOf(target));
         level.addFreshEntity(vortex);
@@ -207,7 +227,8 @@ public class OxygenDistributorBlockEntity extends OxygenLoaderBlockEntity {
 
     protected void clearOxygenBlocks() {
         OxygenApi.API.removeOxygen(level, lastDistributedBlocks);
-        TemperatureApi.API.removeTemperature(level, lastDistributedBlocks); // TODO: move to Temperature Regulator machine
+        TemperatureApi.API.removeTemperature(level, lastDistributedBlocks); // TODO: move to Temperature Regulator
+                                                                            // machine
         lastDistributedBlocks.clear();
     }
 
@@ -223,11 +244,13 @@ public class OxygenDistributorBlockEntity extends OxygenLoaderBlockEntity {
             if (AdAstraConfigClient.showOxygenDistributorArea) {
                 AdAstraClient.OXYGEN_OVERLAY_RENDERER.removePositions(pos);
                 if (AdAstraClient.OXYGEN_OVERLAY_RENDERER.canAdd(pos)
-                    && canFunction()
-                    && canCraftDistribution(FluidConstants.fromMillibuckets(Math.max(1, calculateFluidPerTick() / 1000)))) {
+                        && canFunction()
+                        && canCraftDistribution(
+                                FluidConstants.fromMillibuckets(Math.max(1, calculateFluidPerTick() / 1000)))) {
                     AdAstraClient.OXYGEN_OVERLAY_RENDERER.addPositions(pos, lastDistributedBlocks);
                 }
-            } else AdAstraClient.OXYGEN_OVERLAY_RENDERER.clearPositions();
+            } else
+                AdAstraClient.OXYGEN_OVERLAY_RENDERER.clearPositions();
         }
 
         lastYRot = yRot;
@@ -280,16 +303,16 @@ public class OxygenDistributorBlockEntity extends OxygenLoaderBlockEntity {
 
     @Override
     public int @NotNull [] getSlotsForFace(@NotNull Direction side) {
-        return new int[]{1, 2};
+        return new int[] { 1, 2 };
     }
 
     // Only sync positions when recalculating the distributed blocks.
     @Override
-    public @NotNull CompoundTag getUpdateTag() {
-        var tag = super.getUpdateTag();
+    public @NotNull CompoundTag getUpdateTag(HolderLookup.@NotNull Provider registries) {
+        var tag = super.getUpdateTag(registries);
         if (shouldSyncPositions) {
             tag.putLongArray("LastDistributedBlocks", lastDistributedBlocks.stream()
-                .mapToLong(BlockPos::asLong).toArray());
+                    .mapToLong(BlockPos::asLong).toArray());
             shouldSyncPositions = false;
         }
         return tag;

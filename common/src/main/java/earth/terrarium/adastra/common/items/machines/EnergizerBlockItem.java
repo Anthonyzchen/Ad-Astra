@@ -30,14 +30,16 @@ public class EnergizerBlockItem extends BlockItem implements BotariumEnergyItem<
     }
 
     @Override
-    protected boolean updateCustomBlockEntityTag(BlockPos pos, Level level, Player player, ItemStack stack, BlockState state) {
+    protected boolean updateCustomBlockEntityTag(BlockPos pos, Level level, Player player, ItemStack stack,
+            BlockState state) {
         if (level.isClientSide() || !(level.getBlockEntity(pos) instanceof EnergizerBlockEntity entity)) {
             return super.updateCustomBlockEntityTag(pos, level, player, stack, state);
         }
 
         ItemStackHolder holder = new ItemStackHolder(stack);
         EnergyContainer itemEnergyContainer = EnergyContainer.of(holder);
-        if (itemEnergyContainer == null) return super.updateCustomBlockEntityTag(pos, level, player, stack, state);
+        if (itemEnergyContainer == null)
+            return super.updateCustomBlockEntityTag(pos, level, player, stack, state);
         entity.getEnergyStorage().setEnergy(itemEnergyContainer.getStoredEnergy());
         entity.onEnergyChange();
 
@@ -47,18 +49,18 @@ public class EnergizerBlockItem extends BlockItem implements BotariumEnergyItem<
     @Override
     public WrappedItemEnergyContainer getEnergyStorage(ItemStack holder) {
         return new WrappedItemEnergyContainer(
-            holder,
-            new SimpleEnergyContainer(2_000_000) {
-                @Override
-                public long maxInsert() {
-                    return 1_000;
-                }
+                holder,
+                new SimpleEnergyContainer(2_000_000) {
+                    @Override
+                    public long maxInsert() {
+                        return 1_000;
+                    }
 
-                @Override
-                public long maxExtract() {
-                    return 1_000;
-                }
-            });
+                    @Override
+                    public long maxExtract() {
+                        return 1_000;
+                    }
+                });
     }
 
     @Override
@@ -77,9 +79,9 @@ public class EnergizerBlockItem extends BlockItem implements BotariumEnergyItem<
         return 0x63dcc2;
     }
 
-
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag isAdvanced) {
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents,
+            TooltipFlag isAdvanced) {
         var energy = getEnergyStorage(stack);
         tooltipComponents.add(TooltipUtils.getEnergyComponent(energy.getStoredEnergy(), energy.getMaxCapacity()));
         tooltipComponents.add(TooltipUtils.getMaxEnergyInComponent(energy.maxInsert()));

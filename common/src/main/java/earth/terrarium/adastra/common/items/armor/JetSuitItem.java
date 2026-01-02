@@ -17,6 +17,7 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorMaterial;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
@@ -31,17 +32,19 @@ public class JetSuitItem extends SpaceSuitItem implements BotariumEnergyItem<Wra
 
     private final long energyCapacity;
 
-    public JetSuitItem(ArmorMaterial material, Type type, int tankSize, int energy, Properties properties) {
+    public JetSuitItem(net.minecraft.core.Holder<ArmorMaterial> material, Type type, int tankSize, int energy,
+            Properties properties) {
         super(material, type, tankSize, properties);
         this.energyCapacity = energy;
     }
 
     @Override
-    public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, @NotNull List<Component> tooltipComponents, @NotNull TooltipFlag isAdvanced) {
+    public void appendHoverText(@NotNull ItemStack stack, @NotNull Item.TooltipContext context,
+            @NotNull List<Component> tooltipComponents, @NotNull TooltipFlag isAdvanced) {
         tooltipComponents.add(TooltipUtils.getFluidComponent(
-            FluidUtils.getTank(stack),
-            FluidConstants.fromMillibuckets(tankSize),
-            ModFluids.OXYGEN.get()));
+                FluidUtils.getTank(stack),
+                FluidConstants.fromMillibuckets(tankSize),
+                ModFluids.OXYGEN.get()));
         var energy = getEnergyStorage(stack);
         tooltipComponents.add(TooltipUtils.getEnergyComponent(energy.getStoredEnergy(), energyCapacity));
         tooltipComponents.add(TooltipUtils.getMaxEnergyInComponent(energy.maxInsert()));
@@ -51,28 +54,36 @@ public class JetSuitItem extends SpaceSuitItem implements BotariumEnergyItem<Wra
     @Override
     public WrappedItemEnergyContainer getEnergyStorage(ItemStack holder) {
         return new WrappedItemEnergyContainer(
-            holder,
-            new SimpleEnergyContainer(energyCapacity) {
-                @Override
-                public long maxInsert() {
-                    return 1000;
-                }
-            });
+                holder,
+                new SimpleEnergyContainer(energyCapacity) {
+                    @Override
+                    public long maxInsert() {
+                        return 1000;
+                    }
+                });
     }
 
     @Override
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
         super.inventoryTick(stack, level, entity, slotId, isSelected);
-        if (!(entity instanceof Player player)) return;
-        if (player.getItemBySlot(EquipmentSlot.CHEST) != stack) return;
+        if (!(entity instanceof Player player))
+            return;
+        if (player.getItemBySlot(EquipmentSlot.CHEST) != stack)
+            return;
 
-        if (player.getAbilities().flying) return;
-        if (player.getCooldowns().isOnCooldown(stack.getItem())) return;
-        if (!hasFullJetSuitSet(player)) return;
+        if (player.getAbilities().flying)
+            return;
+        if (player.getCooldowns().isOnCooldown(stack.getItem()))
+            return;
+        if (!hasFullJetSuitSet(player))
+            return;
 
-        if (!KeybindManager.suitFlightEnabled(player)) return;
-        if (!KeybindManager.jumpDown(player)) return;
-        if (!canFly(player, stack)) return;
+        if (!KeybindManager.suitFlightEnabled(player))
+            return;
+        if (!KeybindManager.jumpDown(player))
+            return;
+        if (!canFly(player, stack))
+            return;
 
         if (KeybindManager.sprintDown(player)) {
             fullFlight(player);
@@ -92,7 +103,8 @@ public class JetSuitItem extends SpaceSuitItem implements BotariumEnergyItem<Wra
 
     protected void fullFlight(Player player) {
         Vec3 movement = player.getLookAngle().normalize().scale(0.075);
-        if (player.getDeltaMovement().length() > 2.0) return;
+        if (player.getDeltaMovement().length() > 2.0)
+            return;
         player.addDeltaMovement(movement);
         player.fallDistance = Math.max(player.fallDistance / 1.5f, 0.0f);
         if (!player.isFallFlying()) {
@@ -105,24 +117,32 @@ public class JetSuitItem extends SpaceSuitItem implements BotariumEnergyItem<Wra
     }
 
     private void consume(Player player, ItemStack stack, int amount) {
-        if (player.isCreative() || player.isSpectator() || player.level().isClientSide()) return;
+        if (player.isCreative() || player.isSpectator() || player.level().isClientSide())
+            return;
         getEnergyStorage(stack).internalExtract(amount, false);
     }
 
     protected boolean isFullFlightEnabled(Player player) {
-        return KeybindManager.suitFlightEnabled(player) && KeybindManager.jumpDown(player) && KeybindManager.sprintDown(player);
+        return KeybindManager.suitFlightEnabled(player) && KeybindManager.jumpDown(player)
+                && KeybindManager.sprintDown(player);
     }
 
-    public static double sigmoidAcceleration(double t, double peakTime, double peakAcceleration, double initialAcceleration) {
+    public static double sigmoidAcceleration(double t, double peakTime, double peakAcceleration,
+            double initialAcceleration) {
         return ((2 * peakAcceleration) / (1 + Math.exp(-t / peakTime)) - peakAcceleration) + initialAcceleration;
     }
 
     public void spawnParticles(Level level, LivingEntity entity, HumanoidModel<?> model, ItemStack stack) {
-        if (!(entity instanceof Player player)) return;
-        if (!canFly(player, stack)) return;
-        if (!hasFullJetSuitSet(player)) return;
-        if (!KeybindManager.suitFlightEnabled(player)) return;
-        if (!KeybindManager.jumpDown(player) || (!KeybindManager.jumpDown(player) && !KeybindManager.sprintDown(player)))
+        if (!(entity instanceof Player player))
+            return;
+        if (!canFly(player, stack))
+            return;
+        if (!hasFullJetSuitSet(player))
+            return;
+        if (!KeybindManager.suitFlightEnabled(player))
+            return;
+        if (!KeybindManager.jumpDown(player)
+                || (!KeybindManager.jumpDown(player) && !KeybindManager.sprintDown(player)))
             return;
 
         spawnParticles(level, entity, model.rightArm.xRot + 0.05, entity.isFallFlying() ? 0.0 : 0.8, -0.45);
@@ -140,21 +160,26 @@ public class JetSuitItem extends SpaceSuitItem implements BotariumEnergyItem<Wra
         double sideOffsetZ = Math.sin((yRot - 90) * Math.PI / 180) * pitch;
 
         level.addParticle(ParticleTypes.FLAME, true,
-            entity.getX() + forwardOffsetX + sideOffsetX,
-            entity.getY() + yOffset,
-            entity.getZ() + sideOffsetZ + forwardOffsetZ,
-            0, 0, 0);
+                entity.getX() + forwardOffsetX + sideOffsetX,
+                entity.getY() + yOffset,
+                entity.getZ() + sideOffsetZ + forwardOffsetZ,
+                0, 0, 0);
     }
 
     @SuppressWarnings("unused") // NeoForge
     public boolean elytraFlightTick(ItemStack stack, LivingEntity entity, int flightTicks) {
-        if (entity.level().isClientSide()) return true;
-        if (this.type != Type.CHESTPLATE) return true;
+        if (entity.level().isClientSide())
+            return true;
+        if (this.type != Type.CHESTPLATE)
+            return true;
         int nextFlightTick = flightTicks + 1;
-        if (nextFlightTick % 10 != 0) return true;
+        if (nextFlightTick % 10 != 0)
+            return true;
 
-        if (nextFlightTick % 20 == 0) {
-            stack.hurtAndBreak(1, entity, e -> e.broadcastBreakEvent(EquipmentSlot.CHEST));
+        if (nextFlightTick % 20 == 0 && entity instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+            stack.hurtAndBreak(1, serverPlayer.serverLevel(), serverPlayer,
+                    item -> {
+                    });
         }
 
         entity.gameEvent(GameEvent.ELYTRA_GLIDE);

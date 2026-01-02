@@ -26,7 +26,8 @@ public class VehiclePart extends Entity implements MultipartPartEntity<Vehicle> 
     private final Vector3f offset;
     private final BiFunction<Player, InteractionHand, InteractionResult> interactionHandler;
 
-    public VehiclePart(Vehicle vehicle, float width, float height, Vector3f offset, BiFunction<Player, InteractionHand, InteractionResult> interactionHandler) {
+    public VehiclePart(Vehicle vehicle, float width, float height, Vector3f offset,
+            BiFunction<Player, InteractionHand, InteractionResult> interactionHandler) {
         super(vehicle.getType(), vehicle.level());
         this.vehicle = vehicle;
         this.interactionHandler = interactionHandler;
@@ -36,13 +37,16 @@ public class VehiclePart extends Entity implements MultipartPartEntity<Vehicle> 
     }
 
     @Override
-    protected void defineSynchedData() {}
+    protected void defineSynchedData(net.minecraft.network.syncher.SynchedEntityData.Builder builder) {
+    }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag compound) {}
+    protected void readAdditionalSaveData(CompoundTag compound) {
+    }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag compound) {}
+    protected void addAdditionalSaveData(CompoundTag compound) {
+    }
 
     @Override
     public boolean isPickable() {
@@ -66,7 +70,8 @@ public class VehiclePart extends Entity implements MultipartPartEntity<Vehicle> 
     }
 
     @Override
-    public @NotNull Packet<ClientGamePacketListener> getAddEntityPacket() {
+    public @NotNull Packet<ClientGamePacketListener> getAddEntityPacket(
+            net.minecraft.server.level.ServerEntity serverEntity) {
         throw new UnsupportedOperationException();
     }
 
@@ -90,7 +95,8 @@ public class VehiclePart extends Entity implements MultipartPartEntity<Vehicle> 
         Matrix3f rotationMatrix = new Matrix3f();
         rotationMatrix.rotateY(this.vehicle.getYRot() * 0.017453292F);
         Vector3f offset = this.offset.mulTranspose(rotationMatrix, new Vector3f());
-        this.setPos(this.vehicle.getX() + offset.x(), this.vehicle.getY() + offset.y(), this.vehicle.getZ() + offset.z());
+        this.setPos(this.vehicle.getX() + offset.x(), this.vehicle.getY() + offset.y(),
+                this.vehicle.getZ() + offset.z());
     }
 
     @Override

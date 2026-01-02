@@ -1,6 +1,7 @@
 package earth.terrarium.adastra.client.components.machines;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import java.time.Duration;
 import com.teamresourceful.resourcefullib.client.components.CursorWidget;
 import com.teamresourceful.resourcefullib.client.screens.CursorScreen;
 import com.teamresourceful.resourcefullib.client.utils.RenderUtils;
@@ -63,7 +64,9 @@ public class FluidBarWidget extends ConfigurationWidget implements CursorWidget,
             float g = FastColor.ARGB32.green(color) / 255f;
             float b = FastColor.ARGB32.blue(color) / 255f;
 
-            try (var ignored = RenderUtils.createScissorBox(Minecraft.getInstance(), graphics.pose(), x, y + GuiUtils.FLUID_BAR_HEIGHT - (int) (GuiUtils.FLUID_BAR_HEIGHT * ratio), GuiUtils.FLUID_BAR_WIDTH, GuiUtils.FLUID_BAR_HEIGHT)) {
+            try (var ignored = RenderUtils.createScissorBox(Minecraft.getInstance(), graphics.pose(), x,
+                    y + GuiUtils.FLUID_BAR_HEIGHT - (int) (GuiUtils.FLUID_BAR_HEIGHT * ratio), GuiUtils.FLUID_BAR_WIDTH,
+                    GuiUtils.FLUID_BAR_HEIGHT)) {
                 for (int i = 1; i < 5; i++) {
                     graphics.blit(x, y + GuiUtils.FLUID_BAR_HEIGHT - i * 16, 0, 16, 16, sprite, r, g, b, 1);
                 }
@@ -77,17 +80,15 @@ public class FluidBarWidget extends ConfigurationWidget implements CursorWidget,
         if (this.isHoveredOrFocused()) {
             if (holder.isEmpty()) {
                 setTooltip(Tooltip.create(CommonComponents.joinLines(
-                    TooltipUtils.getFluidComponent(holder, capacity),
-                    TooltipUtils.getFluidDifferenceComponent(difference)
-                )));
+                        TooltipUtils.getFluidComponent(holder, capacity),
+                        TooltipUtils.getFluidDifferenceComponent(difference))));
             } else {
                 setTooltip(Tooltip.create(CommonComponents.joinLines(
-                    TooltipUtils.getFluidComponent(holder, capacity),
-                    TooltipUtils.getFluidDifferenceComponent(difference),
-                    ConstantComponents.CLEAR_FLUID_TANK
-                )));
+                        TooltipUtils.getFluidComponent(holder, capacity),
+                        TooltipUtils.getFluidDifferenceComponent(difference),
+                        ConstantComponents.CLEAR_FLUID_TANK)));
             }
-            setTooltipDelay(-1);
+            setTooltipDelay(Duration.ofMillis(-1));
         }
     }
 

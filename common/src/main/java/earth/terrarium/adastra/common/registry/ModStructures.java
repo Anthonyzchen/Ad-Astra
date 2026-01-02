@@ -12,9 +12,13 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProc
 
 public class ModStructures {
 
-    public static final ResourcefulRegistry<StructureType<?>> STRUCTURE_TYPES = ResourcefulRegistries.create(BuiltInRegistries.STRUCTURE_TYPE, AdAstra.MOD_ID);
-    public static final ResourcefulRegistry<StructureProcessorType<?>> STRUCTURE_PROCESSORS = ResourcefulRegistries.create(BuiltInRegistries.STRUCTURE_PROCESSOR, AdAstra.MOD_ID);
+    public static final ResourcefulRegistry<StructureType<?>> STRUCTURE_TYPES = ResourcefulRegistries
+            .create(BuiltInRegistries.STRUCTURE_TYPE, AdAstra.MOD_ID);
+    public static final ResourcefulRegistry<StructureProcessorType<?>> STRUCTURE_PROCESSORS = ResourcefulRegistries
+            .create(BuiltInRegistries.STRUCTURE_PROCESSOR, AdAstra.MOD_ID);
 
-    public static final RegistryEntry<StructureType<LargeJigsawStructure>> LARGE_JIGSAW_STRUCTURE = STRUCTURE_TYPES.register("large_jigsaw_structure", () -> () -> LargeJigsawStructure.CODEC);
-    public static final RegistryEntry<StructureProcessorType<StructureVoidProcessor>> STRUCTURE_VOID_PROCESSOR = STRUCTURE_PROCESSORS.register("structure_void_processor", () -> () -> StructureVoidProcessor.CODEC);
+    public static final RegistryEntry<StructureType<LargeJigsawStructure>> LARGE_JIGSAW_STRUCTURE = STRUCTURE_TYPES
+            .register("large_jigsaw_structure", () -> () -> LargeJigsawStructure.CODEC);
+    public static final RegistryEntry<StructureProcessorType<StructureVoidProcessor>> STRUCTURE_VOID_PROCESSOR = STRUCTURE_PROCESSORS
+            .register("structure_void_processor", () -> () -> StructureVoidProcessor.CODEC);
 }

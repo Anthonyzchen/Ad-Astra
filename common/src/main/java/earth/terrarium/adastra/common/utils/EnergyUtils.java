@@ -9,6 +9,9 @@ import earth.terrarium.botarium.common.energy.impl.InsertOnlyEnergyContainer;
 import earth.terrarium.botarium.common.item.ItemStackHolder;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.component.CustomData;
+import net.minecraft.nbt.CompoundTag;
 
 public class EnergyUtils {
 
@@ -29,8 +32,11 @@ public class EnergyUtils {
         var container = EnergyContainer.of(holder);
         if (container != null) {
             container.setEnergy(container.getMaxCapacity());
-            stack.getOrCreateTagElement(Botarium.BOTARIUM_DATA)
-                .putLong("Energy", container.getMaxCapacity());
+            CustomData.update(DataComponents.CUSTOM_DATA, stack, tag -> {
+                CompoundTag botariumData = tag.getCompound(Botarium.BOTARIUM_DATA);
+                botariumData.putLong("Energy", container.getMaxCapacity());
+                tag.put(Botarium.BOTARIUM_DATA, botariumData);
+            });
         }
         return stack;
     }

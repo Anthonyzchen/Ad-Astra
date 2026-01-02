@@ -23,11 +23,13 @@ public class AdAstraPlanetRenderers extends SimpleJsonResourceReloadListener {
     }
 
     @Override
-    protected void apply(Map<ResourceLocation, JsonElement> object, ResourceManager resourceManager, ProfilerFiller profiler) {
+    protected void apply(Map<ResourceLocation, JsonElement> object, ResourceManager resourceManager,
+            ProfilerFiller profiler) {
         Map<ResourceKey<Level>, ModDimensionSpecialEffects> effects = new HashMap<>();
         object.forEach((key, value) -> {
             JsonObject json = GsonHelper.convertToJsonObject(value, "planets");
-            PlanetRenderer renderer = PlanetRenderer.CODEC.parse(JsonOps.INSTANCE, json).getOrThrow(false, Constants.LOGGER::error);
+            PlanetRenderer renderer = PlanetRenderer.CODEC.parse(JsonOps.INSTANCE, json)
+                    .getOrThrow(IllegalStateException::new);
             effects.put(renderer.dimension(), new ModDimensionSpecialEffects(renderer));
         });
         ClientPlatformUtils.registerPlanetRenderers(effects);

@@ -36,11 +36,11 @@ public abstract class VehicleItem extends RenderedItem implements BotariumFluidI
     @Override
     public WrappedItemFluidContainer getFluidContainer(ItemStack holder) {
         return new WrappedItemFluidContainer(
-            holder,
-            new SimpleFluidContainer(
-                FluidConstants.fromMillibuckets(3000),
-                1,
-                (t, f) -> f.is(ModFluidTags.FUEL)));
+                holder,
+                new SimpleFluidContainer(
+                        FluidConstants.fromMillibuckets(3000),
+                        1,
+                        (t, f) -> f.is(ModFluidTags.FUEL)));
     }
 
     @Override
@@ -51,7 +51,8 @@ public abstract class VehicleItem extends RenderedItem implements BotariumFluidI
     @Override
     public int getBarWidth(@NotNull ItemStack stack) {
         var fluidContainer = getFluidContainer(stack);
-        return (int) (((double) fluidContainer.getFirstFluid().getFluidAmount() / fluidContainer.getTankCapacity(0)) * 13);
+        return (int) (((double) fluidContainer.getFirstFluid().getFluidAmount() / fluidContainer.getTankCapacity(0))
+                * 13);
     }
 
     @Override
@@ -60,10 +61,11 @@ public abstract class VehicleItem extends RenderedItem implements BotariumFluidI
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Level level, List<Component> tooltipComponents, TooltipFlag isAdvanced) {
+    public void appendHoverText(ItemStack stack, net.minecraft.world.item.Item.TooltipContext context,
+            List<Component> tooltipComponents, TooltipFlag isAdvanced) {
         tooltipComponents.add(TooltipUtils.getFluidComponent(
-            FluidUtils.getTank(stack),
-            FluidUtils.getTankCapacity(stack),
-            ModFluids.FUEL.get()));
+                FluidUtils.getTank(stack),
+                FluidUtils.getTankCapacity(stack),
+                ModFluids.FUEL.get()));
     }
 }

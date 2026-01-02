@@ -1,6 +1,7 @@
 package earth.terrarium.adastra.common.blockentities;
 
 import earth.terrarium.adastra.common.blockentities.base.TickableBlockEntity;
+import net.minecraft.core.HolderLookup;
 import earth.terrarium.adastra.common.blocks.GlobeBlock;
 import earth.terrarium.adastra.common.registry.ModBlockEntityTypes;
 import net.minecraft.core.BlockPos;
@@ -52,16 +53,16 @@ public class GlobeBlockEntity extends BlockEntity implements TickableBlockEntity
     }
 
     @Override
-    public void load(CompoundTag tag) {
-        super.load(tag);
+    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
         torque = tag.getFloat("Torque");
         yRot = tag.getFloat("YRot");
         lastYRot = yRot;
     }
 
     @Override
-    public void saveAdditional(CompoundTag tag) {
-        super.saveAdditional(tag);
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
         tag.putFloat("Torque", torque);
         tag.putFloat("YRot", yRot);
     }
@@ -72,7 +73,7 @@ public class GlobeBlockEntity extends BlockEntity implements TickableBlockEntity
     }
 
     @Override
-    public CompoundTag getUpdateTag() {
-        return saveWithoutMetadata();
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        return saveWithoutMetadata(registries);
     }
 }

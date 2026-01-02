@@ -8,6 +8,7 @@ import earth.terrarium.botarium.common.fluid.impl.InsertOnlyFluidContainer;
 import earth.terrarium.botarium.common.fluid.impl.SimpleFluidContainer;
 import earth.terrarium.botarium.common.fluid.impl.WrappedBlockFluidContainer;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.HolderLookup;
 
 import java.util.List;
 import java.util.function.BiPredicate;
@@ -15,39 +16,44 @@ import java.util.stream.Stream;
 
 public record BiFluidContainer(SimpleFluidContainer input, SimpleFluidContainer output) implements FluidContainer {
 
-    public BiFluidContainer(long capacity, int inputTanks, int outputTanks, BiPredicate<Integer, FluidHolder> inputFilter, BiPredicate<Integer, FluidHolder> outputFilter) {
+    public BiFluidContainer(long capacity, int inputTanks, int outputTanks,
+            BiPredicate<Integer, FluidHolder> inputFilter, BiPredicate<Integer, FluidHolder> outputFilter) {
         this(
-            new InsertOnlyFluidContainer(
-                i -> capacity,
-                inputTanks,
-                inputFilter),
-            new ExtractOnlyFluidContainer(
-                i -> capacity,
-                outputTanks,
-                outputFilter));
+                new InsertOnlyFluidContainer(
+                        i -> capacity,
+                        inputTanks,
+                        inputFilter),
+                new ExtractOnlyFluidContainer(
+                        i -> capacity,
+                        outputTanks,
+                        outputFilter));
     }
 
     @Override
     public long insertFluid(FluidHolder fluid, boolean simulate) {
-        if (fluid.isEmpty()) return 0;
+        if (fluid.isEmpty())
+            return 0;
         return input.insertFluid(fluid, simulate);
     }
 
     @Override
     public long internalInsert(FluidHolder fluids, boolean simulate) {
-        if (fluids.isEmpty()) return 0;
+        if (fluids.isEmpty())
+            return 0;
         return output.internalInsert(fluids, simulate);
     }
 
     @Override
     public FluidHolder extractFluid(FluidHolder fluid, boolean simulate) {
-        if (fluid.isEmpty()) return FluidHolder.empty();
+        if (fluid.isEmpty())
+            return FluidHolder.empty();
         return output.extractFluid(fluid, simulate);
     }
 
     @Override
     public FluidHolder internalExtract(FluidHolder fluid, boolean simulate) {
-        if (fluid.isEmpty()) return FluidHolder.empty();
+        if (fluid.isEmpty())
+            return FluidHolder.empty();
         return input.internalExtract(fluid, simulate);
     }
 
@@ -82,7 +88,8 @@ public record BiFluidContainer(SimpleFluidContainer input, SimpleFluidContainer 
 
     @Override
     public void fromContainer(FluidContainer container) {
-        if (!(container instanceof BiFluidContainer tank)) return;
+        if (!(container instanceof BiFluidContainer tank))
+            return;
         input.fromContainer(tank.input);
         output.fromContainer(tank.output);
     }
@@ -108,15 +115,15 @@ public record BiFluidContainer(SimpleFluidContainer input, SimpleFluidContainer 
     }
 
     @Override
-    public void deserialize(CompoundTag nbt) {
-        input.deserialize(nbt.getCompound("Input"));
-        output.deserialize(nbt.getCompound("Output"));
+    public void deserialize(CompoundTag nbt, HolderLookup.Provider provider) {
+        input.deserialize(nbt.getCompound("Input"), provider);
+        output.deserialize(nbt.getCompound("Output"), provider);
     }
 
     @Override
-    public CompoundTag serialize(CompoundTag nbt) {
-        nbt.put("Input", input.serialize(new CompoundTag()));
-        nbt.put("Output", output.serialize(new CompoundTag()));
+    public CompoundTag serialize(CompoundTag nbt, HolderLookup.Provider provider) {
+        nbt.put("Input", input.serialize(new CompoundTag(), provider));
+        nbt.put("Output", output.serialize(new CompoundTag(), provider));
         return nbt;
     }
 
@@ -128,7 +135,8 @@ public record BiFluidContainer(SimpleFluidContainer input, SimpleFluidContainer 
 
     @Override
     public void readSnapshot(FluidSnapshot snapshot) {
-        if (!(snapshot instanceof BiFluidSnapshot tank)) return;
+        if (!(snapshot instanceof BiFluidSnapshot tank))
+            return;
         input.readSnapshot(tank.input);
         output.readSnapshot(tank.output);
     }
@@ -137,8 +145,10 @@ public record BiFluidContainer(SimpleFluidContainer input, SimpleFluidContainer 
 
         @Override
         public void loadSnapshot(FluidContainer container) {
-            if (!(container instanceof WrappedBlockFluidContainer wrapped)) return;
-            if (!(wrapped.container() instanceof BiFluidContainer tank)) return;
+            if (!(container instanceof WrappedBlockFluidContainer wrapped))
+                return;
+            if (!(wrapped.container() instanceof BiFluidContainer tank))
+                return;
             input.loadSnapshot(tank.input);
             output.loadSnapshot(tank.output);
         }

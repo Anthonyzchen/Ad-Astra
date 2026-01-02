@@ -4,7 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.Tesselator;
-import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.blaze3d.vertex.*;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.math.Axis;
 import com.teamresourceful.resourcefullib.client.utils.RenderUtils;
@@ -47,23 +47,22 @@ import java.util.List;
 
 public class PlanetsScreen extends AbstractContainerScreen<PlanetsMenu> {
 
-    public static final ResourceLocation SELECTION_MENU = new ResourceLocation(AdAstra.MOD_ID, "planets/selection_menu");
-    public static final ResourceLocation SMALL_SELECTION_MENU = new ResourceLocation(AdAstra.MOD_ID, "planets/small_selection_menu");
+    public static final ResourceLocation SELECTION_MENU = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID,
+            "planets/selection_menu");
+    public static final ResourceLocation SMALL_SELECTION_MENU = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID,
+            "planets/small_selection_menu");
 
     public static final WidgetSprites BUTTON_SPRITES = new WidgetSprites(
-        new ResourceLocation(AdAstra.MOD_ID, "planets/button"),
-        new ResourceLocation(AdAstra.MOD_ID, "planets/button_highlighted")
-    );
+            ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "planets/button"),
+            ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "planets/button_highlighted"));
 
     public static final WidgetSprites BACK_BUTTON_SPRITES = new WidgetSprites(
-        new ResourceLocation(AdAstra.MOD_ID, "planets/back_button"),
-        new ResourceLocation(AdAstra.MOD_ID, "planets/back_button_highlighted")
-    );
+            ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "planets/back_button"),
+            ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "planets/back_button_highlighted"));
 
     public static final WidgetSprites PLUS_BUTTON_SPRITES = new WidgetSprites(
-        new ResourceLocation(AdAstra.MOD_ID, "planets/plus_button"),
-        new ResourceLocation(AdAstra.MOD_ID, "planets/plus_button_highlighted")
-    );
+            ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "planets/plus_button"),
+            ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "planets/plus_button_highlighted"));
 
     private final List<Button> buttons = new ArrayList<>();
     private Button backButton;
@@ -87,8 +86,8 @@ public class PlanetsScreen extends AbstractContainerScreen<PlanetsMenu> {
         this.imageHeight = height;
 
         var planets = AdAstraData.planets().values().stream()
-            .filter(planet -> !menu.disabledPlanets().contains(planet.dimension().location()))
-            .filter(planet -> menu.tier() >= planet.tier()).toList();
+                .filter(planet -> !menu.disabledPlanets().contains(planet.dimension().location()))
+                .filter(planet -> menu.tier() >= planet.tier()).toList();
         hasMultipleSolarSystems = planets.stream().map(Planet::solarSystem).distinct().count() > 1;
         pageIndex = hasMultipleSolarSystems ? 0 : 1;
     }
@@ -116,17 +115,21 @@ public class PlanetsScreen extends AbstractContainerScreen<PlanetsMenu> {
             rebuildWidgets();
         }));
 
-        addSpaceStatonButton = addRenderableWidget(new LabeledImageButton(114, height / 2 - 41, 12, 12, PLUS_BUTTON_SPRITES, b -> {
-            if (selectedPlanet != null) {
-                int ownedSpaceStationCount = menu.getOwnedAndTeamSpaceStations(selectedPlanet.orbitIfPresent()).size();
-                Component name = Component.translatable("text.ad_astra.text.space_station_name", ownedSpaceStationCount + 1);
-                menu.constructSpaceStation(selectedPlanet.dimension(), name);
-                close();
-            }
-        }));
+        addSpaceStatonButton = addRenderableWidget(
+                new LabeledImageButton(114, height / 2 - 41, 12, 12, PLUS_BUTTON_SPRITES, b -> {
+                    if (selectedPlanet != null) {
+                        int ownedSpaceStationCount = menu.getOwnedAndTeamSpaceStations(selectedPlanet.orbitIfPresent())
+                                .size();
+                        Component name = Component.translatable("text.ad_astra.text.space_station_name",
+                                ownedSpaceStationCount + 1);
+                        menu.constructSpaceStation(selectedPlanet.dimension(), name);
+                        close();
+                    }
+                }));
         if (selectedPlanet != null) {
             addSpaceStatonButton.setTooltip(getSpaceStationRecipeTooltip(selectedPlanet.orbitIfPresent()));
-            addSpaceStatonButton.active = selectedPlanet != null && menu.canConstruct(selectedPlanet.orbitIfPresent()) && !menu.isInSpaceStation(selectedPlanet.orbitIfPresent());
+            addSpaceStatonButton.active = selectedPlanet != null && menu.canConstruct(selectedPlanet.orbitIfPresent())
+                    && !menu.isInSpaceStation(selectedPlanet.orbitIfPresent());
         }
 
         backButton.visible = pageIndex > (hasMultipleSolarSystems ? 0 : 1);
@@ -140,7 +143,9 @@ public class PlanetsScreen extends AbstractContainerScreen<PlanetsMenu> {
                 pageIndex = 1;
                 selectedSolarSystem = solarSystem;
                 rebuildWidgets();
-            }, Component.translatableWithFallback("solar_system.%s.%s".formatted(solarSystem.getNamespace(), solarSystem.getPath()), title(solarSystem.getPath()))));
+            }, Component.translatableWithFallback(
+                    "solar_system.%s.%s".formatted(solarSystem.getNamespace(), solarSystem.getPath()),
+                    title(solarSystem.getPath()))));
             buttons.add(button);
         });
     }
@@ -150,9 +155,12 @@ public class PlanetsScreen extends AbstractContainerScreen<PlanetsMenu> {
             if (CadmusIntegration.cadmusLoaded()) {
                 CadmusIntegration.addClientListeners(planet.dimension());
             }
-            if (planet.isSpace()) continue;
-            if (menu.tier() < planet.tier()) continue;
-            if (!planet.solarSystem().equals(selectedSolarSystem)) continue;
+            if (planet.isSpace())
+                continue;
+            if (menu.tier() < planet.tier())
+                continue;
+            if (!planet.solarSystem().equals(selectedSolarSystem))
+                continue;
             buttons.add(addWidget(new LabeledImageButton(10, 0, 99, 20, BUTTON_SPRITES, b -> {
                 pageIndex = 2;
                 selectedPlanet = planet;
@@ -162,13 +170,15 @@ public class PlanetsScreen extends AbstractContainerScreen<PlanetsMenu> {
     }
 
     private void createSelectedPlanetButtons() {
-        if (selectedPlanet == null) return;
+        if (selectedPlanet == null)
+            return;
         var pos = menu.getLandingPos(selectedPlanet.dimension(), true);
         var button = addRenderableWidget(new LabeledImageButton(
-            114, height / 2 - 77, 99, 20, BUTTON_SPRITES,
-            b -> land(selectedPlanet.dimension()), ConstantComponents.LAND));
+                114, height / 2 - 77, 99, 20, BUTTON_SPRITES,
+                b -> land(selectedPlanet.dimension()), ConstantComponents.LAND));
         button.setTooltip(Tooltip.create(Component.translatable("tooltip.ad_astra.land",
-            menu.getPlanetName(selectedPlanet.dimension()), pos.getX(), pos.getZ()).withStyle(ChatFormatting.AQUA)));
+                menu.getPlanetName(selectedPlanet.dimension()), pos.getX(), pos.getZ())
+                .withStyle(ChatFormatting.AQUA)));
 
         addSpaceStationButtons(selectedPlanet.orbitIfPresent());
     }
@@ -176,8 +186,8 @@ public class PlanetsScreen extends AbstractContainerScreen<PlanetsMenu> {
     private void addSpaceStationButtons(ResourceKey<Level> dimension) {
         menu.getOwnedAndTeamSpaceStations(dimension).forEach(station -> {
             var pos = station.getSecond().position();
-            var button = addWidget(new LabeledImageButton(114, height / 2, 99, 20, BUTTON_SPRITES, b ->
-                landOnSpaceStation(dimension, pos), station.getSecond().name()));
+            var button = addWidget(new LabeledImageButton(114, height / 2, 99, 20, BUTTON_SPRITES,
+                    b -> landOnSpaceStation(dimension, pos), station.getSecond().name()));
             button.setTooltip(getSpaceStationLandTooltip(dimension, pos, station.getFirst()));
             spaceStationButtons.add(button);
         });
@@ -185,15 +195,16 @@ public class PlanetsScreen extends AbstractContainerScreen<PlanetsMenu> {
 
     public Tooltip getSpaceStationLandTooltip(ResourceKey<Level> dimension, ChunkPos pos, String owner) {
         return Tooltip.create(CommonComponents.joinLines(
-            Component.translatable("tooltip.ad_astra.space_station_land", menu.getPlanetName(dimension), pos.getMiddleBlockX(), pos.getMiddleBlockZ()).withStyle(ChatFormatting.AQUA),
-            Component.translatable("tooltip.ad_astra.space_station_owner", owner).withStyle(ChatFormatting.GOLD)
-        ));
+                Component.translatable("tooltip.ad_astra.space_station_land", menu.getPlanetName(dimension),
+                        pos.getMiddleBlockX(), pos.getMiddleBlockZ()).withStyle(ChatFormatting.AQUA),
+                Component.translatable("tooltip.ad_astra.space_station_owner", owner).withStyle(ChatFormatting.GOLD)));
     }
 
     public Tooltip getSpaceStationRecipeTooltip(ResourceKey<Level> planet) {
         List<Component> tooltip = new ArrayList<>();
         var pos = menu.getLandingPos(planet, false);
-        tooltip.add(Component.translatable("tooltip.ad_astra.construct_space_station_at", menu.getPlanetName(planet), pos.getX(), pos.getZ()).withStyle(ChatFormatting.AQUA));
+        tooltip.add(Component.translatable("tooltip.ad_astra.construct_space_station_at", menu.getPlanetName(planet),
+                pos.getX(), pos.getZ()).withStyle(ChatFormatting.AQUA));
 
         if (menu.isInSpaceStation(planet) || menu.isClaimed(planet)) {
             tooltip.add(ConstantComponents.SPACE_STATION_ALREADY_EXISTS);
@@ -203,14 +214,19 @@ public class PlanetsScreen extends AbstractContainerScreen<PlanetsMenu> {
         }
 
         List<Pair<ItemStack, Integer>> ingredients = menu.ingredients().get(planet);
-        if (ingredients == null) return Tooltip.create(CommonComponents.joinLines(tooltip));
+        if (ingredients == null)
+            return Tooltip.create(CommonComponents.joinLines(tooltip));
         for (var ingredient : ingredients) {
             var stack = ingredient.getFirst();
             int amountOwned = ingredient.getSecond();
-            boolean hasEnough = menu.player().isCreative() || menu.player().isSpectator() || amountOwned >= stack.getCount();
-            tooltip.add(Component.translatable("tooltip.ad_astra.requirement", amountOwned, stack.getCount(), stack.getHoverName()
-                    .copy().withStyle(ChatFormatting.DARK_AQUA))
-                .copy().withStyle(hasEnough ? ChatFormatting.GREEN : ChatFormatting.RED));
+            boolean hasEnough = menu.player().isCreative() || menu.player().isSpectator()
+                    || amountOwned >= stack.getCount();
+            tooltip.add(
+                    Component
+                            .translatable("tooltip.ad_astra.requirement", amountOwned, stack.getCount(),
+                                    stack.getHoverName()
+                                            .copy().withStyle(ChatFormatting.DARK_AQUA))
+                            .copy().withStyle(hasEnough ? ChatFormatting.GREEN : ChatFormatting.RED));
         }
 
         return Tooltip.create(CommonComponents.joinLines(tooltip));
@@ -228,7 +244,8 @@ public class PlanetsScreen extends AbstractContainerScreen<PlanetsMenu> {
     private void renderButtons(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         int scrollPixels = (int) scrollAmount;
 
-        try (var ignored = RenderUtils.createScissorBox(Minecraft.getInstance(), graphics.pose(), 0, height / 2 - 43, 112, 131)) {
+        try (var ignored = RenderUtils.createScissorBox(Minecraft.getInstance(), graphics.pose(), 0, height / 2 - 43,
+                112, 131)) {
             for (var button : buttons) {
                 button.render(graphics, mouseX, mouseY, partialTick);
             }
@@ -242,7 +259,8 @@ public class PlanetsScreen extends AbstractContainerScreen<PlanetsMenu> {
         if (pageIndex == 2 && selectedPlanet != null) {
             int spaceStationScrollPixels = (int) spaceStationScrollAmount;
 
-            try (var ignored = RenderUtils.createScissorBox(Minecraft.getInstance(), graphics.pose(), 112, height / 2 - 2, 112, 90)) {
+            try (var ignored = RenderUtils.createScissorBox(Minecraft.getInstance(), graphics.pose(), 112,
+                    height / 2 - 2, 112, 90)) {
                 for (var button : spaceStationButtons) {
                     button.render(graphics, mouseX, mouseY, partialTick);
                 }
@@ -256,7 +274,8 @@ public class PlanetsScreen extends AbstractContainerScreen<PlanetsMenu> {
     }
 
     @Override
-    protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {}
+    protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
+    }
 
     @Override
     public void renderBackground(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
@@ -265,19 +284,19 @@ public class PlanetsScreen extends AbstractContainerScreen<PlanetsMenu> {
 
         // Render diamond pattern lines
         RenderSystem.setShader(GameRenderer::getRendertypeLinesShader);
-        Tesselator tessellator = Tesselator.getInstance();
-        BufferBuilder bufferBuilder = tessellator.getBuilder();
-        RenderSystem.setShader(GameRenderer::getPositionColorShader);
-        bufferBuilder.begin(VertexFormat.Mode.DEBUG_LINES, DefaultVertexFormat.POSITION_COLOR);
+
+        ByteBufferBuilder byteBuffer = new ByteBufferBuilder(256);
+        BufferBuilder bufferBuilder = new BufferBuilder(byteBuffer, VertexFormat.Mode.DEBUG_LINES,
+                DefaultVertexFormat.POSITION_COLOR);
 
         for (int i = -height; i <= width; i += 24) {
-            bufferBuilder.vertex(i, 0, 0).color(0xff0f2559).endVertex();
-            bufferBuilder.vertex(i + height, height, 0).color(0xff0f2559).endVertex();
+            bufferBuilder.addVertex(i, 0, 0).setColor(0xff0f2559);
+            bufferBuilder.addVertex(i + height, height, 0).setColor(0xff0f2559);
         }
 
         for (int i = width + height; i >= 0; i -= 24) {
-            bufferBuilder.vertex(i, 0, 0).color(0xff0f2559).endVertex();
-            bufferBuilder.vertex(i - height, height, 0).color(0xff0f2559).endVertex();
+            bufferBuilder.addVertex(i, 0, 0).setColor(0xff0f2559);
+            bufferBuilder.addVertex(i - height, height, 0).setColor(0xff0f2559);
         }
 
         if (PlanetConstants.PROXIMA_CENTAURI.equals(selectedSolarSystem)) {
@@ -286,7 +305,8 @@ public class PlanetsScreen extends AbstractContainerScreen<PlanetsMenu> {
             drawCircles(0, 4, 0xff24327b, bufferBuilder);
         }
 
-        tessellator.end();
+        BufferUploader.drawWithShader(bufferBuilder.build());
+        byteBuffer.close();
 
         if (PlanetConstants.PROXIMA_CENTAURI.equals(selectedSolarSystem)) {
             renderProximaCentauri(graphics);
@@ -305,10 +325,15 @@ public class PlanetsScreen extends AbstractContainerScreen<PlanetsMenu> {
         }
 
         if (pageIndex == 2 && selectedPlanet != null) {
-            var title = Component.translatableWithFallback("planet.%s.%s".formatted(selectedPlanet.dimension().location().getNamespace(), selectedPlanet.dimension().location().getPath()), title(selectedPlanet.dimension().location().getPath()));
+            var title = Component.translatableWithFallback(
+                    "planet.%s.%s".formatted(selectedPlanet.dimension().location().getNamespace(),
+                            selectedPlanet.dimension().location().getPath()),
+                    title(selectedPlanet.dimension().location().getPath()));
             graphics.drawCenteredString(font, title, 57, height / 2 - 60, 0xffffff);
         } else if (pageIndex == 1 && selectedSolarSystem != null) {
-            var title = Component.translatableWithFallback("solar_system.%s.%s".formatted(selectedSolarSystem.getNamespace(), selectedSolarSystem.getPath()), title(selectedSolarSystem.getPath()));
+            var title = Component.translatableWithFallback(
+                    "solar_system.%s.%s".formatted(selectedSolarSystem.getNamespace(), selectedSolarSystem.getPath()),
+                    title(selectedSolarSystem.getPath()));
             graphics.drawCenteredString(font, title, 57, height / 2 - 60, 0xffffff);
         } else {
             graphics.drawCenteredString(font, ConstantComponents.CATALOG, 57, height / 2 - 60, 0xffffff);
@@ -345,7 +370,8 @@ public class PlanetsScreen extends AbstractContainerScreen<PlanetsMenu> {
         }
     }
 
-    public static void drawCircle(BufferBuilder bufferBuilder, double x, double y, double radius, int sides, int color) {
+    public static void drawCircle(BufferBuilder bufferBuilder, double x, double y, double radius, int sides,
+            int color) {
         for (double r = radius - 0.5; r <= radius + 0.5; r += 0.1) {
             for (int i = 0; i < sides; i++) {
                 double angle = i * 2.0 * Math.PI / sides;
@@ -355,8 +381,8 @@ public class PlanetsScreen extends AbstractContainerScreen<PlanetsMenu> {
                 double x2 = x + r * Math.cos(nextAngle);
                 double y2 = y + r * Math.sin(nextAngle);
 
-                bufferBuilder.vertex(x1, y1, 0).color(color).endVertex();
-                bufferBuilder.vertex(x2, y2, 0).color(color).endVertex();
+                bufferBuilder.addVertex((float) x1, (float) y1, 0).setColor(color);
+                bufferBuilder.addVertex((float) x2, (float) y2, 0).setColor(color);
             }
         }
     }
@@ -367,7 +393,8 @@ public class PlanetsScreen extends AbstractContainerScreen<PlanetsMenu> {
     }
 
     @Override
-    protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {}
+    protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {
+    }
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
@@ -387,8 +414,10 @@ public class PlanetsScreen extends AbstractContainerScreen<PlanetsMenu> {
             return;
         }
         var player = menu.player();
-        if (player.isCreative() || player.isSpectator()) super.onClose();
-        else if (!(player.getVehicle() instanceof Rocket)) super.onClose();
+        if (player.isCreative() || player.isSpectator())
+            super.onClose();
+        else if (!(player.getVehicle() instanceof Rocket))
+            super.onClose();
     }
 
     protected void close() {

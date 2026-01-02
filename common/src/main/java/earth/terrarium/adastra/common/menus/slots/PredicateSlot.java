@@ -1,6 +1,7 @@
 package earth.terrarium.adastra.common.menus.slots;
 
 import earth.terrarium.adastra.common.container.SingleSlotContainer;
+import earth.terrarium.adastra.common.recipes.ContainerRecipeInput;
 import net.minecraft.world.Container;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -20,12 +21,13 @@ public class PredicateSlot extends Slot {
         this.predicate = predicate;
     }
 
-    public static <T extends Recipe<Container>> PredicateSlot ofRecipeInput(Container container, int slot, int x, int y, Level level, RecipeType<T> type) {
+    public static <T extends Recipe<ContainerRecipeInput>> PredicateSlot ofRecipeInput(Container container, int slot,
+            int x, int y, Level level, RecipeType<T> type) {
         final RecipeManager recipeManager = level.getRecipeManager();
         final SingleSlotContainer inventory = new SingleSlotContainer(slot);
         return new PredicateSlot(container, slot, x, y, item -> {
             inventory.setItem(item);
-            return recipeManager.getRecipeFor(type, inventory, level).isPresent();
+            return recipeManager.getRecipeFor(type, new ContainerRecipeInput(inventory), level).isPresent();
         });
     }
 

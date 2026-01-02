@@ -37,16 +37,17 @@ public class LaunchPadBlock extends Block implements SimpleWaterloggedBlock {
 
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
-    public static final EnumProperty<LaunchPadPartProperty> PART = EnumProperty.create("part", LaunchPadPartProperty.class);
+    public static final EnumProperty<LaunchPadPartProperty> PART = EnumProperty.create("part",
+            LaunchPadPartProperty.class);
 
     public static final VoxelShape SHAPE = Shapes.or(Block.box(0, 0, 0, 16, 2, 16));
 
     public LaunchPadBlock(Properties properties) {
         super(properties);
         registerDefaultState(stateDefinition.any()
-            .setValue(POWERED, false)
-            .setValue(PART, LaunchPadPartProperty.CENTER)
-            .setValue(WATERLOGGED, false));
+                .setValue(POWERED, false)
+                .setValue(PART, LaunchPadPartProperty.CENTER)
+                .setValue(WATERLOGGED, false));
     }
 
     @Override
@@ -55,7 +56,8 @@ public class LaunchPadBlock extends Block implements SimpleWaterloggedBlock {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable BlockGetter level, List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, net.minecraft.world.item.Item.TooltipContext context,
+            List<Component> tooltip, TooltipFlag flag) {
         TooltipUtils.addDescriptionComponent(tooltip, ConstantComponents.LAUNCH_PAD_INFO);
     }
 
@@ -66,9 +68,7 @@ public class LaunchPadBlock extends Block implements SimpleWaterloggedBlock {
 
     @Override
     public FluidState getFluidState(BlockState state) {
-        return state.getValue(WATERLOGGED) ?
-            Fluids.WATER.getSource(false) :
-            super.getFluidState(state);
+        return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
     }
 
     @Override
@@ -83,12 +83,14 @@ public class LaunchPadBlock extends Block implements SimpleWaterloggedBlock {
     }
 
     @Override
-    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos neighborPos, boolean movedByPiston) {
+    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos neighborPos,
+            boolean movedByPiston) {
         if (!level.isClientSide()) {
             BlockPos controllerPos = getController(state, pos);
             BlockState controllerState = level.getBlockState(controllerPos);
             if (controllerState.getBlock() instanceof LaunchPadBlock) {
-                level.setBlock(controllerPos, controllerState.setValue(POWERED, level.hasNeighborSignal(pos)), Block.UPDATE_CLIENTS);
+                level.setBlock(controllerPos, controllerState.setValue(POWERED, level.hasNeighborSignal(pos)),
+                        Block.UPDATE_CLIENTS);
             }
         }
     }
@@ -103,10 +105,12 @@ public class LaunchPadBlock extends Block implements SimpleWaterloggedBlock {
 
     @Override
     public boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
-        if (!Block.canSupportRigidBlock(level, pos.below())) return false;
+        if (!Block.canSupportRigidBlock(level, pos.below()))
+            return false;
         for (var part : LaunchPadPartProperty.values()) {
             BlockPos offset = pos.north(part.xOffset()).east(part.yOffset());
-            if (!level.getBlockState(offset).isAir()) return false;
+            if (!level.getBlockState(offset).isAir())
+                return false;
         }
         return true;
     }

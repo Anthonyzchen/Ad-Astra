@@ -10,7 +10,9 @@ import earth.terrarium.botarium.common.menu.ExtraDataMenuProvider;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -44,14 +46,15 @@ public class PlanetsMenuProvider implements ExtraDataMenuProvider {
             buffer.writeResourceKey(dimension);
 
             ServerLevel targetLevel = player.server.getLevel(dimension);
-            if (targetLevel == null) throw new IllegalStateException("Dimension " + dimension + " does not exist.");
+            if (targetLevel == null)
+                throw new IllegalStateException("Dimension " + dimension + " does not exist.");
             var spaceStations = SpaceStationHandler.getAllSpaceStations(targetLevel);
             buffer.writeVarInt(spaceStations.size());
 
             spaceStations.forEach((id, stations) -> {
                 buffer.writeVarInt(stations.size());
                 stations.forEach(station -> {
-                    buffer.writeComponent(station.name());
+                    buffer.writeUtf(Component.Serializer.toJson(station.name(), targetLevel.registryAccess()));
                     buffer.writeChunkPos(station.position());
                 });
                 buffer.writeUUID(id);
@@ -59,8 +62,8 @@ public class PlanetsMenuProvider implements ExtraDataMenuProvider {
         });
 
         List<GlobalPos> locations = new ArrayList<>();
-        AdAstraData.planets().forEach((dimension, planet) ->
-            LaunchingDimensionHandler.getSpawningLocation(player, player.serverLevel(), planet).ifPresent(locations::add));
+        AdAstraData.planets().forEach((dimension, planet) -> LaunchingDimensionHandler
+                .getSpawningLocation(player, player.serverLevel(), planet).ifPresent(locations::add));
 
         buffer.writeVarInt(locations.size());
         locations.forEach(buffer::writeGlobalPos);
@@ -70,12 +73,13 @@ public class PlanetsMenuProvider implements ExtraDataMenuProvider {
         Set<ResourceLocation> disabledPlanets = new HashSet<>();
         String[] planets = buf.readUtf().split(",");
         for (var planet : planets) {
-            disabledPlanets.add(new ResourceLocation(planet));
+            disabledPlanets.add(ResourceLocation.parse(planet));
         }
         return Collections.unmodifiableSet(disabledPlanets);
     }
 
-    public static Map<ResourceKey<Level>, Map<UUID, Set<SpaceStation>>> createSpaceStationsFromBuf(FriendlyByteBuf buf) {
+    public static Map<ResourceKey<Level>, Map<UUID, Set<SpaceStation>>> createSpaceStationsFromBuf(
+            FriendlyByteBuf buf) {
         Map<ResourceKey<Level>, Map<UUID, Set<SpaceStation>>> spaceStationsMap = new HashMap<>();
 
         int planetsSize = buf.readVarInt();
@@ -89,7 +93,8 @@ public class PlanetsMenuProvider implements ExtraDataMenuProvider {
                 Set<SpaceStation> spaceStations = new HashSet<>();
 
                 for (int k = 0; k < stationGroupSize; k++) {
-                    Component stationName = buf.readComponent();
+                    Component stationName = Component.Serializer.fromJson(buf.readUtf(),
+                            ((RegistryFriendlyByteBuf) buf).registryAccess());
                     ChunkPos stationPos = buf.readChunkPos();
                     spaceStations.add(new SpaceStation(stationPos, stationName));
                 }

@@ -12,6 +12,7 @@ import earth.terrarium.botarium.common.menu.MenuHooks;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -35,7 +36,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
 
-public abstract class Vehicle extends Entity implements PlayerRideable, ExtraDataMenuProvider, MultipartEntity, HasCustomInventoryScreen {
+public abstract class Vehicle extends Entity
+        implements PlayerRideable, ExtraDataMenuProvider, MultipartEntity, HasCustomInventoryScreen {
 
     private int lerpSteps;
     private double lerpX;
@@ -56,23 +58,25 @@ public abstract class Vehicle extends Entity implements PlayerRideable, ExtraDat
         super(type, level);
     }
 
-    protected void addPart(float width, float height, Vector3f offset, BiFunction<Player, InteractionHand, InteractionResult> handler) {
+    protected void addPart(float width, float height, Vector3f offset,
+            BiFunction<Player, InteractionHand, InteractionResult> handler) {
         VehiclePart part = new VehiclePart(this, width, height, offset, handler);
         this.parts.add(part);
         this.multipartParts.add(part);
     }
 
     @Override
-    protected void defineSynchedData() {}
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+    }
 
     @Override
     protected void readAdditionalSaveData(CompoundTag compound) {
-        inventory.fromTag(compound.getList("Inventory", Tag.TAG_COMPOUND));
+        inventory.fromTag(compound.getList("Inventory", Tag.TAG_COMPOUND), registryAccess());
     }
 
     @Override
     protected void addAdditionalSaveData(CompoundTag compound) {
-        compound.put("Inventory", inventory.createTag());
+        compound.put("Inventory", inventory.createTag(registryAccess()));
     }
 
     @Override
@@ -99,7 +103,8 @@ public abstract class Vehicle extends Entity implements PlayerRideable, ExtraDat
     public void tick() {
         super.tick();
         this.tickLerp();
-        if (!isNoGravity()) tickGravity();
+        if (!isNoGravity())
+            tickGravity();
         setPos(getX(), getY(), getZ());
         if (isControlledByLocalInstance()) {
             if (level().isClientSide() && isVehicle() && getControllingPassenger() instanceof Player player) {
@@ -160,11 +165,13 @@ public abstract class Vehicle extends Entity implements PlayerRideable, ExtraDat
 
     @Override
     public boolean hurt(DamageSource source, float amount) {
-        if (this.isInvulnerableTo(source)) return false;
-        if (source.is(DamageTypeTags.IS_PROJECTILE)) return false;
+        if (this.isInvulnerableTo(source))
+            return false;
+        if (source.is(DamageTypeTags.IS_PROJECTILE))
+            return false;
         if (amount >= 0
-            && source.getEntity() instanceof Player player
-            && (player.getVehicle() == null || !player.getVehicle().equals(this))) {
+                && source.getEntity() instanceof Player player
+                && (player.getVehicle() == null || !player.getVehicle().equals(this))) {
             playSound(SoundEvents.NETHERITE_BLOCK_BREAK);
             if (!player.getAbilities().instabuild) {
                 drop();
@@ -229,7 +236,8 @@ public abstract class Vehicle extends Entity implements PlayerRideable, ExtraDat
     }
 
     /**
-     * Checks if it's safe to dismount the vehicle. If not, the passenger has to hold shift for 2 seconds to dismount.
+     * Checks if it's safe to dismount the vehicle. If not, the passenger has to
+     * hold shift for 2 seconds to dismount.
      */
     public boolean isSafeToDismount(Player player) {
         return true;
@@ -240,7 +248,8 @@ public abstract class Vehicle extends Entity implements PlayerRideable, ExtraDat
      */
     public float xxa() {
         var controllingPassenger = getControllingPassenger();
-        if (controllingPassenger == null) return 0;
+        if (controllingPassenger == null)
+            return 0;
         return level().isClientSide() ? controllingPassenger.xxa : xxa;
     }
 
@@ -249,13 +258,15 @@ public abstract class Vehicle extends Entity implements PlayerRideable, ExtraDat
      */
     public float zza() {
         var controllingPassenger = getControllingPassenger();
-        if (controllingPassenger == null) return 0;
+        if (controllingPassenger == null)
+            return 0;
         return level().isClientSide() ? controllingPassenger.zza : zza;
     }
 
     public boolean passengerHasSpaceDown() {
         var controllingPassenger = getControllingPassenger();
-        if (!(controllingPassenger instanceof LivingEntityAccessor entity)) return false;
+        if (!(controllingPassenger instanceof LivingEntityAccessor entity))
+            return false;
         return entity.isJumping();
     }
 

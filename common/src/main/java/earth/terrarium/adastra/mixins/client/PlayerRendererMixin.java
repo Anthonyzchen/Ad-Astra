@@ -22,22 +22,28 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(PlayerRenderer.class)
-public abstract class PlayerRendererMixin extends LivingEntityRenderer<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> {
+public abstract class PlayerRendererMixin
+        extends LivingEntityRenderer<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> {
 
-    @Shadow
-    protected abstract void setupRotations(AbstractClientPlayer entityLiving, PoseStack matrixStack, float ageInTicks, float rotationYaw, float partialTicks);
+    // @Shadow
+    // protected abstract void setupRotations(AbstractClientPlayer entityLiving,
+    // PoseStack matrixStack, float ageInTicks,
+    // float rotationYaw, float partialTicks);
 
     @Shadow
     protected abstract void setModelProperties(AbstractClientPlayer clientPlayer);
 
-    public PlayerRendererMixin(EntityRendererProvider.Context context, PlayerModel<AbstractClientPlayer> model, float shadowRadius) {
+    public PlayerRendererMixin(EntityRendererProvider.Context context, PlayerModel<AbstractClientPlayer> model,
+            float shadowRadius) {
         super(context, model, shadowRadius);
     }
 
     @Inject(method = "renderHand", at = @At("HEAD"), cancellable = true)
-    private void adastra$renderHand(PoseStack poseStack, MultiBufferSource buffer, int packedLight, AbstractClientPlayer player, ModelPart rendererArm, ModelPart rendererArmwear, CallbackInfo ci) {
+    private void adastra$renderHand(PoseStack poseStack, MultiBufferSource buffer, int packedLight,
+            AbstractClientPlayer player, ModelPart rendererArm, ModelPart rendererArmwear, CallbackInfo ci) {
         var stack = player.getItemBySlot(EquipmentSlot.CHEST);
-        if (!(stack.getItem() instanceof SpaceSuitItem spaceSuit)) return;
+        if (!(stack.getItem() instanceof SpaceSuitItem spaceSuit))
+            return;
         ci.cancel();
 
         var playerModel = getModel();
@@ -50,7 +56,8 @@ public abstract class PlayerRendererMixin extends LivingEntityRenderer<AbstractC
 
         var layer = SpaceSuitModel.getLayerLocation(stack);
         var texture = SpaceSuitModel.getTextureLocation(stack);
-        if (layer == null || texture == null) return;
+        if (layer == null || texture == null)
+            return;
         var root = Minecraft.getInstance().getEntityModels().bakeLayer(layer);
 
         var spaceSuitModel = new SpaceSuitModel(root, EquipmentSlot.CHEST, stack, null);
@@ -63,10 +70,12 @@ public abstract class PlayerRendererMixin extends LivingEntityRenderer<AbstractC
 
         if (isRightHand) {
             spaceSuitModel.rightArm.copyFrom(rendererArm);
-            spaceSuitModel.rightArm.render(poseStack, buffer.getBuffer(RenderType.entityTranslucent(texture)), packedLight, OverlayTexture.NO_OVERLAY, r, g, b, 1);
+            spaceSuitModel.rightArm.render(poseStack, buffer.getBuffer(RenderType.entityTranslucent(texture)),
+                    packedLight, OverlayTexture.NO_OVERLAY, color);
         } else {
             spaceSuitModel.leftArm.copyFrom(rendererArm);
-            spaceSuitModel.leftArm.render(poseStack, buffer.getBuffer(RenderType.entityTranslucent(texture)), packedLight, OverlayTexture.NO_OVERLAY, r, g, b, 1);
+            spaceSuitModel.leftArm.render(poseStack, buffer.getBuffer(RenderType.entityTranslucent(texture)),
+                    packedLight, OverlayTexture.NO_OVERLAY, color);
         }
     }
 }

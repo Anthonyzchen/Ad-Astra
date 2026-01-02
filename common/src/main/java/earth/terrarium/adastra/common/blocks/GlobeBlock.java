@@ -46,8 +46,8 @@ public class GlobeBlock extends BasicEntityBlock implements SimpleWaterloggedBlo
     public GlobeBlock(Properties properties) {
         super(properties, true);
         registerDefaultState(stateDefinition.any()
-            .setValue(WATERLOGGED, false)
-            .setValue(POWERED, false));
+                .setValue(WATERLOGGED, false)
+                .setValue(POWERED, false));
     }
 
     @Override
@@ -61,12 +61,14 @@ public class GlobeBlock extends BasicEntityBlock implements SimpleWaterloggedBlo
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable BlockGetter level, List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, net.minecraft.world.item.Item.TooltipContext context,
+            List<Component> tooltip, TooltipFlag flag) {
         TooltipUtils.addDescriptionComponent(tooltip, ConstantComponents.GLOBE_INFO);
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player,
+            BlockHitResult hit) {
         if (level.getBlockEntity(pos) instanceof GlobeBlockEntity entity) {
             entity.rotateGlobe();
         }
@@ -87,7 +89,8 @@ public class GlobeBlock extends BasicEntityBlock implements SimpleWaterloggedBlo
     }
 
     @Override
-    public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+    public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level,
+            BlockPos pos, BlockPos neighborPos) {
         if (state.getValue(WATERLOGGED)) {
             level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
         }
@@ -96,9 +99,7 @@ public class GlobeBlock extends BasicEntityBlock implements SimpleWaterloggedBlo
 
     @Override
     public FluidState getFluidState(BlockState state) {
-        return state.getValue(WATERLOGGED) ?
-            Fluids.WATER.getSource(false) :
-            super.getFluidState(state);
+        return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
     }
 
     @Override
@@ -108,7 +109,8 @@ public class GlobeBlock extends BasicEntityBlock implements SimpleWaterloggedBlo
     }
 
     @Override
-    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos neighborPos, boolean movedByPiston) {
+    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos neighborPos,
+            boolean movedByPiston) {
         super.neighborChanged(state, level, pos, neighborBlock, neighborPos, movedByPiston);
         if (!level.isClientSide()) {
             level.setBlockAndUpdate(pos, state.setValue(POWERED, level.hasNeighborSignal(pos)));

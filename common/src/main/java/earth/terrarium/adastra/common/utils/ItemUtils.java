@@ -18,10 +18,12 @@ public class ItemUtils {
      * @param direction The direction to push items to.
      */
     public static void push(Container from, Container to, int[] fromSlots, Direction direction) {
-        if (inventoryFull(to)) return;
+        if (inventoryFull(to))
+            return;
         for (int slot : fromSlots) {
             ItemStack stack = from.getItem(slot);
-            if (stack.isEmpty()) continue;
+            if (stack.isEmpty())
+                continue;
             if (!addItem(to, stack.copyWithCount(1), IntStream.range(0, to.getContainerSize()).toArray(), direction)) {
                 continue;
             }
@@ -40,11 +42,14 @@ public class ItemUtils {
      * @param direction The direction to pull items from.
      */
     public static void pull(Container from, Container to, int[] toSlots, Direction direction) {
-        if (inventoryFull(to)) return;
+        if (inventoryFull(to))
+            return;
         for (int i = 0; i < from.getContainerSize(); i++) {
             ItemStack stack = from.getItem(i);
-            if (stack.isEmpty()) continue;
-            if (!addItem(to, stack.copyWithCount(1), toSlots, direction)) continue;
+            if (stack.isEmpty())
+                continue;
+            if (!addItem(to, stack.copyWithCount(1), toSlots, direction))
+                continue;
             from.removeItem(i, 1);
             to.setChanged();
             return;
@@ -60,8 +65,10 @@ public class ItemUtils {
     public static boolean inventoryFull(Container container) {
         for (int i = 0; i < container.getContainerSize(); i++) {
             ItemStack stack = container.getItem(i);
-            if (stack.isEmpty()) return false;
-            if (stack.getCount() < stack.getMaxStackSize()) return false;
+            if (stack.isEmpty())
+                return false;
+            if (stack.getCount() < stack.getMaxStackSize())
+                return false;
         }
         return true;
     }
@@ -79,7 +86,8 @@ public class ItemUtils {
         for (int slot : toSlots) {
             if (to instanceof WorldlyContainer worldlyContainer) {
                 int[] slots = worldlyContainer.getSlotsForFace(direction);
-                if (IntStream.of(slots).noneMatch(i -> i == slot)) continue;
+                if (IntStream.of(slots).noneMatch(i -> i == slot))
+                    continue;
             }
             var toStack = to.getItem(slot);
             if (toStack.isEmpty()) {
@@ -98,7 +106,8 @@ public class ItemUtils {
      *
      * @param container The container to add the item to.
      * @param output    The output item.
-     * @param slots     The potential slots to add the item to. The item will be added to the first available slot.
+     * @param slots     The potential slots to add the item to. The item will be
+     *                  added to the first available slot.
      */
     public static void addItem(Container container, ItemStack output, int... slots) {
         for (int slot : slots) {
@@ -123,8 +132,8 @@ public class ItemUtils {
      */
     public static boolean canAddItem(ItemStack input, ItemStack output) {
         return input.isEmpty()
-            || (ItemStack.isSameItemSameTags(input, output)
-            && output.getCount() + input.getCount() <= input.getMaxStackSize());
+                || (ItemStack.isSameItemSameComponents(input, output)
+                        && output.getCount() + input.getCount() <= input.getMaxStackSize());
     }
 
     /**
@@ -138,7 +147,8 @@ public class ItemUtils {
     public static boolean canAddItem(Container container, ItemStack output, int... slots) {
         for (int slot : slots) {
             ItemStack input = container.getItem(slot);
-            if (canAddItem(input, output)) return true;
+            if (canAddItem(input, output))
+                return true;
         }
         return false;
     }

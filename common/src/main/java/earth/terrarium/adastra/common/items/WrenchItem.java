@@ -25,14 +25,16 @@ public class WrenchItem extends Item {
     public @NotNull InteractionResult useOn(UseOnContext context) {
         Level level = context.getLevel();
         if (level.getBlockState(context.getClickedPos()).getBlock() instanceof Wrenchable block) {
-            block.onWrench(level, context.getClickedPos(), level.getBlockState(context.getClickedPos()), context.getClickedFace(), context.getPlayer(), context.getClickLocation());
+            block.onWrench(level, context.getClickedPos(), level.getBlockState(context.getClickedPos()),
+                    context.getClickedFace(), context.getPlayer(), context.getClickLocation());
             return InteractionResult.SUCCESS;
         }
         return super.useOn(context);
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag isAdvanced) {
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents,
+            TooltipFlag isAdvanced) {
         TooltipUtils.addDescriptionComponent(tooltipComponents, ConstantComponents.WRENCH_INFO);
     }
 }

@@ -34,7 +34,7 @@ public class RadioBlock extends BasicEntityBlock {
         super(properties, false);
 
         registerDefaultState(defaultBlockState()
-            .setValue(FACING, EightDirectionProperty.Direction.NORTH));
+                .setValue(FACING, EightDirectionProperty.Direction.NORTH));
     }
 
     @Override
@@ -50,7 +50,8 @@ public class RadioBlock extends BasicEntityBlock {
 
     @Override
     @SuppressWarnings("deprecation")
-    public @NotNull InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    public @NotNull InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player,
+            BlockHitResult hit) {
         if (level.isClientSide()) {
             RadioHandler.open(pos);
         }
@@ -65,7 +66,8 @@ public class RadioBlock extends BasicEntityBlock {
 
     @Nullable
     public BlockState getStateForPlacement(BlockPlaceContext context) {
-        var direction = EightDirectionProperty.Direction.VALUES[Mth.floor((double) (context.getRotation() * 8.0F / 360.0F) + 0.5D) & 7];
+        var direction = EightDirectionProperty.Direction.VALUES[Mth
+                .floor((double) (context.getRotation() * 8.0F / 360.0F) + 0.5D) & 7];
         return this.defaultBlockState().setValue(FACING, direction);
     }
 }

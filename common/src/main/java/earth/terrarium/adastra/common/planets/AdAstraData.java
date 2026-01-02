@@ -5,7 +5,6 @@ import com.google.gson.JsonObject;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
 import com.teamresourceful.resourcefullib.common.lib.Constants;
-import com.teamresourceful.resourcefullib.common.networking.PacketHelper;
 import earth.terrarium.adastra.api.planets.Planet;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
@@ -30,12 +29,13 @@ public class AdAstraData extends SimpleJsonResourceReloadListener {
     }
 
     @Override
-    protected void apply(Map<ResourceLocation, JsonElement> object, ResourceManager resourceManager, ProfilerFiller profiler) {
+    protected void apply(Map<ResourceLocation, JsonElement> object, ResourceManager resourceManager,
+            ProfilerFiller profiler) {
         PLANETS.clear();
         DIMENSIONS_TO_PLANETS.clear();
         object.forEach((key, value) -> {
             JsonObject json = GsonHelper.convertToJsonObject(value, "planets");
-            Planet planet = Planet.CODEC.parse(JsonOps.INSTANCE, json).getOrThrow(false, Constants.LOGGER::error);
+            Planet planet = Planet.CODEC.parse(JsonOps.INSTANCE, json).getOrThrow(IllegalStateException::new);
             PLANETS.put(planet.dimension(), planet);
             DIMENSIONS_TO_PLANETS.put(planet.dimension(), planet.dimension());
             for (ResourceKey<Level> dimension : planet.additionalLaunchDimensions()) {
@@ -45,19 +45,30 @@ public class AdAstraData extends SimpleJsonResourceReloadListener {
     }
 
     public static void encodePlanets(FriendlyByteBuf buf) {
-        PacketHelper.writeWithYabn(buf, Planet.CODEC.listOf(), planets().values().stream().toList(), true)
-            .get()
-            .mapRight(DataResult.PartialResult::message)
-            .ifRight(Constants.LOGGER::error);
+        List<Planet> planetList = planets().values().stream().toList();
+        buf.writeInt(planetList.size());
+        for (Planet planet : planetList) {
+            Planet.CODEC.encodeStart(JsonOps.INSTANCE, planet)
+                    .resultOrPartial(Constants.LOGGER::error)
+                    .ifPresent(json -> buf.writeUtf(json.toString()));
+        }
     }
 
     public static Collection<Planet> decodePlanets(FriendlyByteBuf buf) {
-        return PacketHelper.readWithYabn(buf, Planet.CODEC.listOf(), true)
-            .get()
-            .mapRight(DataResult.PartialResult::message)
-            .ifRight(Constants.LOGGER::error)
-            .left()
-            .orElse(Collections.emptyList());
+        List<Planet> planets = new ArrayList<>();
+        int count = buf.readInt();
+        for (int i = 0; i < count; i++) {
+            String jsonStr = buf.readUtf();
+            try {
+                JsonElement json = com.google.gson.JsonParser.parseString(jsonStr);
+                Planet.CODEC.parse(JsonOps.INSTANCE, json)
+                        .resultOrPartial(Constants.LOGGER::error)
+                        .ifPresent(planets::add);
+            } catch (Exception e) {
+                Constants.LOGGER.error("Failed to decode planet: {}", e.getMessage());
+            }
+        }
+        return planets;
     }
 
     public static ResourceKey<Level> getPlanetLocation(ResourceKey<Level> dimension) {

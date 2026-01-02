@@ -15,7 +15,8 @@ import net.minecraft.util.Mth;
 // LEGACY ENTITY. WILL BE REPLACED IN THE FUTURE.
 public class CorruptedLunarianModel extends EntityModel<CorruptedLunarian> {
 
-    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(AdAstra.MOD_ID, "corrupted_lunarian"), "main");
+    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(
+            ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "corrupted_lunarian"), "main");
 
     private final ModelPart head;
     private final ModelPart body;
@@ -46,51 +47,86 @@ public class CorruptedLunarianModel extends EntityModel<CorruptedLunarian> {
         MeshDefinition meshdefinition = new MeshDefinition();
         PartDefinition partdefinition = meshdefinition.getRoot();
 
-        PartDefinition head = partdefinition.addOrReplaceChild("head", CubeListBuilder.create().texOffs(0, 19).mirror().addBox(-4.0F, -9.0F, -4.0F, 8.0F, 9.0F, 8.0F, new CubeDeformation(0.0F)).mirror(false)
-            .texOffs(0, 0).mirror().addBox(-4.5F, -18.0F, -4.5F, 9.0F, 10.0F, 9.0F, new CubeDeformation(0.0F)).mirror(false)
-            .texOffs(0, 20).mirror().addBox(-1.0F, -3.0F, -6.0F, 2.0F, 4.0F, 2.0F, new CubeDeformation(0.0F)).mirror(false), PartPose.offset(0.0F, 0.0F, 0.0F));
+        PartDefinition head = partdefinition.addOrReplaceChild("head",
+                CubeListBuilder.create().texOffs(0, 19).mirror()
+                        .addBox(-4.0F, -9.0F, -4.0F, 8.0F, 9.0F, 8.0F, new CubeDeformation(0.0F)).mirror(false)
+                        .texOffs(0, 0).mirror()
+                        .addBox(-4.5F, -18.0F, -4.5F, 9.0F, 10.0F, 9.0F, new CubeDeformation(0.0F)).mirror(false)
+                        .texOffs(0, 20).mirror()
+                        .addBox(-1.0F, -3.0F, -6.0F, 2.0F, 4.0F, 2.0F, new CubeDeformation(0.0F)).mirror(false),
+                PartPose.offset(0.0F, 0.0F, 0.0F));
 
-        PartDefinition extra_arms = partdefinition.addOrReplaceChild("extra_arms", CubeListBuilder.create(), PartPose.offset(0.0F, 0.0F, 3.0F));
+        PartDefinition extra_arms = partdefinition.addOrReplaceChild("extra_arms", CubeListBuilder.create(),
+                PartPose.offset(0.0F, 0.0F, 3.0F));
 
-        PartDefinition backarm1 = extra_arms.addOrReplaceChild("backarm1", CubeListBuilder.create(), PartPose.offset(-1.2968F, 6.4078F, 0.3907F));
+        PartDefinition backarm1 = extra_arms.addOrReplaceChild("backarm1", CubeListBuilder.create(),
+                PartPose.offset(-1.2968F, 6.4078F, 0.3907F));
 
-        PartDefinition body_r1 = backarm1.addOrReplaceChild("body_r1", CubeListBuilder.create().texOffs(52, 0).addBox(-11.5F, 0.0F, 9.5F, 10.0F, 2.0F, 2.0F, new CubeDeformation(0.0F))
-            .texOffs(36, 0).addBox(-1.5F, 0.0F, -0.5F, 2.0F, 2.0F, 12.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.2968F, -0.4078F, 0.1093F, -0.6109F, -0.6109F, 0.0F));
+        PartDefinition body_r1 = backarm1.addOrReplaceChild("body_r1",
+                CubeListBuilder.create().texOffs(52, 0)
+                        .addBox(-11.5F, 0.0F, 9.5F, 10.0F, 2.0F, 2.0F, new CubeDeformation(0.0F))
+                        .texOffs(36, 0).addBox(-1.5F, 0.0F, -0.5F, 2.0F, 2.0F, 12.0F, new CubeDeformation(0.0F)),
+                PartPose.offsetAndRotation(0.2968F, -0.4078F, 0.1093F, -0.6109F, -0.6109F, 0.0F));
 
-        PartDefinition backarm2 = extra_arms.addOrReplaceChild("backarm2", CubeListBuilder.create(), PartPose.offset(1.0F, 6.0F, 1.0F));
+        PartDefinition backarm2 = extra_arms.addOrReplaceChild("backarm2", CubeListBuilder.create(),
+                PartPose.offset(1.0F, 6.0F, 1.0F));
 
-        PartDefinition body_r2 = backarm2.addOrReplaceChild("body_r2", CubeListBuilder.create().texOffs(52, 0).mirror().addBox(2.0F, 0.0F, 9.5F, 10.0F, 2.0F, 2.0F, new CubeDeformation(0.0F)).mirror(false)
-            .texOffs(36, 0).addBox(0.0F, 0.0F, -0.5F, 2.0F, 2.0F, 12.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(-0.5F, 0.0F, -0.5F, -0.6109F, 0.6981F, 0.0F));
+        PartDefinition body_r2 = backarm2.addOrReplaceChild("body_r2",
+                CubeListBuilder.create().texOffs(52, 0).mirror()
+                        .addBox(2.0F, 0.0F, 9.5F, 10.0F, 2.0F, 2.0F, new CubeDeformation(0.0F)).mirror(false)
+                        .texOffs(36, 0).addBox(0.0F, 0.0F, -0.5F, 2.0F, 2.0F, 12.0F, new CubeDeformation(0.0F)),
+                PartPose.offsetAndRotation(-0.5F, 0.0F, -0.5F, -0.6109F, 0.6981F, 0.0F));
 
-        PartDefinition backarm3 = extra_arms.addOrReplaceChild("backarm3", CubeListBuilder.create(), PartPose.offset(-1.0F, 4.0F, 1.0F));
+        PartDefinition backarm3 = extra_arms.addOrReplaceChild("backarm3", CubeListBuilder.create(),
+                PartPose.offset(-1.0F, 4.0F, 1.0F));
 
-        PartDefinition body_r3 = backarm3.addOrReplaceChild("body_r3", CubeListBuilder.create().texOffs(52, 0).addBox(-11.5F, -2.0F, 9.5F, 10.0F, 2.0F, 2.0F, new CubeDeformation(0.0F))
-            .texOffs(36, 0).addBox(-1.5F, -2.0F, -0.5F, 2.0F, 2.0F, 12.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, 1.0F, -0.5F, 0.6109F, -0.6109F, 0.0F));
+        PartDefinition body_r3 = backarm3.addOrReplaceChild("body_r3",
+                CubeListBuilder.create().texOffs(52, 0)
+                        .addBox(-11.5F, -2.0F, 9.5F, 10.0F, 2.0F, 2.0F, new CubeDeformation(0.0F))
+                        .texOffs(36, 0).addBox(-1.5F, -2.0F, -0.5F, 2.0F, 2.0F, 12.0F, new CubeDeformation(0.0F)),
+                PartPose.offsetAndRotation(0.0F, 1.0F, -0.5F, 0.6109F, -0.6109F, 0.0F));
 
-        PartDefinition backarm4 = extra_arms.addOrReplaceChild("backarm4", CubeListBuilder.create(), PartPose.offset(1.0F, 4.0F, 0.0F));
+        PartDefinition backarm4 = extra_arms.addOrReplaceChild("backarm4", CubeListBuilder.create(),
+                PartPose.offset(1.0F, 4.0F, 0.0F));
 
-        PartDefinition body_r4 = backarm4.addOrReplaceChild("body_r4", CubeListBuilder.create().texOffs(52, 0).mirror().addBox(2.0F, -2.0F, 9.5F, 10.0F, 2.0F, 2.0F, new CubeDeformation(0.0F)).mirror(false)
-            .texOffs(36, 0).addBox(0.0F, -2.0F, -0.5F, 2.0F, 2.0F, 12.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(-0.5F, 1.0F, 0.5F, 0.6109F, 0.6109F, 0.0F));
+        PartDefinition body_r4 = backarm4.addOrReplaceChild("body_r4",
+                CubeListBuilder.create().texOffs(52, 0).mirror()
+                        .addBox(2.0F, -2.0F, 9.5F, 10.0F, 2.0F, 2.0F, new CubeDeformation(0.0F)).mirror(false)
+                        .texOffs(36, 0).addBox(0.0F, -2.0F, -0.5F, 2.0F, 2.0F, 12.0F, new CubeDeformation(0.0F)),
+                PartPose.offsetAndRotation(-0.5F, 1.0F, 0.5F, 0.6109F, 0.6109F, 0.0F));
 
-        PartDefinition body = partdefinition.addOrReplaceChild("body", CubeListBuilder.create().texOffs(100, 0).mirror().addBox(0.0F, -12.0F, -5.0F, 8.0F, 12.0F, 6.0F, new CubeDeformation(0.0F)).mirror(false)
-            .texOffs(0, 36).mirror().addBox(0.0F, -12.0F, -5.0F, 8.0F, 19.0F, 6.0F, new CubeDeformation(0.5F)).mirror(false), PartPose.offset(-4.0F, 12.0F, 2.0F));
+        PartDefinition body = partdefinition.addOrReplaceChild("body",
+                CubeListBuilder.create().texOffs(100, 0).mirror()
+                        .addBox(0.0F, -12.0F, -5.0F, 8.0F, 12.0F, 6.0F, new CubeDeformation(0.0F)).mirror(false)
+                        .texOffs(0, 36).mirror()
+                        .addBox(0.0F, -12.0F, -5.0F, 8.0F, 19.0F, 6.0F, new CubeDeformation(0.5F)).mirror(false),
+                PartPose.offset(-4.0F, 12.0F, 2.0F));
 
-        PartDefinition leg0 = partdefinition.addOrReplaceChild("leg0", CubeListBuilder.create().texOffs(0, 81).mirror().addBox(-2.0F, 0.0F, -2.0F, 4.0F, 12.0F, 4.0F, new CubeDeformation(0.0F)).mirror(false), PartPose.offset(2.0F, 12.0F, 0.0F));
+        PartDefinition leg0 = partdefinition.addOrReplaceChild("leg0",
+                CubeListBuilder.create().texOffs(0, 81).mirror()
+                        .addBox(-2.0F, 0.0F, -2.0F, 4.0F, 12.0F, 4.0F, new CubeDeformation(0.0F)).mirror(false),
+                PartPose.offset(2.0F, 12.0F, 0.0F));
 
-        PartDefinition leg1 = partdefinition.addOrReplaceChild("leg1", CubeListBuilder.create().texOffs(0, 81).addBox(-2.0F, 0.0F, -2.0F, 4.0F, 12.0F, 4.0F, new CubeDeformation(0.0F)), PartPose.offset(-2.0F, 12.0F, 0.0F));
+        PartDefinition leg1 = partdefinition.addOrReplaceChild("leg1", CubeListBuilder.create().texOffs(0, 81).addBox(
+                -2.0F, 0.0F, -2.0F, 4.0F, 12.0F, 4.0F, new CubeDeformation(0.0F)), PartPose.offset(-2.0F, 12.0F, 0.0F));
 
-        PartDefinition arms = partdefinition.addOrReplaceChild("arms", CubeListBuilder.create(), PartPose.offsetAndRotation(0.0F, 2.0F, 0.0F, -1.5708F, 0.0F, 0.0F));
+        PartDefinition arms = partdefinition.addOrReplaceChild("arms", CubeListBuilder.create(),
+                PartPose.offsetAndRotation(0.0F, 2.0F, 0.0F, -1.5708F, 0.0F, 0.0F));
 
-        PartDefinition arm1 = arms.addOrReplaceChild("arm1", CubeListBuilder.create().texOffs(30, 61).mirror().addBox(-2.0F, -2.0F, -2.0F, 4.0F, 12.0F, 4.0F, new CubeDeformation(0.0F)).mirror(false), PartPose.offset(6.0F, 0.1434F, 0.2048F));
+        PartDefinition arm1 = arms.addOrReplaceChild("arm1",
+                CubeListBuilder.create().texOffs(30, 61).mirror()
+                        .addBox(-2.0F, -2.0F, -2.0F, 4.0F, 12.0F, 4.0F, new CubeDeformation(0.0F)).mirror(false),
+                PartPose.offset(6.0F, 0.1434F, 0.2048F));
 
-        PartDefinition arm2 = arms.addOrReplaceChild("arm2", CubeListBuilder.create().texOffs(30, 61).addBox(-2.0F, -2.0F, -2.0F, 4.0F, 12.0F, 4.0F, new CubeDeformation(0.0F)), PartPose.offset(-6.0F, 0.1434F, 0.2048F));
+        PartDefinition arm2 = arms.addOrReplaceChild("arm2", CubeListBuilder.create().texOffs(30, 61).addBox(-2.0F,
+                -2.0F, -2.0F, 4.0F, 12.0F, 4.0F, new CubeDeformation(0.0F)), PartPose.offset(-6.0F, 0.1434F, 0.2048F));
 
         return LayerDefinition.create(meshdefinition, 128, 128);
     }
 
-
     @Override
-    public void setupAnim(CorruptedLunarian entity, float limbAngle, float limbDistance, float animationProgress, float headYaw, float headPitch) {
+    public void setupAnim(CorruptedLunarian entity, float limbAngle, float limbDistance, float animationProgress,
+            float headYaw, float headPitch) {
         this.arm2.yRot = 0.0f;
         this.arm1.yRot = 0.0f;
         this.arm2.zRot = 0.0f;
@@ -117,16 +153,17 @@ public class CorruptedLunarianModel extends EntityModel<CorruptedLunarian> {
     }
 
     @Override
-    public void renderToBuffer(PoseStack poseStack, VertexConsumer vertices, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
-        head.render(poseStack, vertices, packedLight, packedOverlay);
-        body.render(poseStack, vertices, packedLight, packedOverlay);
-        leg0.render(poseStack, vertices, packedLight, packedOverlay);
-        leg1.render(poseStack, vertices, packedLight, packedOverlay);
-        arm1.render(poseStack, vertices, packedLight, packedOverlay);
-        arm2.render(poseStack, vertices, packedLight, packedOverlay);
-        monsterarm1.render(poseStack, vertices, packedLight, packedOverlay);
-        monsterarm2.render(poseStack, vertices, packedLight, packedOverlay);
-        monsterarm3.render(poseStack, vertices, packedLight, packedOverlay);
-        monsterarm4.render(poseStack, vertices, packedLight, packedOverlay);
+    public void renderToBuffer(PoseStack poseStack, VertexConsumer vertices, int packedLight, int packedOverlay,
+            int color) {
+        head.render(poseStack, vertices, packedLight, packedOverlay, color);
+        body.render(poseStack, vertices, packedLight, packedOverlay, color);
+        leg0.render(poseStack, vertices, packedLight, packedOverlay, color);
+        leg1.render(poseStack, vertices, packedLight, packedOverlay, color);
+        arm1.render(poseStack, vertices, packedLight, packedOverlay, color);
+        arm2.render(poseStack, vertices, packedLight, packedOverlay, color);
+        monsterarm1.render(poseStack, vertices, packedLight, packedOverlay, color);
+        monsterarm2.render(poseStack, vertices, packedLight, packedOverlay, color);
+        monsterarm3.render(poseStack, vertices, packedLight, packedOverlay, color);
+        monsterarm4.render(poseStack, vertices, packedLight, packedOverlay, color);
     }
 }

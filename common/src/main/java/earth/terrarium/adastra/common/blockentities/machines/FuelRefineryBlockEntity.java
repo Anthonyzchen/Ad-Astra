@@ -32,16 +32,21 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class FuelRefineryBlockEntity extends RecipeMachineBlockEntity<RefiningRecipe> implements BotariumFluidBlock<WrappedBlockFluidContainer> {
+public class FuelRefineryBlockEntity extends RecipeMachineBlockEntity<RefiningRecipe>
+        implements BotariumFluidBlock<WrappedBlockFluidContainer> {
 
     public static final List<ConfigurationEntry> SIDE_CONFIG = List.of(
-        new ConfigurationEntry(ConfigurationType.SLOT, Configuration.NONE, ConstantComponents.SIDE_CONFIG_INPUT_SLOTS),
-        new ConfigurationEntry(ConfigurationType.SLOT, Configuration.NONE, ConstantComponents.SIDE_CONFIG_EXTRACTION_SLOTS),
-        new ConfigurationEntry(ConfigurationType.SLOT, Configuration.NONE, ConstantComponents.SIDE_CONFIG_OUTPUT_SLOTS),
-        new ConfigurationEntry(ConfigurationType.ENERGY, Configuration.NONE, ConstantComponents.SIDE_CONFIG_ENERGY),
-        new ConfigurationEntry(ConfigurationType.FLUID, Configuration.NONE, ConstantComponents.SIDE_CONFIG_INPUT_FLUID),
-        new ConfigurationEntry(ConfigurationType.FLUID, Configuration.NONE, ConstantComponents.SIDE_CONFIG_OUTPUT_FLUID)
-    );
+            new ConfigurationEntry(ConfigurationType.SLOT, Configuration.NONE,
+                    ConstantComponents.SIDE_CONFIG_INPUT_SLOTS),
+            new ConfigurationEntry(ConfigurationType.SLOT, Configuration.NONE,
+                    ConstantComponents.SIDE_CONFIG_EXTRACTION_SLOTS),
+            new ConfigurationEntry(ConfigurationType.SLOT, Configuration.NONE,
+                    ConstantComponents.SIDE_CONFIG_OUTPUT_SLOTS),
+            new ConfigurationEntry(ConfigurationType.ENERGY, Configuration.NONE, ConstantComponents.SIDE_CONFIG_ENERGY),
+            new ConfigurationEntry(ConfigurationType.FLUID, Configuration.NONE,
+                    ConstantComponents.SIDE_CONFIG_INPUT_FLUID),
+            new ConfigurationEntry(ConfigurationType.FLUID, Configuration.NONE,
+                    ConstantComponents.SIDE_CONFIG_OUTPUT_FLUID));
 
     private WrappedBlockFluidContainer fluidContainer;
 
@@ -55,49 +60,56 @@ public class FuelRefineryBlockEntity extends RecipeMachineBlockEntity<RefiningRe
     }
 
     @Override
-    public WrappedBlockEnergyContainer getEnergyStorage(Level level, BlockPos pos, BlockState state, @Nullable BlockEntity entity, @Nullable Direction direction) {
-        if (energyContainer != null) return energyContainer;
+    public WrappedBlockEnergyContainer getEnergyStorage(Level level, BlockPos pos, BlockState state,
+            @Nullable BlockEntity entity, @Nullable Direction direction) {
+        if (energyContainer != null)
+            return energyContainer;
         return energyContainer = new WrappedBlockEnergyContainer(
-            this,
-            EnergyUtils.machineInsertOnlyEnergy(MachineConfig.STEEL)
-        );
+                this,
+                EnergyUtils.machineInsertOnlyEnergy(MachineConfig.STEEL));
     }
 
     @Override
-    public @Nullable WrappedBlockFluidContainer getFluidContainer(Level level, BlockPos pos, BlockState state, @Nullable BlockEntity entity, @Nullable Direction direction) {
+    public @Nullable WrappedBlockFluidContainer getFluidContainer(Level level, BlockPos pos, BlockState state,
+            @Nullable BlockEntity entity, @Nullable Direction direction) {
         return getFluidContainer();
     }
 
     public WrappedBlockFluidContainer getFluidContainer() {
-        if (fluidContainer != null) return fluidContainer;
+        if (fluidContainer != null)
+            return fluidContainer;
         return fluidContainer = new WrappedBlockFluidContainer(
-            this,
-            new BiFluidContainer(
-                FluidConstants.fromMillibuckets(MachineConfig.STEEL.fluidCapacity),
-                1,
-                1,
-                (tank, holder) -> level().getRecipeManager().getAllRecipesFor(ModRecipeTypes.REFINING.get())
-                    .stream()
-                    .anyMatch(r -> r.value().input().test(holder)),
-                (tank, holder) -> level().getRecipeManager().getAllRecipesFor(ModRecipeTypes.REFINING.get())
-                    .stream()
-                    .anyMatch(r -> r.value().result().matches(holder))));
+                this,
+                new BiFluidContainer(
+                        FluidConstants.fromMillibuckets(MachineConfig.STEEL.fluidCapacity),
+                        1,
+                        1,
+                        (tank, holder) -> level().getRecipeManager().getAllRecipesFor(ModRecipeTypes.REFINING.get())
+                                .stream()
+                                .anyMatch(r -> r.value().input().test(holder)),
+                        (tank, holder) -> level().getRecipeManager().getAllRecipesFor(ModRecipeTypes.REFINING.get())
+                                .stream()
+                                .anyMatch(r -> r.value().result().matches(holder))));
     }
 
     @Override
     public void tickSideInteractions(BlockPos pos, Predicate<Direction> filter, List<ConfigurationEntry> sideConfig) {
-        TransferUtils.pullItemsNearby(this, pos, new int[]{1}, sideConfig.get(0), filter);
-        TransferUtils.pullItemsNearby(this, pos, new int[]{3}, sideConfig.get(1), filter);
-        TransferUtils.pushItemsNearby(this, pos, new int[]{2, 4}, sideConfig.get(2), filter);
+        TransferUtils.pullItemsNearby(this, pos, new int[] { 1 }, sideConfig.get(0), filter);
+        TransferUtils.pullItemsNearby(this, pos, new int[] { 3 }, sideConfig.get(1), filter);
+        TransferUtils.pushItemsNearby(this, pos, new int[] { 2, 4 }, sideConfig.get(2), filter);
         TransferUtils.pullEnergyNearby(this, pos, getEnergyStorage().maxInsert(), sideConfig.get(3), filter);
-        TransferUtils.pullFluidNearby(this, pos, getFluidContainer(), FluidConstants.fromMillibuckets(200), 0, sideConfig.get(4), filter);
-        TransferUtils.pushFluidNearby(this, pos, getFluidContainer(), FluidConstants.fromMillibuckets(200), 1, sideConfig.get(5), filter);
+        TransferUtils.pullFluidNearby(this, pos, getFluidContainer(), FluidConstants.fromMillibuckets(200), 0,
+                sideConfig.get(4), filter);
+        TransferUtils.pushFluidNearby(this, pos, getFluidContainer(), FluidConstants.fromMillibuckets(200), 1,
+                sideConfig.get(5), filter);
     }
 
     @Override
     public void recipeTick(ServerLevel level, WrappedBlockEnergyContainer energyStorage) {
-        if (recipe == null) return;
-        if (fluidContainer == null) getFluidContainer();
+        if (recipe == null)
+            return;
+        if (fluidContainer == null)
+            getFluidContainer();
         if (!canCraft()) {
             clearRecipe();
             return;
@@ -106,29 +118,34 @@ public class FuelRefineryBlockEntity extends RecipeMachineBlockEntity<RefiningRe
         energyStorage.internalExtract(recipe.energy(), false);
 
         cookTime++;
-        if (cookTime < cookTimeTotal) return;
+        if (cookTime < cookTimeTotal)
+            return;
         craft();
     }
 
     @Override
     public void craft() {
-        if (recipe == null) return;
+        if (recipe == null)
+            return;
 
-        fluidContainer.internalExtract(getFluidContainer().getFirstFluid().copyWithAmount(recipe.input().getFluidAmount()), false);
+        fluidContainer.internalExtract(
+                getFluidContainer().getFirstFluid().copyWithAmount(recipe.input().getFluidAmount()), false);
         fluidContainer.internalInsert(recipe.result(), false);
 
         updateSlots();
 
         cookTime = 0;
-        if (fluidContainer.getFirstFluid().isEmpty()) clearRecipe();
+        if (fluidContainer.getFirstFluid().isEmpty())
+            clearRecipe();
     }
 
     @Override
     public void update() {
-        quickCheck.getRecipeFor(this, level()).ifPresent(r -> {
-            recipe = r.value();
-            cookTimeTotal = r.value().cookingTime();
-        });
+        quickCheck.getRecipeFor(new earth.terrarium.adastra.common.recipes.ContainerRecipeInput(this), level())
+                .ifPresent(r -> {
+                    recipe = r.value();
+                    cookTimeTotal = r.value().cookingTime();
+                });
         updateSlots();
     }
 
@@ -146,6 +163,6 @@ public class FuelRefineryBlockEntity extends RecipeMachineBlockEntity<RefiningRe
 
     @Override
     public int @NotNull [] getSlotsForFace(@NotNull Direction side) {
-        return new int[]{1, 2, 3, 4};
+        return new int[] { 1, 2, 3, 4 };
     }
 }

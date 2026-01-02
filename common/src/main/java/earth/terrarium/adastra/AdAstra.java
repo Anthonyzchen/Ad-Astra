@@ -48,7 +48,7 @@ public class AdAstra {
         ModRecipeTypes.RECIPE_TYPES.init();
         ModRecipeSerializers.RECIPE_SERIALIZERS.init();
         ModParticleTypes.PARTICLE_TYPES.init();
-        ModPaintingVariants.PAINTING_VARIANTS.init();
+        // ModPaintingVariants.PAINTING_VARIANTS.init();
         ModSoundEvents.SOUND_EVENTS.init();
         ModStructures.STRUCTURE_TYPES.init();
         ModStructures.STRUCTURE_PROCESSORS.init();
@@ -68,7 +68,7 @@ public class AdAstra {
     }
 
     public static void onAddReloadListener(BiConsumer<ResourceLocation, PreparableReloadListener> registry) {
-        registry.accept(new ResourceLocation(AdAstra.MOD_ID, "planets"), new AdAstraData());
+        registry.accept(ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "planets"), new AdAstraData());
     }
 
     public static void onDatapackSync(ServerPlayer player) {
@@ -81,7 +81,8 @@ public class AdAstra {
                 boolean oxygen = OxygenApi.API.hasOxygen(player);
                 short temperature = TemperatureApi.API.getTemperature(player);
                 float gravity = GravityApi.API.getGravity(player);
-                NetworkHandler.CHANNEL.sendToPlayer(new ClientboundSyncLocalPlanetDataPacket(new PlanetData(oxygen, temperature, gravity)), player);
+                NetworkHandler.CHANNEL.sendToPlayer(
+                        new ClientboundSyncLocalPlanetDataPacket(new PlanetData(oxygen, temperature, gravity)), player);
             }
         });
     }

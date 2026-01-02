@@ -1,26 +1,35 @@
 package earth.terrarium.adastra.common.registry;
 
-import com.teamresourceful.resourcefullib.common.item.tabs.ResourcefulCreativeTab;
+import com.teamresourceful.resourcefullib.common.registry.RegistryEntry;
+import com.teamresourceful.resourcefullib.common.registry.ResourcefulRegistries;
+import com.teamresourceful.resourcefullib.common.registry.ResourcefulRegistry;
 import earth.terrarium.adastra.AdAstra;
 import earth.terrarium.adastra.common.utils.EnergyUtils;
 import earth.terrarium.adastra.common.utils.FluidUtils;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-@SuppressWarnings({"unused", "SameParameterValue"})
+@SuppressWarnings({ "unused", "SameParameterValue" })
 public class ModCreativeTab {
 
-    public static final Supplier<CreativeModeTab> TAB = new ResourcefulCreativeTab(new ResourceLocation(AdAstra.MOD_ID, "main"))
-        .setItemIcon(ModItems.TIER_1_ROCKET)
-        .addContent(ModCreativeTab::getCustomNbtItems)
-        .addRegistry(ModItems.ITEMS)
-        .build();
+    public static final ResourcefulRegistry<CreativeModeTab> TABS = ResourcefulRegistries
+            .create(BuiltInRegistries.CREATIVE_MODE_TAB, AdAstra.MOD_ID);
+
+    public static final RegistryEntry<CreativeModeTab> TAB = TABS.register("main",
+            () -> CreativeModeTab.builder(CreativeModeTab.Row.TOP, 0)
+                    .icon(() -> new ItemStack(ModItems.TIER_1_ROCKET.get()))
+                    .title(Component.translatable("itemGroup.adastra.main"))
+                    .displayItems((parameters, output) -> {
+                        getCustomNbtItems().forEach(output::accept);
+                        ModItems.ITEMS.stream().forEach(entry -> output.accept(entry.get()));
+                    })
+                    .build());
 
     public static Stream<ItemStack> getCustomNbtItems() {
         List<ItemStack> list = new ArrayList<>();
@@ -43,5 +52,7 @@ public class ModCreativeTab {
         return list.stream();
     }
 
-    public static void init() {} // NO-OP
+    public static void init() {
+        TABS.init();
+    }
 }

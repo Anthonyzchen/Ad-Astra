@@ -34,7 +34,7 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
-import net.minecraft.world.level.pathfinder.BlockPathTypes;
+import net.minecraft.world.level.pathfinder.PathType;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -43,20 +43,21 @@ import java.util.List;
 // LEGACY ENTITY. WILL BE REPLACED IN THE FUTURE.
 public class GlacianRam extends Animal implements Shearable {
 
-    private static final EntityDataAccessor<Boolean> SHEARED = SynchedEntityData.defineId(GlacianRam.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> SHEARED = SynchedEntityData.defineId(GlacianRam.class,
+            EntityDataSerializers.BOOLEAN);
     private int eatPermafrostTimer;
     private EatPermafrostGoal eatPermafrostGoal;
 
     public GlacianRam(EntityType<? extends GlacianRam> entityType, Level level) {
         super(entityType, level);
         this.getNavigation().setCanFloat(true);
-        this.setPathfindingMalus(BlockPathTypes.POWDER_SNOW, -1.0f);
-        this.setPathfindingMalus(BlockPathTypes.DANGER_POWDER_SNOW, -1.0f);
+        this.setPathfindingMalus(PathType.POWDER_SNOW, -1.0f);
+        this.setPathfindingMalus(PathType.DANGER_POWDER_SNOW, -1.0f);
     }
 
     public static AttributeSupplier.Builder createMobAttributes() {
         return Mob.createMobAttributes().add(Attributes.MAX_HEALTH, 16.0)
-            .add(Attributes.MOVEMENT_SPEED, 0.20f);
+                .add(Attributes.MOVEMENT_SPEED, 0.20f);
     }
 
     @Override
@@ -74,9 +75,9 @@ public class GlacianRam extends Animal implements Shearable {
     }
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(SHEARED, false);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(SHEARED, false);
     }
 
     @Override
@@ -97,13 +98,15 @@ public class GlacianRam extends Animal implements Shearable {
         ItemStack itemStack = player.getItemInHand(hand);
         if (itemStack.is(Items.BUCKET) && !this.isBaby()) {
             player.playSound(this.getMilkingSound(), 1.0f, 1.0f);
-            ItemStack itemStack2 = ItemUtils.createFilledResult(itemStack, player, Items.MILK_BUCKET.getDefaultInstance());
+            ItemStack itemStack2 = ItemUtils.createFilledResult(itemStack, player,
+                    Items.MILK_BUCKET.getDefaultInstance());
             player.setItemInHand(hand, itemStack2);
             return InteractionResult.sidedSuccess(this.level().isClientSide);
         } else {
             InteractionResult actionResult = super.mobInteract(player, hand);
             if (actionResult.consumesAction() && this.isFood(itemStack)) {
-                this.level().playSound(null, this, this.getEatingSound(itemStack), SoundSource.NEUTRAL, 1.0f, Mth.randomBetween(this.level().random, 0.8f, 1.2f));
+                this.level().playSound(null, this, this.getEatingSound(itemStack), SoundSource.NEUTRAL, 1.0f,
+                        Mth.randomBetween(this.level().random, 0.8f, 1.2f));
             }
 
             return this.shear(player, hand);
@@ -130,7 +133,11 @@ public class GlacianRam extends Animal implements Shearable {
         if (itemStack.is(Items.SHEARS)) {
             if (!this.level().isClientSide && this.readyForShearing()) {
                 this.shear(player, SoundSource.PLAYERS);
-                itemStack.hurtAndBreak(1, player, playerx -> playerx.broadcastBreakEvent(hand));
+                if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+                    itemStack.hurtAndBreak(1, serverPlayer.serverLevel(), serverPlayer,
+                            playerx -> {
+                            });
+                }
                 return InteractionResult.SUCCESS;
             } else {
                 return InteractionResult.CONSUME;
@@ -149,14 +156,17 @@ public class GlacianRam extends Animal implements Shearable {
         for (ItemStack item : this.onSheared(player, shearedSoundCategory)) {
             ItemEntity itemEntity = this.spawnAtLocation(item);
             if (itemEntity != null) {
-                itemEntity.setDeltaMovement(itemEntity.getDeltaMovement().add((this.random.nextFloat() - this.random.nextFloat()) * 0.1F, this.random.nextFloat() * 0.05F, (this.random.nextFloat() - this.random.nextFloat()) * 0.1F));
+                itemEntity.setDeltaMovement(itemEntity.getDeltaMovement().add(
+                        (this.random.nextFloat() - this.random.nextFloat()) * 0.1F, this.random.nextFloat() * 0.05F,
+                        (this.random.nextFloat() - this.random.nextFloat()) * 0.1F));
             }
         }
     }
 
     public List<ItemStack> onSheared(@Nullable Player player, SoundSource shearedSoundCategory) {
         this.level().playSound(null, this, SoundEvents.SHEEP_SHEAR, shearedSoundCategory, 1.0F, 1.0F);
-        if (player != null) this.gameEvent(GameEvent.SHEAR, player);
+        if (player != null)
+            this.gameEvent(GameEvent.SHEAR, player);
         this.setSheared(true);
         int i = 1 + this.random.nextInt(3);
         List<ItemStack> items = new ArrayList<>();
@@ -240,7 +250,8 @@ public class GlacianRam extends Animal implements Shearable {
         } else if (this.eatPermafrostTimer >= 4 && this.eatPermafrostTimer <= 36) {
             return 1.0F;
         } else {
-            return this.eatPermafrostTimer < 4 ? ((float) this.eatPermafrostTimer - delta) / 4.0F : -((float) (this.eatPermafrostTimer - 40) - delta) / 4.0F;
+            return this.eatPermafrostTimer < 4 ? ((float) this.eatPermafrostTimer - delta) / 4.0F
+                    : -((float) (this.eatPermafrostTimer - 40) - delta) / 4.0F;
         }
     }
 

@@ -46,19 +46,24 @@ public class LunarianWanderingTraderSpawner implements CustomSpawner {
 
     @Override
     public int tick(ServerLevel level, boolean spawnMonsters, boolean spawnAnimals) {
-        if (!level.getGameRules().getBoolean(GameRules.RULE_DO_TRADER_SPAWNING)) return 0;
-        if (--this.spawnTimer > 0) return 0;
+        if (!level.getGameRules().getBoolean(GameRules.RULE_DO_TRADER_SPAWNING))
+            return 0;
+        if (--this.spawnTimer > 0)
+            return 0;
 
         this.spawnTimer = DEFAULT_SPAWN_TIMER;
         this.spawnDelay -= DEFAULT_SPAWN_TIMER;
         this.properties.setWanderingTraderSpawnDelay(this.spawnDelay);
-        if (this.spawnDelay > 0) return 0;
+        if (this.spawnDelay > 0)
+            return 0;
         this.spawnDelay = DEFAULT_SPAWN_DELAY;
-        if (!level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING)) return 0;
+        if (!level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING))
+            return 0;
         int i = this.spawnChance;
         this.spawnChance = Mth.clamp(this.spawnChance + 25, 25, 75);
         this.properties.setWanderingTraderSpawnChance(this.spawnChance);
-        if (this.random.nextInt(100) > i) return 0;
+        if (this.random.nextInt(100) > i)
+            return 0;
         if (this.trySpawn(level)) {
             this.spawnChance = 25;
             return 1;
@@ -68,14 +73,19 @@ public class LunarianWanderingTraderSpawner implements CustomSpawner {
 
     private boolean trySpawn(ServerLevel level) {
         ServerPlayer playerEntity = level.getRandomPlayer();
-        if (playerEntity == null) return true;
-        if (this.random.nextInt(10) != 0) return false;
-        if (!PlanetApi.API.isPlanet(level.dimension())) return false;
-        if (Level.OVERWORLD.equals(level.dimension())) return false;
+        if (playerEntity == null)
+            return true;
+        if (this.random.nextInt(10) != 0)
+            return false;
+        if (!PlanetApi.API.isPlanet(level.dimension()))
+            return false;
+        if (Level.OVERWORLD.equals(level.dimension()))
+            return false;
 
         BlockPos blockPos = playerEntity.blockPosition();
         PoiManager pointOfInterestStorage = level.getPoiManager();
-        Optional<BlockPos> optional = pointOfInterestStorage.find(holder -> holder.is(PoiTypes.MEETING), pos -> true, blockPos, 48, PoiManager.Occupancy.ANY);
+        Optional<BlockPos> optional = pointOfInterestStorage.find(holder -> holder.is(PoiTypes.MEETING), pos -> true,
+                blockPos, 48, PoiManager.Occupancy.ANY);
         BlockPos blockPos2 = optional.orElse(blockPos);
         BlockPos blockPos3 = this.getNearbySpawnPos(level, blockPos2, 48);
         if (blockPos3 != null && this.doesNotSuffocateAt(level, blockPos3)) {
@@ -83,7 +93,8 @@ public class LunarianWanderingTraderSpawner implements CustomSpawner {
                 return false;
             }
 
-            WanderingTrader wanderingTraderEntity = ModEntityTypes.LUNARIAN_WANDERING_TRADER.get().spawn(level, blockPos3, MobSpawnType.EVENT);
+            WanderingTrader wanderingTraderEntity = ModEntityTypes.LUNARIAN_WANDERING_TRADER.get().spawn(level,
+                    blockPos3, MobSpawnType.EVENT);
             if (wanderingTraderEntity != null) {
 
                 this.properties.setWanderingTraderId(wanderingTraderEntity.getUUID());
@@ -97,13 +108,15 @@ public class LunarianWanderingTraderSpawner implements CustomSpawner {
     }
 
     @Nullable
-    private BlockPos getNearbySpawnPos(LevelReader level, BlockPos pos, int range) {
+    private BlockPos getNearbySpawnPos(ServerLevelAccessor level, BlockPos pos, int range) {
         BlockPos blockPos = null;
         for (int i = 0; i < 10; ++i) {
             int k;
             int j = pos.getX() + this.random.nextInt(range * 2) - range;
-            BlockPos blockPos2 = BlockPos.containing(j, level.getHeight(Heightmap.Types.WORLD_SURFACE, j, k = pos.getZ() + this.random.nextInt(range * 2) - range), k);
-            if (!NaturalSpawner.isSpawnPositionOk(SpawnPlacements.Type.ON_GROUND, level, blockPos2, ModEntityTypes.LUNARIAN_WANDERING_TRADER.get()))
+            BlockPos blockPos2 = BlockPos.containing(j, level.getHeight(Heightmap.Types.WORLD_SURFACE, j,
+                    k = pos.getZ() + this.random.nextInt(range * 2) - range), k);
+            if (!SpawnPlacements.checkSpawnRules(ModEntityTypes.LUNARIAN_WANDERING_TRADER.get(), level,
+                    MobSpawnType.EVENT, blockPos2, level.getRandom()))
                 continue;
             blockPos = blockPos2;
             break;

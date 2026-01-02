@@ -38,7 +38,8 @@ public class GasTankItem extends Item implements BotariumFluidItem<WrappedItemFl
     }
 
     @Override
-    public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level level, Player player, @NotNull InteractionHand usedHand) {
+    public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level level, Player player,
+            @NotNull InteractionHand usedHand) {
         ItemStack stack = player.getItemInHand(usedHand);
         if (FluidUtils.hasFluid(stack)) {
             player.startUsingItem(usedHand);
@@ -47,28 +48,37 @@ public class GasTankItem extends Item implements BotariumFluidItem<WrappedItemFl
     }
 
     @Override
-    public void onUseTick(@NotNull Level level, @NotNull LivingEntity entity, @NotNull ItemStack stack, int remainingUseDuration) {
-        if (level.isClientSide()) return;
-        if (!(entity instanceof Player player)) return;
+    public void onUseTick(@NotNull Level level, @NotNull LivingEntity entity, @NotNull ItemStack stack,
+            int remainingUseDuration) {
+        if (level.isClientSide())
+            return;
+        if (!(entity instanceof Player player))
+            return;
         Inventory inventory = player.getInventory();
         var container = FluidUtils.getTank(stack);
-        if (container.getFluidAmount() == 0) return;
+        if (container.getFluidAmount() == 0)
+            return;
         ItemStackHolder from = new ItemStackHolder(stack);
-        if (!distributeSequential(from, container, inventory)) return;
+        if (!distributeSequential(from, container, inventory))
+            return;
         inventory.setItem(inventory.selected, from.getStack());
         if (entity.tickCount % 4 == 0) {
-            level.playSound(null, player.blockPosition(), SoundEvents.GENERIC_DRINK, player.getSoundSource(), 1.0F, 1.0F);
+            level.playSound(null, player.blockPosition(), SoundEvents.GENERIC_DRINK, player.getSoundSource(), 1.0F,
+                    1.0F);
         }
     }
 
     public boolean distributeSequential(ItemStackHolder from, FluidHolder container, Inventory inventory) {
         for (int i = inventory.getContainerSize() - 1; i >= 0; i--) {
             var stack = inventory.getItem(i);
-            if (stack.isEmpty() || stack.is(this)) continue;
+            if (stack.isEmpty() || stack.is(this))
+                continue;
             ItemStackHolder to = new ItemStackHolder(stack);
-            long moved = FluidApi.moveFluid(from, to, container.copyWithAmount(FluidConstants.fromMillibuckets(distributionAmount)), false);
+            long moved = FluidApi.moveFluid(from, to,
+                    container.copyWithAmount(FluidConstants.fromMillibuckets(distributionAmount)), false);
             inventory.setItem(i, to.getStack());
-            if (moved > 0) return true;
+            if (moved > 0)
+                return true;
         }
         return false;
     }
@@ -76,17 +86,20 @@ public class GasTankItem extends Item implements BotariumFluidItem<WrappedItemFl
     @Override
     public WrappedItemFluidContainer getFluidContainer(ItemStack holder) {
         return new WrappedItemFluidContainer(
-            holder,
-            new SimpleFluidContainer(
-                FluidConstants.fromMillibuckets(tankSize),
-                1,
-                (t, f) -> true));
+                holder,
+                new SimpleFluidContainer(
+                        FluidConstants.fromMillibuckets(tankSize),
+                        1,
+                        (t, f) -> true));
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Level level, List<Component> tooltipComponents, TooltipFlag isAdvanced) {
-        tooltipComponents.add(TooltipUtils.getFluidComponent(FluidUtils.getTank(stack), FluidUtils.getTankCapacity(stack)));
-        tooltipComponents.add(TooltipUtils.getMaxFluidOutComponent(FluidConstants.fromMillibuckets(distributionAmount)));
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents,
+            TooltipFlag isAdvanced) {
+        tooltipComponents
+                .add(TooltipUtils.getFluidComponent(FluidUtils.getTank(stack), FluidUtils.getTankCapacity(stack)));
+        tooltipComponents
+                .add(TooltipUtils.getMaxFluidOutComponent(FluidConstants.fromMillibuckets(distributionAmount)));
         TooltipUtils.addDescriptionComponent(tooltipComponents, ConstantComponents.GAS_TANK_INFO);
     }
 
@@ -102,7 +115,8 @@ public class GasTankItem extends Item implements BotariumFluidItem<WrappedItemFl
     @Override
     public int getBarWidth(@NotNull ItemStack stack) {
         var fluidContainer = getFluidContainer(stack);
-        return (int) (((double) fluidContainer.getFirstFluid().getFluidAmount() / fluidContainer.getTankCapacity(0)) * 13);
+        return (int) (((double) fluidContainer.getFirstFluid().getFluidAmount() / fluidContainer.getTankCapacity(0))
+                * 13);
     }
 
     @Override

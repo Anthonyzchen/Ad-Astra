@@ -11,6 +11,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
@@ -28,13 +29,15 @@ public class RoverItem extends VehicleItem {
     @Override
     public InteractionResult useOn(UseOnContext context) {
         var level = context.getLevel();
-        if (level.isClientSide()) return InteractionResult.CONSUME;
+        if (level.isClientSide())
+            return InteractionResult.CONSUME;
         var pos = context.getClickedPos();
         var stack = context.getItemInHand();
 
         level.playSound(null, pos, SoundEvents.LODESTONE_PLACE, SoundSource.BLOCKS, 1, 1);
         var vehicle = type().create(level);
-        if (vehicle == null) return InteractionResult.PASS;
+        if (vehicle == null)
+            return InteractionResult.PASS;
         vehicle.setPos(pos.getX() + 0.5, pos.getY() + 1, pos.getZ() + 0.5);
         vehicle.setYRot(context.getRotation() + 270);
         level.addFreshEntity(vehicle);
@@ -43,7 +46,8 @@ public class RoverItem extends VehicleItem {
             ItemStackHolder holder = new ItemStackHolder(stack);
             var container = getFluidContainer(stack).container();
             var fromContainer = FluidContainer.of(holder);
-            if (fromContainer == null) return InteractionResult.PASS;
+            if (fromContainer == null)
+                return InteractionResult.PASS;
             FluidApi.moveFluid(fromContainer, rover.fluidContainer(), container.getFirstFluid(), false);
         }
 
@@ -52,8 +56,9 @@ public class RoverItem extends VehicleItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Level level, List<Component> tooltipComponents, TooltipFlag isAdvanced) {
-        super.appendHoverText(stack, level, tooltipComponents, isAdvanced);
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents,
+            TooltipFlag isAdvanced) {
+        super.appendHoverText(stack, context, tooltipComponents, isAdvanced);
         TooltipUtils.addDescriptionComponent(tooltipComponents, ConstantComponents.ROVER_INFO);
     }
 }

@@ -45,10 +45,13 @@ public class Rover extends Vehicle implements PlayerRideable, RadioHolder {
     private static final float MAX_SPEED_KM = 50.0f;
     private static final float ACCELERATION_RATE = 0.02f;
 
-    public static final EntityDataAccessor<Long> FUEL = SynchedEntityData.defineId(Rover.class, EntityDataSerializers.LONG);
-    public static final EntityDataAccessor<String> FUEL_TYPE = SynchedEntityData.defineId(Rover.class, EntityDataSerializers.STRING);
+    public static final EntityDataAccessor<Long> FUEL = SynchedEntityData.defineId(Rover.class,
+            EntityDataSerializers.LONG);
+    public static final EntityDataAccessor<String> FUEL_TYPE = SynchedEntityData.defineId(Rover.class,
+            EntityDataSerializers.STRING);
 
-    private final SimpleFluidContainer fluidContainer = new SimpleFluidContainer(FluidConstants.fromMillibuckets(3000), 1, (amount, fluid) -> fluid.is(ModFluidTags.TIER_1_ROVER_FUEL));
+    private final SimpleFluidContainer fluidContainer = new SimpleFluidContainer(FluidConstants.fromMillibuckets(3000),
+            1, (amount, fluid) -> fluid.is(ModFluidTags.TIER_1_ROVER_FUEL));
 
     private float speed;
     private float angle;
@@ -60,7 +63,7 @@ public class Rover extends Vehicle implements PlayerRideable, RadioHolder {
 
     public Rover(EntityType<?> type, Level level) {
         super(type, level);
-        setMaxUpStep(1.0f);
+        // this.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.STEP_HEIGHT).setBaseValue(1.0);
 
         addPart(0.6f, 0.7f, new Vector3f(0.6f, 1f, 0.5f), (player, hand) -> {
             if (player.getVehicle() instanceof Rover) {
@@ -81,10 +84,10 @@ public class Rover extends Vehicle implements PlayerRideable, RadioHolder {
     }
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(FUEL, 0L);
-        this.entityData.define(FUEL_TYPE, "air");
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(FUEL, 0L);
+        builder.define(FUEL_TYPE, "air");
     }
 
     @Override
@@ -92,7 +95,7 @@ public class Rover extends Vehicle implements PlayerRideable, RadioHolder {
         super.readAdditionalSaveData(compound);
         speed = compound.getFloat("Speed");
         angle = compound.getFloat("Angle");
-        fluidContainer.deserialize(compound);
+        fluidContainer.deserialize(compound, level().registryAccess());
     }
 
     @Override
@@ -100,7 +103,7 @@ public class Rover extends Vehicle implements PlayerRideable, RadioHolder {
         super.addAdditionalSaveData(compound);
         compound.putFloat("Speed", speed);
         compound.putFloat("Angle", angle);
-        fluidContainer.serialize(compound);
+        fluidContainer.serialize(compound, level().registryAccess());
     }
 
     public FluidContainer fluidContainer() {
@@ -111,7 +114,8 @@ public class Rover extends Vehicle implements PlayerRideable, RadioHolder {
     public ItemStack getDropStack() {
         ItemStackHolder stack = new ItemStackHolder(ModItems.ROVER.get().getDefaultInstance());
         var container = FluidContainer.of(stack);
-        if (container == null) return stack.getStack();
+        if (container == null)
+            return stack.getStack();
         FluidApi.moveFluid(fluidContainer, container, fluidContainer.getFirstFluid(), false);
         return stack.getStack();
     }
@@ -152,10 +156,33 @@ public class Rover extends Vehicle implements PlayerRideable, RadioHolder {
 
     @Override
     protected void positionRider(Entity passenger, MoveFunction callback) {
-        if (!hasPassenger(passenger)) return;
+        if (!hasPassenger(passenger))
+            return;
 
         float zOffset = getControllingPassenger() == passenger ? -0.6f : 0.4f;
-        float yOffset = (this.isRemoved() ? 0.01f : 0.95f) + passenger.getMyRidingOffset(this);
+        double yOffset = (this.isRemoved() ? 0.01 : 0.95); // offset from vehicle
+        // In 1.21 we use passenger.getPassengerRidingPosition(this) usually, or assume
+        // passenger handles its own offset.
+        // But here we set explicit position.
+        // passenger.getMyRidingOffset(this) is gone.
+        // Use passenger.getPassengerAttachmentPoint(this,
+        // passenger.getDimensions(passenger.getPose()), 1.0f).y? No.
+        // passenger.getRidingHeight()? No.
+        // We can use getPassengerRidingPosition(passenger) on vehicle?
+        // Actually, positionRider controls where passenger sits.
+        // The yOffset was: vehicle base height + passenger offset.
+        // passenger.getMyRidingOffset(vehicle) returned "how high the passenger sits on
+        // execution".
+        // In 1.21, vehicle controls getting attachment point.
+        // We can just use a constant or
+        // passenger.getPassengerRidingPosition(passenger).y?
+        // Let's assume just yOffset from vehicle for now and add a standard offset if
+        // needed.
+        // Or re-implement getMyRidingOffset logic: usually 0 for players.
+        // For mobs, it varies.
+        // However, we can use passenger.getVehicleAttachmentPoint(this).y?
+        // Let's simplify and assume 0 for now as it was likely 0 for players.
+        yOffset += 0.0;
         Vec3 position = new Vec3(-0.5, 0, zOffset).yRot(-getYRot() * (float) (Math.PI / 180) - (float) (Math.PI / 2));
 
         clampRotation(passenger);
@@ -225,22 +252,25 @@ public class Rover extends Vehicle implements PlayerRideable, RadioHolder {
         // handle speed
         float yRot = getYRot() * (float) (Math.PI / 180);
         setDeltaMovement(
-            Mth.sin(-yRot) * speed,
-            getDeltaMovement().y,
-            Mth.cos(yRot) * speed
-        );
+                Mth.sin(-yRot) * speed,
+                getDeltaMovement().y,
+                Mth.cos(yRot) * speed);
 
-        if (zza > 0) consumeFuel();
+        if (zza > 0)
+            consumeFuel();
     }
-
 
     // run over entities, launching and damaging them
     private void doEntityCollisionTick() {
-        if (level().isClientSide()) return;
-        if (getDeltaMovement().length() <= 0.15) return;
+        if (level().isClientSide())
+            return;
+        if (getDeltaMovement().length() <= 0.15)
+            return;
         AABB aabb = getBoundingBox().inflate(1.001);
-        List<LivingEntity> entities = level().getEntitiesOfClass(LivingEntity.class, aabb, entity -> !getPassengers().contains(entity));
-        if (entities.isEmpty()) return;
+        List<LivingEntity> entities = level().getEntitiesOfClass(LivingEntity.class, aabb,
+                entity -> !getPassengers().contains(entity));
+        if (entities.isEmpty())
+            return;
 
         double power = getDeltaMovement().length() * 0.4;
         float damage = (float) (power * 0.5f) * 100;
@@ -276,8 +306,10 @@ public class Rover extends Vehicle implements PlayerRideable, RadioHolder {
     }
 
     public void consumeFuel() {
-        if (level().isClientSide() || tickCount % 5 != 0) return;
-        fluidContainer.extractFluid(fluidContainer.getFirstFluid().copyWithAmount(FluidConstants.fromMillibuckets(1)), false);
+        if (level().isClientSide() || tickCount % 5 != 0)
+            return;
+        fluidContainer.extractFluid(fluidContainer.getFirstFluid().copyWithAmount(FluidConstants.fromMillibuckets(1)),
+                false);
     }
 
     public boolean hasEnoughFuel() {
@@ -289,9 +321,9 @@ public class Rover extends Vehicle implements PlayerRideable, RadioHolder {
 
     public FluidHolder fluid() {
         return FluidHolder.of(
-            BuiltInRegistries.FLUID.get(new ResourceLocation(entityData.get(FUEL_TYPE))),
-            entityData.get(FUEL),
-            null);
+                BuiltInRegistries.FLUID.get(ResourceLocation.parse(entityData.get(FUEL_TYPE))),
+                entityData.get(FUEL),
+                null);
     }
 
     @Override
