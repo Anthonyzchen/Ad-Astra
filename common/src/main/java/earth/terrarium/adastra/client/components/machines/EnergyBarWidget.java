@@ -7,15 +7,17 @@ import earth.terrarium.adastra.client.components.base.TickableWidget;
 import earth.terrarium.adastra.client.utils.GuiUtils;
 import earth.terrarium.adastra.common.menus.configuration.EnergyConfiguration;
 import earth.terrarium.adastra.common.utils.TooltipUtils;
-import earth.terrarium.botarium.common.energy.base.EnergyContainer;
+import earth.terrarium.common_storage_lib.storage.base.ValueStorage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.CommonComponents;
 
+import java.time.Duration;
+
 public class EnergyBarWidget extends ConfigurationWidget implements CursorWidget, TickableWidget {
 
-    protected final EnergyContainer container;
+    protected final ValueStorage container;
     protected long lastStoredEnergy;
     protected long difference;
 
@@ -26,15 +28,18 @@ public class EnergyBarWidget extends ConfigurationWidget implements CursorWidget
 
     @Override
     public void tick() {
-        this.difference = this.container.getStoredEnergy() - this.lastStoredEnergy;
-        this.lastStoredEnergy = this.container.getStoredEnergy();
+        long currentEnergy = this.container.getStoredAmount();
+        if (currentEnergy != this.lastStoredEnergy) {
+            this.difference = currentEnergy - this.lastStoredEnergy;
+            this.lastStoredEnergy = currentEnergy;
+        }
     }
 
     @Override
     protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         super.renderWidget(graphics, mouseX, mouseY, partialTick);
-        long capacity = this.container.getMaxCapacity();
-        long energy = this.container.getStoredEnergy();
+        long capacity = this.container.getCapacity();
+        long energy = this.container.getStoredAmount();
         float ratio = energy / (float) capacity;
         int x = this.getX();
         int y = this.getY();
@@ -46,10 +51,10 @@ public class EnergyBarWidget extends ConfigurationWidget implements CursorWidget
             setTooltip(Tooltip.create(CommonComponents.joinLines(
                 TooltipUtils.getEnergyComponent(energy, capacity),
                 TooltipUtils.getEnergyDifferenceComponent(this.difference),
-                TooltipUtils.getMaxEnergyInComponent(container.maxInsert()),
-                TooltipUtils.getMaxEnergyOutComponent(container.maxExtract())
+                TooltipUtils.getMaxEnergyInComponent(container.getCapacity()),
+                TooltipUtils.getMaxEnergyOutComponent(container.getCapacity())
             )));
-            setTooltipDelay(-1);
+            setTooltipDelay(Duration.ZERO);
         }
     }
 

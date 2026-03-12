@@ -27,7 +27,7 @@ public record ClientboundSendStationsPacket(
         public Type() {
             super(
                 ClientboundSendStationsPacket.class,
-                new ResourceLocation(AdAstra.MOD_ID, "send_stations"),
+                ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "send_stations"),
                 ObjectByteCodec.create(
                     StationInfo.BYTE_CODEC.listOf().fieldOf(ClientboundSendStationsPacket::stations),
                     ClientboundSendStationsPacket::new

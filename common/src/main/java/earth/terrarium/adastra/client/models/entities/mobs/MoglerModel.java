@@ -17,7 +17,7 @@ import net.minecraft.world.entity.monster.hoglin.Hoglin;
 // LEGACY ENTITY. WILL BE REPLACED IN THE FUTURE.
 public class MoglerModel<T extends Entity> extends EntityModel<T> {
 
-    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(AdAstra.MOD_ID, "mogler"), "main");
+    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "mogler"), "main");
 
     private final ModelPart body;
     private final ModelPart head;
@@ -98,17 +98,17 @@ public class MoglerModel<T extends Entity> extends EntityModel<T> {
     }
 
     @Override
-    public void renderToBuffer(PoseStack poseStack, VertexConsumer vertices, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
+    public void renderToBuffer(PoseStack poseStack, VertexConsumer vertices, int packedLight, int packedOverlay, int color) {
         if (this.young) {
             poseStack.scale(0.5f, 0.5f, 0.5f);
             poseStack.translate(0, 1.5f, 0);
         }
 
-        body.render(poseStack, vertices, packedLight, packedOverlay);
-        head.render(poseStack, vertices, packedLight, packedOverlay);
-        right_front_leg.render(poseStack, vertices, packedLight, packedOverlay);
-        left_front_leg.render(poseStack, vertices, packedLight, packedOverlay);
-        leg3.render(poseStack, vertices, packedLight, packedOverlay);
-        left_back_leg.render(poseStack, vertices, packedLight, packedOverlay);
+        body.render(poseStack, vertices, packedLight, packedOverlay, color);
+        head.render(poseStack, vertices, packedLight, packedOverlay, color);
+        right_front_leg.render(poseStack, vertices, packedLight, packedOverlay, color);
+        left_front_leg.render(poseStack, vertices, packedLight, packedOverlay, color);
+        leg3.render(poseStack, vertices, packedLight, packedOverlay, color);
+        left_back_leg.render(poseStack, vertices, packedLight, packedOverlay, color);
     }
 }

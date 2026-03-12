@@ -17,8 +17,9 @@ public abstract class ThrownExperienceBottleMixin extends Entity {
         super(entityType, level);
     }
 
-    @Inject(method = "getGravity", at = @At("HEAD"), cancellable = true)
-    public void adastra$getGravity(CallbackInfoReturnable<Float> cir) {
-        cir.setReturnValue(0.07f * GravityApi.API.getGravity(this));
+    // 1.21.1: getGravity now returns double instead of float
+    @Inject(method = "getDefaultGravity", at = @At("HEAD"), cancellable = true)
+    public void adastra$getGravity(CallbackInfoReturnable<Double> cir) {
+        cir.setReturnValue((double) (0.07f * GravityApi.API.getGravity(this)));
     }
 }

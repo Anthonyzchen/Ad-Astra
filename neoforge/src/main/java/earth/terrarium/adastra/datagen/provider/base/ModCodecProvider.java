@@ -36,7 +36,7 @@ public abstract class ModCodecProvider<T> implements DataProvider {
         build((key, value) ->
             futures.add(DataProvider.saveStable(
                 output,
-                codec.encodeStart(JsonOps.INSTANCE, value).getOrThrow(false, AdAstra.LOGGER::error),
+                codec.encodeStart(JsonOps.INSTANCE, value).getOrThrow(),
                 pathProvider.json(key)
             ))
         );

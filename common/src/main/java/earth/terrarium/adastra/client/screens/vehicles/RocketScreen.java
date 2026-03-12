@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class RocketScreen extends VehicleScreen<RocketMenu, Rocket> {
 
-    public static final ResourceLocation TEXTURE = new ResourceLocation(AdAstra.MOD_ID, "textures/gui/container/rocket.png");
+    public static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/gui/container/rocket.png");
 
     public RocketScreen(RocketMenu menu, Inventory inventory, Component component) {
         super(menu, inventory, component, TEXTURE, 177, 174);
@@ -21,6 +21,6 @@ public class RocketScreen extends VehicleScreen<RocketMenu, Rocket> {
     @Override
     protected void renderBg(@NotNull GuiGraphics graphics, float partialTick, int mouseX, int mouseY) {
         super.renderBg(graphics, partialTick, mouseX, mouseY);
-        this.drawFluidBar(graphics, mouseX, mouseY, 37, 55, entity.fluid(), entity.fluidContainer().getTankCapacity(0));
+        this.drawFluidBar(graphics, mouseX, mouseY, 37, 55, entity.fluidResource(), entity.fluidAmount(), entity.fluidCapacity());
     }
 }

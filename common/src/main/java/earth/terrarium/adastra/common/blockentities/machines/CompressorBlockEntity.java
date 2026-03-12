@@ -12,7 +12,7 @@ import earth.terrarium.adastra.common.registry.ModRecipeTypes;
 import earth.terrarium.adastra.common.utils.EnergyUtils;
 import earth.terrarium.adastra.common.utils.ItemUtils;
 import earth.terrarium.adastra.common.utils.TransferUtils;
-import earth.terrarium.botarium.common.energy.impl.WrappedBlockEnergyContainer;
+import earth.terrarium.common_storage_lib.storage.base.ValueStorage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -38,6 +38,7 @@ public class CompressorBlockEntity extends RecipeMachineBlockEntity<CompressingR
 
     public CompressorBlockEntity(BlockPos pos, BlockState state) {
         super(pos, state, 3, ModRecipeTypes.COMPRESSING);
+        this.energyContainer = EnergyUtils.machineInsertOnlyEnergy(MachineConfig.IRON);
     }
 
     @Override
@@ -45,31 +46,27 @@ public class CompressorBlockEntity extends RecipeMachineBlockEntity<CompressingR
         return new CompressorMenu(id, inventory, this);
     }
 
-    @Override
-    public WrappedBlockEnergyContainer getEnergyStorage(Level level, BlockPos pos, BlockState state, @Nullable BlockEntity entity, @Nullable Direction direction) {
+    public ValueStorage getEnergyStorage(Level level, BlockPos pos, BlockState state, @Nullable BlockEntity entity, @Nullable Direction direction) {
         if (energyContainer != null) return energyContainer;
-        return energyContainer = new WrappedBlockEnergyContainer(
-            this,
-            EnergyUtils.machineInsertOnlyEnergy(MachineConfig.IRON)
-        );
+        return energyContainer = EnergyUtils.machineInsertOnlyEnergy(MachineConfig.IRON);
     }
 
     @Override
     public void tickSideInteractions(BlockPos pos, Predicate<Direction> filter, List<ConfigurationEntry> sideConfig) {
         TransferUtils.pullItemsNearby(this, pos, new int[]{1}, sideConfig.get(0), filter);
         TransferUtils.pushItemsNearby(this, pos, new int[]{2}, sideConfig.get(1), filter);
-        TransferUtils.pullEnergyNearby(this, pos, getEnergyStorage().maxInsert(), sideConfig.get(2), filter);
+        TransferUtils.pullEnergyNearby(this, pos, getEnergyStorage().getCapacity(), sideConfig.get(2), filter);
     }
 
     @Override
-    public void recipeTick(ServerLevel level, WrappedBlockEnergyContainer energyStorage) {
+    public void recipeTick(ServerLevel level, ValueStorage energyStorage) {
         if (recipe == null) return;
         if (!canCraft()) {
             clearRecipe();
             return;
         }
 
-        energyStorage.internalExtract(recipe.energy(), false);
+        energyStorage.extract(recipe.energy(), false);
 
         cookTime++;
         if (cookTime < cookTimeTotal) return;
@@ -90,7 +87,7 @@ public class CompressorBlockEntity extends RecipeMachineBlockEntity<CompressingR
     @Override
     public void update() {
         if (level().isClientSide()) return;
-        quickCheck.getRecipeFor(this, level()).ifPresent(r -> {
+        quickCheck.getRecipeFor(toRecipeInput(), level()).ifPresent(r -> {
             recipe = r.value();
             cookTimeTotal = r.value().cookingTime();
         });

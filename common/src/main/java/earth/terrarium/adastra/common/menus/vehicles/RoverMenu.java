@@ -4,7 +4,6 @@ import earth.terrarium.adastra.common.entities.vehicles.Rover;
 import earth.terrarium.adastra.common.menus.base.BaseEntityContainerMenu;
 import earth.terrarium.adastra.common.menus.slots.CustomSlot;
 import earth.terrarium.adastra.common.registry.ModMenus;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 
@@ -14,8 +13,8 @@ public class RoverMenu extends BaseEntityContainerMenu<Rover> {
         super(ModMenus.ROVER.get(), id, inventory, entity);
     }
 
-    public RoverMenu(int id, Inventory inventory, FriendlyByteBuf buf) {
-        super(ModMenus.ROVER.get(), id, inventory, (Rover) inventory.player.level().getEntity(buf.readVarInt()));
+    public RoverMenu(int id, Inventory inventory, int entityId) {
+        super(ModMenus.ROVER.get(), id, inventory, (Rover) inventory.player.level().getEntity(entityId));
     }
 
     @Override

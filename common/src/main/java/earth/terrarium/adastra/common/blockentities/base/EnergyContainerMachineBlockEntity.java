@@ -1,14 +1,21 @@
 package earth.terrarium.adastra.common.blockentities.base;
 
-import earth.terrarium.botarium.energy.EnergyProvider;
-import earth.terrarium.botarium.storage.base.ValueStorage;
+import earth.terrarium.adastra.common.utils.EnergyUtils;
+import earth.terrarium.common_storage_lib.energy.EnergyProvider;
+import earth.terrarium.common_storage_lib.energy.impl.SimpleValueStorage;
+import earth.terrarium.common_storage_lib.storage.base.ValueStorage;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public abstract class EnergyContainerMachineBlockEntity extends ContainerMachineBlockEntity implements EnergyProvider.BlockEntity {
-    protected ValueStorage energyContainer;
+    protected SimpleValueStorage energyContainer;
 
     public EnergyContainerMachineBlockEntity(BlockPos pos, BlockState state, int containerSize) {
         super(pos, state, containerSize);
@@ -25,32 +32,54 @@ public abstract class EnergyContainerMachineBlockEntity extends ContainerMachine
             case POWER_ITEM -> insertBatterySlot();
             case POWER_MACHINE -> extractBatterySlot();
         }
+        if (time % 2 == 0) {
+            setChanged();
+            sync();
+        }
     }
 
-    public ValueStorage getEnergyStorage() {
-        return getEnergy(null);
+    @Override
+    public void loadAdditional(@NotNull CompoundTag tag, HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
+        if (energyContainer != null && tag.contains("Energy")) {
+            energyContainer.set(tag.getLong("Energy"));
+        }
+    }
+
+    @Override
+    protected void saveAdditional(@NotNull CompoundTag tag, HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
+        if (energyContainer != null) {
+            tag.putLong("Energy", energyContainer.getStoredAmount());
+        }
+    }
+
+    public SimpleValueStorage getEnergyStorage() {
+        return energyContainer;
+    }
+
+    public ValueStorage getEnergyStorage(Direction direction) {
+        return energyContainer;
+    }
+
+    @Override
+    public ValueStorage getEnergy(@Nullable Direction direction) {
+        return energyContainer;
     }
 
     public void extractBatterySlot() {
         ItemStack stack = this.getItem(0);
         if (stack.isEmpty()) return;
-        if (!EnergyContainer.holdsEnergy(stack)) return;
-        ItemStackHolder holder = new ItemStackHolder(stack);
-        EnergyApi.moveEnergy(holder, this, null, energyContainer.maxInsert(), false);
-        if (holder.isDirty()) {
-            this.setItem(0, holder.getStack());
-        }
+        if (!EnergyUtils.holdsEnergy(stack)) return;
+        long maxTransfer = EnergyUtils.getMaxOutputPerTick(stack);
+        EnergyUtils.transferFromItem(stack, energyContainer, maxTransfer);
     }
 
     public void insertBatterySlot() {
         ItemStack stack = this.getItem(0);
         if (stack.isEmpty()) return;
-        if (!EnergyContainer.holdsEnergy(stack)) return;
-        ItemStackHolder holder = new ItemStackHolder(stack);
-        EnergyApi.moveEnergy(this, null, holder, energyContainer.maxExtract(), false);
-        if (holder.isDirty()) {
-            this.setItem(0, holder.getStack());
-        }
+        if (!EnergyUtils.holdsEnergy(stack)) return;
+        EnergyUtils.transferToItem(energyContainer, stack, energyContainer.getCapacity());
     }
 
     public enum ChargeSlotType {

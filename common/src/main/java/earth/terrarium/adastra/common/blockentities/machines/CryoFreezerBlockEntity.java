@@ -12,13 +12,18 @@ import earth.terrarium.adastra.common.registry.ModRecipeTypes;
 import earth.terrarium.adastra.common.utils.EnergyUtils;
 import earth.terrarium.adastra.common.utils.FluidUtils;
 import earth.terrarium.adastra.common.utils.TransferUtils;
-import earth.terrarium.botarium.common.energy.impl.WrappedBlockEnergyContainer;
-import earth.terrarium.botarium.common.fluid.FluidConstants;
-import earth.terrarium.botarium.common.fluid.base.BotariumFluidBlock;
-import earth.terrarium.botarium.common.fluid.impl.ExtractOnlyFluidContainer;
-import earth.terrarium.botarium.common.fluid.impl.WrappedBlockFluidContainer;
+import earth.terrarium.common_storage_lib.fluid.util.FluidProvider;
+import earth.terrarium.common_storage_lib.resources.fluid.FluidResource;
+import earth.terrarium.common_storage_lib.storage.base.CommonStorage;
+import earth.terrarium.common_storage_lib.storage.base.ValueStorage;
+import earth.terrarium.common_storage_lib.fluid.impl.SimpleFluidStorage;
+import earth.terrarium.common_storage_lib.fluid.util.FluidStorageData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -32,7 +37,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class CryoFreezerBlockEntity extends RecipeMachineBlockEntity<CryoFreezingRecipe> implements BotariumFluidBlock<WrappedBlockFluidContainer> {
+public class CryoFreezerBlockEntity extends RecipeMachineBlockEntity<CryoFreezingRecipe> implements FluidProvider.BlockEntity {
+
+    private static final long BUCKET = 81000L;
 
     public static final List<ConfigurationEntry> SIDE_CONFIG = List.of(
         new ConfigurationEntry(ConfigurationType.SLOT, Configuration.NONE, ConstantComponents.SIDE_CONFIG_INPUT_SLOTS),
@@ -42,10 +49,11 @@ public class CryoFreezerBlockEntity extends RecipeMachineBlockEntity<CryoFreezin
         new ConfigurationEntry(ConfigurationType.FLUID, Configuration.NONE, ConstantComponents.SIDE_CONFIG_OUTPUT_FLUID)
     );
 
-    private WrappedBlockFluidContainer fluidContainer;
+    private SimpleFluidStorage fluidContainer;
 
     public CryoFreezerBlockEntity(BlockPos pos, BlockState state) {
         super(pos, state, 4, ModRecipeTypes.CRYO_FREEZING);
+        this.energyContainer = EnergyUtils.machineInsertOnlyEnergy(MachineConfig.OSTRUM);
     }
 
     @Override
@@ -53,30 +61,41 @@ public class CryoFreezerBlockEntity extends RecipeMachineBlockEntity<CryoFreezin
         return new CryoFreezerMenu(id, inventory, this);
     }
 
-    @Override
-    public WrappedBlockEnergyContainer getEnergyStorage(Level level, BlockPos pos, BlockState state, @Nullable BlockEntity entity, @Nullable Direction direction) {
+    public ValueStorage getEnergyStorage(Level level, BlockPos pos, BlockState state, @Nullable BlockEntity entity, @Nullable Direction direction) {
         if (this.energyContainer != null) return this.energyContainer;
-        return this.energyContainer = new WrappedBlockEnergyContainer(
-            this,
-            EnergyUtils.machineInsertOnlyEnergy(MachineConfig.OSTRUM)
-        );
+        return this.energyContainer = EnergyUtils.machineInsertOnlyEnergy(MachineConfig.OSTRUM);
     }
 
-    @Override
-    public @Nullable WrappedBlockFluidContainer getFluidContainer(Level level, BlockPos pos, BlockState state, @Nullable BlockEntity entity, @Nullable Direction direction) {
+    public @Nullable SimpleFluidStorage getFluidContainer(Level level, BlockPos pos, BlockState state, @Nullable BlockEntity entity, @Nullable Direction direction) {
         return getFluidContainer();
     }
 
-    public WrappedBlockFluidContainer getFluidContainer() {
+    public SimpleFluidStorage getFluidContainer() {
         if (fluidContainer != null) return fluidContainer;
-        return fluidContainer = new WrappedBlockFluidContainer(
-            this,
-            new ExtractOnlyFluidContainer(
-                i -> FluidConstants.fromMillibuckets(MachineConfig.OSTRUM.fluidCapacity),
-                1,
-                (tank, holder) -> level().getRecipeManager().getAllRecipesFor(ModRecipeTypes.CRYO_FREEZING.get())
-                    .stream()
-                    .anyMatch(r -> r.value().result().matches(holder))));
+        return fluidContainer = new SimpleFluidStorage(1, MachineConfig.OSTRUM.fluidCapacity * 81L);
+    }
+
+    @Override
+    public CommonStorage<FluidResource> getFluids(@Nullable Direction direction) {
+        return getFluidContainer();
+    }
+
+    @Override
+    public void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
+        if (tag.contains("FluidData")) {
+            FluidStorageData.CODEC.parse(NbtOps.INSTANCE, tag.get("FluidData"))
+                .resultOrPartial(s -> {})
+                .ifPresent(data -> getFluidContainer().readSnapshot(data));
+        }
+    }
+
+    @Override
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
+        FluidStorageData.CODEC.encodeStart(NbtOps.INSTANCE, getFluidContainer().createSnapshot())
+            .resultOrPartial(s -> {})
+            .ifPresent(nbt -> tag.put("FluidData", nbt));
     }
 
     @Override
@@ -87,12 +106,20 @@ public class CryoFreezerBlockEntity extends RecipeMachineBlockEntity<CryoFreezin
         TransferUtils.pullItemsNearby(this, pos, new int[]{2}, sideConfig.get(1), filter);
         TransferUtils.pushItemsNearby(this, pos, new int[]{3}, sideConfig.get(2), filter);
         TransferUtils.pullItemsNearby(this, pos, new int[]{3}, sideConfig.get(2), filter);
-        TransferUtils.pullEnergyNearby(this, pos, getEnergyStorage().maxInsert(), sideConfig.get(3), filter);
-        TransferUtils.pushFluidNearby(this, pos, getFluidContainer(), FluidConstants.fromMillibuckets(200), 0, sideConfig.get(4), filter);
+        TransferUtils.pullEnergyNearby(this, pos, getEnergyStorage().getCapacity(), sideConfig.get(3), filter);
+        TransferUtils.pushFluidNearby(this, pos, getFluidContainer(), 200 * 81L, 0, sideConfig.get(4), filter);
     }
 
     @Override
-    public void recipeTick(ServerLevel level, WrappedBlockEnergyContainer energyStorage) {
+    public void internalServerTick(ServerLevel level, long time, BlockState state, BlockPos pos) {
+        super.internalServerTick(level, time, state, pos);
+        // Process bucket items every tick for immediate feedback
+        // Parent already syncs every 2 ticks via EnergyContainerMachineBlockEntity
+        updateSlots();
+    }
+
+    @Override
+    public void recipeTick(ServerLevel level, ValueStorage energyStorage) {
         if (recipe == null) return;
         if (fluidContainer == null) getFluidContainer();
         if (!canCraft()) {
@@ -100,7 +127,7 @@ public class CryoFreezerBlockEntity extends RecipeMachineBlockEntity<CryoFreezin
             return;
         }
 
-        energyStorage.internalExtract(recipe.energy(), false);
+        energyStorage.extract(recipe.energy(), false);
 
         cookTime++;
         if (cookTime < cookTimeTotal) return;
@@ -112,18 +139,18 @@ public class CryoFreezerBlockEntity extends RecipeMachineBlockEntity<CryoFreezin
         if (recipe == null) return;
 
         getItem(1).shrink(1);
-        fluidContainer.internalInsert(recipe.result(), false);
+
+        // Insert result fluid into tank 0
+        FluidUtils.insertFluid(getFluidContainer().get(0), recipe.result(), recipe.resultAmount(), false);
 
         updateSlots();
-
         cookTime = 0;
-        if (fluidContainer.getFirstFluid().isEmpty()) clearRecipe();
     }
 
     @Override
     public void update() {
         if (level().isClientSide()) return;
-        quickCheck.getRecipeFor(this, level()).ifPresent(r -> {
+        quickCheck.getRecipeFor(toRecipeInput(), level()).ifPresent(r -> {
             recipe = r.value();
             cookTimeTotal = r.value().cookingTime();
         });
@@ -132,8 +159,9 @@ public class CryoFreezerBlockEntity extends RecipeMachineBlockEntity<CryoFreezin
 
     @Override
     public void updateSlots() {
-        FluidUtils.moveContainerToItem(this, fluidContainer, 2, 3, 0);
-        sync();
+        // Use getFluidContainer() (not the raw field) to ensure lazy initialization
+        FluidUtils.moveContainerToItem(this, getFluidContainer(), 2, 3, 0);
+        // Don't call sync() here - parent EnergyContainerMachineBlockEntity already syncs every 2 ticks
     }
 
     @Override

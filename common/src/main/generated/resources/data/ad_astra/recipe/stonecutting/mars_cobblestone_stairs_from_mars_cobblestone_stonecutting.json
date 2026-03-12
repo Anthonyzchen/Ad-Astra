@@ -1,0 +1,6 @@
+{
+  "type": "minecraft:stonecutting",
+  "count": 1,
+  "ingredient": "ad_astra:mars_cobblestone",
+  "result": "ad_astra:mars_cobblestone_stairs"
+}

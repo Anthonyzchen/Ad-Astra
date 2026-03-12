@@ -16,7 +16,7 @@
   },
   "ingredients": [
     {
-      "tag": "c:ostrum_ores"
+      "tag": "c:ores/ostrum"
     }
   ],
   "results": [

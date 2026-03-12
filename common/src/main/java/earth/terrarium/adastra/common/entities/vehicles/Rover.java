@@ -9,14 +9,12 @@ import earth.terrarium.adastra.common.registry.ModItems;
 import earth.terrarium.adastra.common.tags.ModFluidTags;
 import earth.terrarium.adastra.common.utils.FluidUtils;
 import earth.terrarium.adastra.common.utils.radio.RadioHolder;
-import earth.terrarium.botarium.common.fluid.FluidApi;
-import earth.terrarium.botarium.common.fluid.FluidConstants;
-import earth.terrarium.botarium.common.fluid.base.FluidContainer;
-import earth.terrarium.botarium.common.fluid.base.FluidHolder;
-import earth.terrarium.botarium.common.fluid.impl.SimpleFluidContainer;
-import earth.terrarium.botarium.common.item.ItemStackHolder;
+import earth.terrarium.common_storage_lib.fluid.impl.SimpleFluidStorage;
+import earth.terrarium.common_storage_lib.fluid.util.FluidStorageData;
+import earth.terrarium.common_storage_lib.resources.fluid.FluidResource;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -42,13 +40,14 @@ import java.util.List;
 
 public class Rover extends Vehicle implements PlayerRideable, RadioHolder {
 
+    private static final long BUCKET = 81000L;
     private static final float MAX_SPEED_KM = 50.0f;
     private static final float ACCELERATION_RATE = 0.02f;
 
     public static final EntityDataAccessor<Long> FUEL = SynchedEntityData.defineId(Rover.class, EntityDataSerializers.LONG);
     public static final EntityDataAccessor<String> FUEL_TYPE = SynchedEntityData.defineId(Rover.class, EntityDataSerializers.STRING);
 
-    private final SimpleFluidContainer fluidContainer = new SimpleFluidContainer(FluidConstants.fromMillibuckets(3000), 1, (amount, fluid) -> fluid.is(ModFluidTags.TIER_1_ROVER_FUEL));
+    private final SimpleFluidStorage fluidContainer = new SimpleFluidStorage(1, 3000L * BUCKET / 1000L);
 
     private float speed;
     private float angle;
@@ -60,7 +59,6 @@ public class Rover extends Vehicle implements PlayerRideable, RadioHolder {
 
     public Rover(EntityType<?> type, Level level) {
         super(type, level);
-        setMaxUpStep(1.0f);
 
         addPart(0.6f, 0.7f, new Vector3f(0.6f, 1f, 0.5f), (player, hand) -> {
             if (player.getVehicle() instanceof Rover) {
@@ -81,10 +79,15 @@ public class Rover extends Vehicle implements PlayerRideable, RadioHolder {
     }
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(FUEL, 0L);
-        this.entityData.define(FUEL_TYPE, "air");
+    public float maxUpStep() {
+        return 1.0f;
+    }
+
+    @Override
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(FUEL, 0L);
+        builder.define(FUEL_TYPE, "air");
     }
 
     @Override
@@ -92,7 +95,10 @@ public class Rover extends Vehicle implements PlayerRideable, RadioHolder {
         super.readAdditionalSaveData(compound);
         speed = compound.getFloat("Speed");
         angle = compound.getFloat("Angle");
-        fluidContainer.deserialize(compound);
+        if (compound.contains("FluidData")) {
+            FluidStorageData.CODEC.parse(NbtOps.INSTANCE, compound.get("FluidData"))
+                .result().ifPresent(fluidContainer::readSnapshot);
+        }
     }
 
     @Override
@@ -100,20 +106,18 @@ public class Rover extends Vehicle implements PlayerRideable, RadioHolder {
         super.addAdditionalSaveData(compound);
         compound.putFloat("Speed", speed);
         compound.putFloat("Angle", angle);
-        fluidContainer.serialize(compound);
+        FluidStorageData.CODEC.encodeStart(NbtOps.INSTANCE, fluidContainer.createSnapshot())
+            .result().ifPresent(tag -> compound.put("FluidData", tag));
     }
 
-    public FluidContainer fluidContainer() {
+    public SimpleFluidStorage fluidContainer() {
         return fluidContainer;
     }
 
     @Override
     public ItemStack getDropStack() {
-        ItemStackHolder stack = new ItemStackHolder(ModItems.ROVER.get().getDefaultInstance());
-        var container = FluidContainer.of(stack);
-        if (container == null) return stack.getStack();
-        FluidApi.moveFluid(fluidContainer, container, fluidContainer.getFirstFluid(), false);
-        return stack.getStack();
+        // TODO: Migrate to CSL - re-implement fluid transfer from entity to item
+        return ModItems.ROVER.get().getDefaultInstance();
     }
 
     @Override
@@ -155,7 +159,7 @@ public class Rover extends Vehicle implements PlayerRideable, RadioHolder {
         if (!hasPassenger(passenger)) return;
 
         float zOffset = getControllingPassenger() == passenger ? -0.6f : 0.4f;
-        float yOffset = (this.isRemoved() ? 0.01f : 0.95f) + passenger.getMyRidingOffset(this);
+        float yOffset = this.isRemoved() ? 0.01f : 0.95f;
         Vec3 position = new Vec3(-0.5, 0, zOffset).yRot(-getYRot() * (float) (Math.PI / 180) - (float) (Math.PI / 2));
 
         clampRotation(passenger);
@@ -173,9 +177,9 @@ public class Rover extends Vehicle implements PlayerRideable, RadioHolder {
             FluidUtils.moveItemToContainer(inventory, fluidContainer, 0, 1, 0);
             FluidUtils.moveContainerToItem(inventory, fluidContainer, 0, 1, 0);
 
-            var fluidHolder = fluidContainer.getFirstFluid();
-            entityData.set(FUEL, fluidHolder.getFluidAmount());
-            entityData.set(FUEL_TYPE, BuiltInRegistries.FLUID.getKey(fluidHolder.getFluid()).toString());
+            FluidResource fluidResource = fluidContainer.getResource(0);
+            entityData.set(FUEL, fluidContainer.getAmount(0));
+            entityData.set(FUEL_TYPE, BuiltInRegistries.FLUID.getKey(fluidResource.getType()).toString());
         }
     }
 
@@ -277,21 +281,29 @@ public class Rover extends Vehicle implements PlayerRideable, RadioHolder {
 
     public void consumeFuel() {
         if (level().isClientSide() || tickCount % 5 != 0) return;
-        fluidContainer.extractFluid(fluidContainer.getFirstFluid().copyWithAmount(FluidConstants.fromMillibuckets(1)), false);
+        FluidResource resource = fluidContainer.getResource(0);
+        if (!resource.isBlank()) {
+            fluidContainer.extract(resource, BUCKET / 1000L, false);
+        }
     }
 
     public boolean hasEnoughFuel() {
         if (level().isClientSide()) {
             return entityData.get(FUEL) > 0;
         }
-        return fluidContainer.getFirstFluid().getFluidAmount() > 0;
+        return fluidContainer.getAmount(0) > 0;
     }
 
-    public FluidHolder fluid() {
-        return FluidHolder.of(
-            BuiltInRegistries.FLUID.get(new ResourceLocation(entityData.get(FUEL_TYPE))),
-            entityData.get(FUEL),
-            null);
+    public FluidResource fluidResource() {
+        return FluidResource.of(BuiltInRegistries.FLUID.get(ResourceLocation.parse(entityData.get(FUEL_TYPE))));
+    }
+
+    public long fluidAmount() {
+        return entityData.get(FUEL);
+    }
+
+    public long fluidCapacity() {
+        return fluidContainer.getLimit(0, FluidResource.BLANK);
     }
 
     @Override

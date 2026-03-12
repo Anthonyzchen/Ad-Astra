@@ -5,7 +5,6 @@
     "compatibilityLevel": "JAVA_21",
     "mixins": [
         "common.JetSuitItemMixin",
-        "common.ServerPlayerMixin",
         "common.multipart.LevelMixin"
     ],
     "client": [

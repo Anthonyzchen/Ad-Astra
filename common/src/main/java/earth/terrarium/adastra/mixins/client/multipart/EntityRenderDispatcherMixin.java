@@ -25,7 +25,7 @@ public class EntityRenderDispatcherMixin {
             shift = At.Shift.AFTER
         )
     )
-    private static void adastra$renderHitbox(PoseStack poseStack, VertexConsumer buffer, Entity entity, float partialTicks, CallbackInfo ci) {
+    private static void adastra$renderHitbox(PoseStack poseStack, VertexConsumer buffer, Entity entity, float partialTicks, float red, float green, float blue, CallbackInfo ci) {
         if (entity instanceof MultipartEntity multipartEntity) {
             double d = -Mth.lerp(partialTicks, entity.xOld, entity.getX());
             double e = -Mth.lerp(partialTicks, entity.yOld, entity.getY());

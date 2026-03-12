@@ -3,14 +3,15 @@ package earth.terrarium.adastra.common.items.vehicles;
 import earth.terrarium.adastra.common.constants.ConstantComponents;
 import earth.terrarium.adastra.common.entities.vehicles.Rover;
 import earth.terrarium.adastra.common.utils.TooltipUtils;
-import earth.terrarium.botarium.common.fluid.FluidApi;
-import earth.terrarium.botarium.common.fluid.base.FluidContainer;
-import earth.terrarium.botarium.common.item.ItemStackHolder;
+// TODO: Migrate to CSL
+// import earth.terrarium.botarium.common.fluid.FluidApi;
+// import earth.terrarium.botarium.common.fluid.base.FluidContainer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
@@ -40,11 +41,7 @@ public class RoverItem extends VehicleItem {
         level.addFreshEntity(vehicle);
 
         if (vehicle instanceof Rover rover) {
-            ItemStackHolder holder = new ItemStackHolder(stack);
-            var container = getFluidContainer(stack).container();
-            var fromContainer = FluidContainer.of(holder);
-            if (fromContainer == null) return InteractionResult.PASS;
-            FluidApi.moveFluid(fromContainer, rover.fluidContainer(), container.getFirstFluid(), false);
+            // TODO: Migrate to CSL - re-implement fluid transfer from item to entity
         }
 
         stack.shrink(1);
@@ -52,8 +49,8 @@ public class RoverItem extends VehicleItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Level level, List<Component> tooltipComponents, TooltipFlag isAdvanced) {
-        super.appendHoverText(stack, level, tooltipComponents, isAdvanced);
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents, TooltipFlag isAdvanced) {
+        super.appendHoverText(stack, context, tooltipComponents, isAdvanced);
         TooltipUtils.addDescriptionComponent(tooltipComponents, ConstantComponents.ROVER_INFO);
     }
 }

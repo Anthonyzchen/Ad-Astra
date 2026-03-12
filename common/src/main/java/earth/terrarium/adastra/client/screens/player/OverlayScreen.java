@@ -22,12 +22,12 @@ import java.util.Locale;
 
 public class OverlayScreen {
 
-    public static final ResourceLocation BATTERY_EMPTY = new ResourceLocation(AdAstra.MOD_ID, "overlay/battery_empty");
-    public static final ResourceLocation BATTERY = new ResourceLocation(AdAstra.MOD_ID, "textures/gui/sprites/overlay/battery.png");
-    public static final ResourceLocation OXYGEN_TANK_EMPTY = new ResourceLocation(AdAstra.MOD_ID, "overlay/oxygen_tank_empty");
-    public static final ResourceLocation OXYGEN_TANK = new ResourceLocation(AdAstra.MOD_ID, "textures/gui/sprites/overlay/oxygen_tank.png");
-    public static final ResourceLocation ROCKET_BAR = new ResourceLocation(AdAstra.MOD_ID, "overlay/rocket_bar");
-    public static final ResourceLocation ROCKET = new ResourceLocation(AdAstra.MOD_ID, "overlay/rocket");
+    public static final ResourceLocation BATTERY_EMPTY = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "overlay/battery_empty");
+    public static final ResourceLocation BATTERY = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/gui/sprites/overlay/battery.png");
+    public static final ResourceLocation OXYGEN_TANK_EMPTY = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "overlay/oxygen_tank_empty");
+    public static final ResourceLocation OXYGEN_TANK = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/gui/sprites/overlay/oxygen_tank.png");
+    public static final ResourceLocation ROCKET_BAR = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "overlay/rocket_bar");
+    public static final ResourceLocation ROCKET = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "overlay/rocket");
 
     public static void render(GuiGraphics graphics, float partialTick) {
         var player = Minecraft.getInstance().player;
@@ -65,7 +65,8 @@ public class OverlayScreen {
         var chestStack = player.getInventory().getArmor(2);
         if (SpaceSuitItem.hasFullSet(player) && chestStack.getItem() instanceof SpaceSuitItem spaceSuit) {
             long amount = SpaceSuitItem.getOxygenAmount(player);
-            long capacity = spaceSuit.getFluidContainer(chestStack).getTankCapacity(0);
+            var fc = spaceSuit.getFluidContainer(chestStack);
+            long capacity = fc.get(0).getLimit(fc.get(0).getResource());
             double ratio = (double) amount / capacity;
             int barHeight = (int) (ratio * 52);
 
@@ -91,8 +92,8 @@ public class OverlayScreen {
 
         // Battery overlay
         if (JetSuitItem.hasFullSet(player) && chestStack.getItem() instanceof JetSuitItem jetSuit) {
-            long amount = jetSuit.getEnergyStorage(chestStack).getStoredEnergy();
-            long capacity = jetSuit.getEnergyStorage(chestStack).getMaxCapacity();
+            long amount = jetSuit.getEnergyStorage(chestStack).getStoredAmount();
+            long capacity = jetSuit.getEnergyStorage(chestStack).getCapacity();
             double ratio = (double) amount / capacity;
             int barWidth = (int) (ratio * 49);
 

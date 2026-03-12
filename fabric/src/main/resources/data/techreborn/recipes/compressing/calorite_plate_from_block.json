@@ -12,7 +12,7 @@
   "time": 400,
   "ingredients": [
     {
-      "tag": "c:calorite_blocks",
+      "tag": "c:storage_blocks/calorite",
       "count": 1
     }
   ],

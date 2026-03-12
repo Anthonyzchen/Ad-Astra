@@ -6,7 +6,7 @@ import earth.terrarium.adastra.common.config.AdAstraConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.server.network.ServerCommonPacketListenerImpl;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
@@ -23,12 +23,12 @@ public abstract class ServerPlayerMixin extends Player {
         method = "changeDimension",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;send(Lnet/minecraft/network/protocol/Packet;)V",
-            ordinal = 5
+            target = "Lnet/minecraft/server/network/ServerCommonPacketListenerImpl;send(Lnet/minecraft/network/protocol/Packet;)V",
+            ordinal = 4
         )
     )
     // Prevent the portal teleportation sound from playing when leaving the atmosphere.
-    private boolean adastra$changeDimension(ServerGamePacketListenerImpl instance, Packet<?> packet) {
+    private boolean adastra$changeDimension(ServerCommonPacketListenerImpl instance, Packet<?> packet) {
         return getY() > AdAstraConfig.atmosphereLeave + 1 || getY() < AdAstraConfig.atmosphereLeave - 1;
     }
 }

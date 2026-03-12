@@ -11,11 +11,16 @@ import earth.terrarium.adastra.common.menus.machines.*;
 import earth.terrarium.adastra.common.menus.vehicles.LanderMenu;
 import earth.terrarium.adastra.common.menus.vehicles.RocketMenu;
 import earth.terrarium.adastra.common.menus.vehicles.RoverMenu;
-import earth.terrarium.botarium.common.registry.RegistryHelpers;
+import com.teamresourceful.resourcefullib.common.menu.MenuContentHelper;
+import earth.terrarium.adastra.common.menus.base.BlockPosContent;
+import earth.terrarium.adastra.common.menus.base.EntityIdContent;
+import earth.terrarium.adastra.common.menus.base.PlanetsMenuContent;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.level.block.entity.BlockEntity;
+
+import java.util.Optional;
 
 public class ModMenus {
 
@@ -33,18 +38,35 @@ public class ModMenus {
     public static final RegistryEntry<MenuType<CryoFreezerMenu>> CRYO_FREEZER = MENUS.register("cryo_freezer_menu", () -> createMenuType(CryoFreezerMenu::new, CryoFreezerBlockEntity.class));
     public static final RegistryEntry<MenuType<NasaWorkbenchMenu>> NASA_WORKBENCH = MENUS.register("nasa_workbench_menu", () -> createMenuType(NasaWorkbenchMenu::new, NasaWorkbenchBlockEntity.class));
 
-    public static final RegistryEntry<MenuType<RoverMenu>> ROVER = MENUS.register("rover_menu", () -> RegistryHelpers.createMenuType(RoverMenu::new));
-    public static final RegistryEntry<MenuType<RocketMenu>> ROCKET = MENUS.register("rocket_menu", () -> RegistryHelpers.createMenuType(RocketMenu::new));
-    public static final RegistryEntry<MenuType<LanderMenu>> LANDER = MENUS.register("lander_menu", () -> RegistryHelpers.createMenuType(LanderMenu::new));
+    public static final RegistryEntry<MenuType<RoverMenu>> ROVER = MENUS.register("rover_menu", () -> MenuContentHelper.create(
+        (id, inventory, content) -> new RoverMenu(id, inventory, content.map(EntityIdContent::entityId).orElse(-1)),
+        EntityIdContent.SERIALIZER
+    ));
+    public static final RegistryEntry<MenuType<RocketMenu>> ROCKET = MENUS.register("rocket_menu", () -> MenuContentHelper.create(
+        (id, inventory, content) -> new RocketMenu(id, inventory, content.map(EntityIdContent::entityId).orElse(-1)),
+        EntityIdContent.SERIALIZER
+    ));
+    public static final RegistryEntry<MenuType<LanderMenu>> LANDER = MENUS.register("lander_menu", () -> MenuContentHelper.create(
+        (id, inventory, content) -> new LanderMenu(id, inventory, content.map(EntityIdContent::entityId).orElse(-1)),
+        EntityIdContent.SERIALIZER
+    ));
 
-    public static final RegistryEntry<MenuType<PlanetsMenu>> PLANETS = MENUS.register("planets_menu", () -> RegistryHelpers.createMenuType(PlanetsMenu::new));
+    public static final RegistryEntry<MenuType<PlanetsMenu>> PLANETS = MENUS.register("planets_menu", () -> MenuContentHelper.create(
+        (id, inventory, content) -> content
+            .map(c -> new PlanetsMenu(id, inventory, c.disabledPlanets(), c.spaceStations(), c.spawnLocations()))
+            .orElse(new PlanetsMenu(id, inventory, java.util.Set.of(), java.util.Map.of(), java.util.Set.of())),
+        PlanetsMenuContent.SERIALIZER
+    ));
 
     private static <T extends BaseContainerMenu<E>, E extends BlockEntity> MenuType<T> createMenuType(Factory<T, E> factory, Class<E> clazz) {
-        return RegistryHelpers.createMenuType((id, inventory, buf) -> factory.create(
-            id,
-            inventory,
-            BaseContainerMenu.getBlockEntityFromBuf(inventory.player.level(), buf, clazz)
-        ));
+        return MenuContentHelper.create(
+            (id, inventory, content) -> factory.create(
+                id,
+                inventory,
+                content.map(c -> BaseContainerMenu.getBlockEntityFromBuf(inventory.player.level(), c.pos(), clazz)).orElse(null)
+            ),
+            BlockPosContent.SERIALIZER
+        );
     }
 
     public interface Factory<T extends BaseContainerMenu<E>, E extends BlockEntity> {

@@ -16,7 +16,7 @@
   },
   "ingredients": [
     {
-      "tag": "c:cheese_ores"
+      "tag": "c:ores/cheese"
     }
   ],
   "results": [

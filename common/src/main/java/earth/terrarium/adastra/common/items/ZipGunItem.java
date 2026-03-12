@@ -8,14 +8,11 @@ import earth.terrarium.adastra.common.registry.ModFluids;
 import earth.terrarium.adastra.common.tags.ModFluidTags;
 import earth.terrarium.adastra.common.utils.FluidUtils;
 import earth.terrarium.adastra.common.utils.TooltipUtils;
-import earth.terrarium.botarium.common.fluid.FluidConstants;
-import earth.terrarium.botarium.common.fluid.base.BotariumFluidItem;
-import earth.terrarium.botarium.common.fluid.base.FluidContainer;
-import earth.terrarium.botarium.common.fluid.base.FluidHolder;
-import earth.terrarium.botarium.common.fluid.impl.SimpleFluidContainer;
-import earth.terrarium.botarium.common.fluid.impl.WrappedItemFluidContainer;
-import earth.terrarium.botarium.common.fluid.utils.ClientFluidHooks;
-import earth.terrarium.botarium.common.item.ItemStackHolder;
+import earth.terrarium.common_storage_lib.fluid.impl.SimpleFluidStorage;
+// TODO: Migrate to CSL
+// import earth.terrarium.botarium.common.fluid.base.FluidContainer;
+// import earth.terrarium.botarium.common.fluid.base.FluidHolder;
+// import earth.terrarium.botarium.common.fluid.utils.ClientFluidHooks;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
@@ -28,11 +25,12 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class ZipGunItem extends Item implements BotariumFluidItem<WrappedItemFluidContainer> {
+public class ZipGunItem extends Item {
+
+    private static final long BUCKET = 81000L;
 
     public ZipGunItem(Properties properties) {
         super(properties);
@@ -108,14 +106,13 @@ public class ZipGunItem extends Item implements BotariumFluidItem<WrappedItemFlu
     }
 
     public boolean consumeFuel(Player player, ItemStack stack, long amount) {
+        // TODO: Migrate to CSL FluidResource - re-implement fuel consumption
         if (!(stack.getItem() instanceof ZipGunItem)) return false;
         if (player.isCreative()) return true;
-        ItemStackHolder holder = new ItemStackHolder(stack);
-        var container = FluidContainer.of(holder);
+        var container = getFluidContainer(stack);
         if (container == null) return false;
-        FluidHolder extracted = container.extractFluid(FluidHolder.ofMillibuckets(container.getFirstFluid().getFluid(), FluidConstants.fromMillibuckets(amount)), false);
-        stack.setTag(holder.getStack().getTag());
-        return extracted.getFluidAmount() > 0;
+        long extracted = container.extract(container.get(0).getResource(), amount * BUCKET / 1000L, false);
+        return extracted > 0;
     }
 
     @Override
@@ -127,26 +124,19 @@ public class ZipGunItem extends Item implements BotariumFluidItem<WrappedItemFlu
         return 72_000;
     }
 
-    @Override
-    public WrappedItemFluidContainer getFluidContainer(ItemStack holder) {
-        return new WrappedItemFluidContainer(
-            holder,
-            new SimpleFluidContainer(
-                getCapacity(),
-                1,
-                (t, f) -> f.is(ModFluidTags.ZIP_GUN_PROPELLANTS)) {
-            });
+    public SimpleFluidStorage getFluidContainer(ItemStack holder) {
+        return new SimpleFluidStorage(1, getCapacity());
     }
 
     public long getCapacity() {
-        return FluidConstants.fromMillibuckets(3000);
+        return 3000L * BUCKET / 1000L;
     }
 
     @Override
-    public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, @NotNull TooltipFlag isAdvanced) {
+    public void appendHoverText(@NotNull ItemStack stack, @NotNull Item.TooltipContext context, List<Component> tooltipComponents, @NotNull TooltipFlag isAdvanced) {
         tooltipComponents.add(TooltipUtils.getFluidComponent(
             FluidUtils.getTank(stack),
-            FluidUtils.getTankCapacity(stack),
+            FluidUtils.getCapacity(stack),
             ModFluids.OXYGEN.get()));
         TooltipUtils.addDescriptionComponent(tooltipComponents, ConstantComponents.ZIP_GUN_INFO);
     }
@@ -159,12 +149,13 @@ public class ZipGunItem extends Item implements BotariumFluidItem<WrappedItemFlu
     @Override
     public int getBarWidth(@NotNull ItemStack stack) {
         var fluidContainer = getFluidContainer(stack);
-        return (int) (((double) fluidContainer.getFirstFluid().getFluidAmount() / fluidContainer.getTankCapacity(0)) * 13);
+        return (int) (((double) fluidContainer.get(0).getAmount() / (double) fluidContainer.get(0).getLimit(fluidContainer.get(0).getResource())) * 13);
     }
 
     @Override
     public int getBarColor(@NotNull ItemStack stack) {
-        return ClientFluidHooks.getFluidColor(FluidUtils.getTank(stack));
+        // TODO: Migrate to CSL - replace ClientFluidHooks.getFluidColor
+        return 0xFFFFFF;
     }
 
     // Fabric disabling of nbt change animation

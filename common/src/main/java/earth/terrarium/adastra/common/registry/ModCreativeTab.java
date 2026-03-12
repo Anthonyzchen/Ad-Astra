@@ -1,30 +1,39 @@
 package earth.terrarium.adastra.common.registry;
 
-import com.teamresourceful.resourcefullib.common.item.tabs.ResourcefulCreativeTab;
+import com.teamresourceful.resourcefullib.common.registry.RegistryEntry;
 import com.teamresourceful.resourcefullib.common.registry.ResourcefulRegistries;
 import com.teamresourceful.resourcefullib.common.registry.ResourcefulRegistry;
 import earth.terrarium.adastra.AdAstra;
 import earth.terrarium.adastra.common.utils.EnergyUtils;
 import earth.terrarium.adastra.common.utils.FluidUtils;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 @SuppressWarnings({"unused", "SameParameterValue"})
 public class ModCreativeTab {
 
     public static final ResourcefulRegistry<CreativeModeTab> TABS = ResourcefulRegistries.create(BuiltInRegistries.CREATIVE_MODE_TAB, AdAstra.MOD_ID);
-    public static final Supplier<CreativeModeTab> TAB = new ResourcefulCreativeTab(new ResourceLocation(AdAstra.MOD_ID, "main"))
-        .setItemIcon(ModItems.TIER_1_ROCKET)
-        .addContent(ModCreativeTab::getCustomNbtItems)
-        .addRegistry(ModItems.ITEMS)
-        .build();
+
+    public static final RegistryEntry<CreativeModeTab> TAB = TABS.register("main", () ->
+        CreativeModeTab.builder(CreativeModeTab.Row.TOP, 0)
+            .title(Component.translatable("itemGroup." + AdAstra.MOD_ID + ".main"))
+            .icon(() -> new ItemStack(ModItems.TIER_1_ROCKET.get()))
+            .displayItems((parameters, output) -> {
+                // TODO: Re-enable custom NBT items once CSL fluid/energy filling is implemented
+                // getCustomNbtItems().filter(stack -> !stack.isEmpty()).forEach(output::accept);
+                ModItems.ITEMS.stream()
+                    .map(RegistryEntry::get)
+                    .map(ItemStack::new)
+                    .forEach(output::accept);
+            })
+            .build()
+    );
 
     public static Stream<ItemStack> getCustomNbtItems() {
         List<ItemStack> list = new ArrayList<>();

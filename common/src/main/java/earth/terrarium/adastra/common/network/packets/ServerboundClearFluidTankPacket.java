@@ -9,8 +9,9 @@ import com.teamresourceful.resourcefullib.common.network.base.ServerboundPacketT
 import com.teamresourceful.resourcefullib.common.network.defaults.CodecPacketType;
 import earth.terrarium.adastra.AdAstra;
 import earth.terrarium.adastra.common.utils.ModUtils;
-import earth.terrarium.botarium.common.fluid.base.BotariumFluidBlock;
-import earth.terrarium.botarium.common.fluid.base.FluidContainer;
+// TODO: CSL migration - BotariumFluidBlock and FluidContainer replaced
+// import earth.terrarium.common_storage_lib.storage.base.CommonStorage;
+// import earth.terrarium.common_storage_lib.resources.fluid.FluidResource;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -34,7 +35,7 @@ public record ServerboundClearFluidTankPacket(
         public Type() {
             super(
                 ServerboundClearFluidTankPacket.class,
-                new ResourceLocation(AdAstra.MOD_ID, "clear_fluid_tank"),
+                ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "clear_fluid_tank"),
                 ObjectByteCodec.create(
                     ExtraByteCodecs.BLOCK_POS.fieldOf(ServerboundClearFluidTankPacket::machine),
                     ByteCodec.INT.fieldOf(ServerboundClearFluidTankPacket::tank),
@@ -47,12 +48,8 @@ public record ServerboundClearFluidTankPacket(
         public Consumer<Player> handle(ServerboundClearFluidTankPacket packet) {
             return player -> ModUtils.getMachineFromMenuPacket(packet.machine(), player, player.level()).ifPresent(
                 machine -> {
-                    if (!(machine instanceof BotariumFluidBlock<?>)) return;
-                    FluidContainer container = FluidContainer.of(machine, null);
-                    if (container == null) return;
-                    int tank = Mth.clamp(packet.tank(), 0, container.getSize() - 1);
-                    container.internalExtract(container.getFluids().get(tank), false);
-                    container.extractFluid(container.getFluids().get(tank), false);
+                    // TODO: CSL migration - rework fluid tank clearing for CSL API
+                    // Previously checked instanceof BotariumFluidBlock, got FluidContainer, and cleared tank
                 }
             );
         }

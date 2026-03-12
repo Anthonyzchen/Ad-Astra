@@ -2,8 +2,7 @@ package earth.terrarium.adastra.common.entities.vehicles;
 
 import earth.terrarium.adastra.common.entities.multipart.MultipartPartEntity;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
@@ -36,7 +35,7 @@ public class VehiclePart extends Entity implements MultipartPartEntity<Vehicle> 
     }
 
     @Override
-    protected void defineSynchedData() {}
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {}
 
     @Override
     protected void readAdditionalSaveData(CompoundTag compound) {}
@@ -63,11 +62,6 @@ public class VehiclePart extends Entity implements MultipartPartEntity<Vehicle> 
     @Override
     public boolean is(Entity entity) {
         return entity == this || this.vehicle == entity;
-    }
-
-    @Override
-    public @NotNull Packet<ClientGamePacketListener> getAddEntityPacket() {
-        throw new UnsupportedOperationException();
     }
 
     @Override

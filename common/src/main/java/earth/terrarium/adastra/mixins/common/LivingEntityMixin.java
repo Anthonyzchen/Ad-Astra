@@ -13,7 +13,6 @@ import earth.terrarium.adastra.common.items.armor.SpaceSuitItem;
 import earth.terrarium.adastra.common.registry.ModDamageSources;
 import earth.terrarium.adastra.common.tags.ModBiomeTags;
 import earth.terrarium.adastra.common.tags.ModEntityTypeTags;
-import net.minecraft.Optionull;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -79,7 +78,8 @@ public abstract class LivingEntityMixin extends Entity {
         if (entity instanceof Player player) {
             if (player.getAbilities().flying) return;
             if (level().isClientSide()) {
-                gravity = Optionull.mapOrDefault(ClientData.getLocalData(), PlanetData::gravity, PlanetConstants.EARTH_GRAVITY);
+                PlanetData localData = ClientData.getLocalData();
+                gravity = localData != null ? localData.gravity() : PlanetConstants.EARTH_GRAVITY;
             }
         }
 

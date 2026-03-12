@@ -3,7 +3,7 @@ package earth.terrarium.adastra.common.compat.jei;
 import earth.terrarium.adastra.AdAstra;
 import earth.terrarium.adastra.client.screens.machines.*;
 import earth.terrarium.adastra.common.compat.jei.categories.*;
-import earth.terrarium.adastra.common.registry.ModCreativeTab;
+// import earth.terrarium.adastra.common.registry.ModCreativeTab; // unused after useNbtForSubtypes removal
 import earth.terrarium.adastra.common.registry.ModItems;
 import earth.terrarium.adastra.common.registry.ModRecipeTypes;
 import me.shedaniel.rei.plugincompatibilities.api.REIPluginCompatIgnore;
@@ -25,7 +25,7 @@ public class AdAstraJeiPlugin implements IModPlugin {
 
     @Override
     public @NotNull ResourceLocation getPluginUid() {
-        return new ResourceLocation(AdAstra.MOD_ID, "jei");
+        return ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "jei");
     }
 
     @Override
@@ -73,8 +73,10 @@ public class AdAstraJeiPlugin implements IModPlugin {
         registration.addRecipeClickArea(NasaWorkbenchScreen.class, NasaWorkbenchScreen.CLICK_AREA.getX(), NasaWorkbenchScreen.CLICK_AREA.getY(), NasaWorkbenchScreen.CLICK_AREA.getWidth(), NasaWorkbenchScreen.CLICK_AREA.getHeight(), NasaWorkbenchCategory.RECIPE);
     }
 
-    @Override
-    public void registerItemSubtypes(ISubtypeRegistration registration) {
-        ModCreativeTab.getCustomNbtItems().forEach(stack -> registration.useNbtForSubtypes(stack.getItem()));
-    }
+    // TODO: useNbtForSubtypes was removed in JEI for 1.21. Subtypes registration
+    // may need to be re-implemented using ISubtypeInterpreter if needed.
+    // @Override
+    // public void registerItemSubtypes(ISubtypeRegistration registration) {
+    //     ModCreativeTab.getCustomNbtItems().forEach(stack -> registration.useNbtForSubtypes(stack.getItem()));
+    // }
 }

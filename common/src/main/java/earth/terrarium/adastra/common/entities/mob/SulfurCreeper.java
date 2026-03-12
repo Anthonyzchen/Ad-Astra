@@ -1,9 +1,8 @@
 package earth.terrarium.adastra.common.entities.mob;
 
 import earth.terrarium.adastra.common.items.armor.SpaceSuitItem;
-import earth.terrarium.botarium.common.fluid.FluidConstants;
-import earth.terrarium.botarium.common.fluid.base.FluidContainer;
-import earth.terrarium.botarium.common.item.ItemStackHolder;
+// TODO: Migrate to CSL
+// import earth.terrarium.botarium.common.fluid.base.FluidContainer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.AreaEffectCloud;
 import net.minecraft.world.entity.EntityType;
@@ -38,16 +37,14 @@ public class SulfurCreeper extends Creeper {
         Explosion explosion = this.level().explode(this, this.getX(), this.getY(), this.getZ(), 3 * power, Level.ExplosionInteraction.MOB);
         this.discard();
 
+        // TODO: Migrate to CSL - re-implement oxygen drain on explosion
         for (Player player : explosion.getHitPlayers().keySet()) {
             var stack = player.getItemBySlot(EquipmentSlot.CHEST);
             if (SpaceSuitItem.hasFullSet(player)) {
-                ItemStackHolder holder = new ItemStackHolder(stack);
-                if (!FluidContainer.holdsFluid(stack)) continue;
-                FluidContainer container = FluidContainer.of(holder);
-                if (container == null) continue;
-                long amount = Math.max(0, (long) ((7 - player.getPosition(0).distanceTo(player.getPosition(0))) * (FluidConstants.fromMillibuckets(125))));
-                container.extractFluid(container.getFirstFluid().copyWithAmount(amount), false);
-                player.setItemSlot(EquipmentSlot.CHEST, holder.getStack());
+                if (!(stack.getItem() instanceof SpaceSuitItem suit)) continue;
+                long amount = Math.max(0, (long) ((7 - player.getPosition(0).distanceTo(player.getPosition(0))) * 125));
+                suit.consumeOxygen(stack, amount);
+                player.setItemSlot(EquipmentSlot.CHEST, stack);
             }
         }
 

@@ -16,7 +16,7 @@
   },
   "ingredients": [
     {
-      "tag": "c:ice_shard_ores"
+      "tag": "c:ores/ice_shard"
     }
   ],
   "results": [

@@ -6,14 +6,15 @@ import earth.terrarium.adastra.common.constants.ConstantComponents;
 import earth.terrarium.adastra.common.entities.vehicles.Rocket;
 import earth.terrarium.adastra.common.tags.ModBlockTags;
 import earth.terrarium.adastra.common.utils.TooltipUtils;
-import earth.terrarium.botarium.common.fluid.FluidApi;
-import earth.terrarium.botarium.common.fluid.base.FluidContainer;
-import earth.terrarium.botarium.common.item.ItemStackHolder;
+// TODO: Migrate to CSL
+// import earth.terrarium.botarium.common.fluid.FluidApi;
+// import earth.terrarium.botarium.common.fluid.base.FluidContainer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
@@ -31,29 +32,29 @@ public class RocketItem extends VehicleItem {
     @Override
     public InteractionResult useOn(UseOnContext context) {
         var level = context.getLevel();
-        if (level.isClientSide()) return InteractionResult.PASS;
+        if (level.isClientSide()) return InteractionResult.SUCCESS;
         var pos = context.getClickedPos();
         var stack = context.getItemInHand();
         var state = level.getBlockState(pos);
 
-        if (!state.is(ModBlockTags.LAUNCH_PADS)) return InteractionResult.PASS;
+        if (!state.is(ModBlockTags.LAUNCH_PADS)) {
+            return InteractionResult.PASS;
+        }
         if (state.hasProperty(LaunchPadBlock.PART) && state.getValue(LaunchPadBlock.PART) != LaunchPadPartProperty.CENTER) {
             return InteractionResult.PASS;
         }
 
-        level.playSound(null, pos, SoundEvents.NETHERITE_BLOCK_PLACE, SoundSource.BLOCKS, 1, 1);
         var vehicle = type().create(level);
-        if (vehicle == null) return InteractionResult.PASS;
+        if (vehicle == null) {
+            return InteractionResult.PASS;
+        }
+        level.playSound(null, pos, SoundEvents.NETHERITE_BLOCK_PLACE, SoundSource.BLOCKS, 1, 1);
         vehicle.setPos(pos.getX() + 0.5, pos.getY() + 0.125f, pos.getZ() + 0.5);
         vehicle.setYRot(context.getHorizontalDirection().getOpposite().toYRot());
         level.addFreshEntity(vehicle);
 
         if (vehicle instanceof Rocket rocket) {
-            ItemStackHolder holder = new ItemStackHolder(stack);
-            var container = getFluidContainer(stack).container();
-            var fromContainer = FluidContainer.of(holder);
-            if (fromContainer == null) return InteractionResult.PASS;
-            FluidApi.moveFluid(fromContainer, rocket.fluidContainer(), container.getFirstFluid(), false);
+            // TODO: Migrate to CSL - re-implement fluid transfer from item to entity
         }
 
         stack.shrink(1);
@@ -61,8 +62,8 @@ public class RocketItem extends VehicleItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Level level, List<Component> tooltipComponents, TooltipFlag isAdvanced) {
-        super.appendHoverText(stack, level, tooltipComponents, isAdvanced);
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents, TooltipFlag isAdvanced) {
+        super.appendHoverText(stack, context, tooltipComponents, isAdvanced);
         TooltipUtils.addDescriptionComponent(tooltipComponents, ConstantComponents.ROCKET_INFO);
     }
 }

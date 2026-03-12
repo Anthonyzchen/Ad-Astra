@@ -13,13 +13,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class ServerLevelEntityCallbacksMixin {
 
 
+    // 1.21.1: Use TAIL instead of targeting updateDynamicGameEventListener for resilience
     @Inject(
         method = "onTrackingStart(Lnet/minecraft/world/entity/Entity;)V",
-        at = @At(
-            value = "INVOKE",
-            shift = At.Shift.BEFORE,
-            target = "Lnet/minecraft/world/entity/Entity;updateDynamicGameEventListener(Ljava/util/function/BiConsumer;)V"
-        )
+        at = @At("TAIL")
     )
     private void adastra$onTrackingStart(Entity entity, CallbackInfo ci) {
         if (entity instanceof MultipartEntity multipartEntity) {
@@ -31,13 +28,10 @@ public class ServerLevelEntityCallbacksMixin {
         }
     }
 
+    // 1.21.1: Use TAIL instead of targeting updateDynamicGameEventListener for resilience
     @Inject(
         method = "onTrackingEnd(Lnet/minecraft/world/entity/Entity;)V",
-        at = @At(
-            value = "INVOKE",
-            shift = At.Shift.BEFORE,
-            target = "Lnet/minecraft/world/entity/Entity;updateDynamicGameEventListener(Ljava/util/function/BiConsumer;)V"
-        )
+        at = @At("TAIL")
     )
     private void adastra$onTrackingStop(Entity entity, CallbackInfo ci) {
         if (entity instanceof MultipartEntity multipartEntity) {

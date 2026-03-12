@@ -5,9 +5,12 @@ import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.decoration.Painting;
@@ -25,16 +28,15 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 public class SpacePaintingItem extends HangingEntityItem {
 
-    private final Supplier<PaintingVariant> defaultVariant;
+    private final ResourceKey<PaintingVariant> defaultVariantKey;
     private final TagKey<PaintingVariant> variants;
 
-    public SpacePaintingItem(Properties settings, Supplier<PaintingVariant> defaultVariant, TagKey<PaintingVariant> variants) {
+    public SpacePaintingItem(Properties settings, ResourceKey<PaintingVariant> defaultVariantKey, TagKey<PaintingVariant> variants) {
         super(EntityType.PAINTING, settings);
-        this.defaultVariant = defaultVariant;
+        this.defaultVariantKey = defaultVariantKey;
         this.variants = variants;
     }
 
@@ -56,9 +58,9 @@ public class SpacePaintingItem extends HangingEntityItem {
         }
         Painting painting = optional.get();
 
-        CompoundTag tag = stack.getTag();
-        if (tag != null) {
-            EntityType.updateCustomEntityTag(level, player, painting, tag);
+        CustomData customData = stack.getOrDefault(DataComponents.ENTITY_DATA, CustomData.EMPTY);
+        if (!customData.isEmpty()) {
+            customData.loadInto(painting);
         }
         if (painting.survives()) {
             if (!level.isClientSide) {
@@ -73,7 +75,11 @@ public class SpacePaintingItem extends HangingEntityItem {
     }
 
     public Optional<Painting> create(Level level, BlockPos pos, Direction direction) {
-        Painting painting = new Painting(level, pos, direction, BuiltInRegistries.PAINTING_VARIANT.wrapAsHolder(defaultVariant.get())) {
+        var registry = level.registryAccess().registryOrThrow(Registries.PAINTING_VARIANT);
+        Optional<Holder.Reference<PaintingVariant>> defaultHolder = registry.getHolder(defaultVariantKey);
+        if (defaultHolder.isEmpty()) return Optional.empty();
+
+        Painting painting = new Painting(level, pos, direction, defaultHolder.get()) {
             @Override
             public ItemEntity spawnAtLocation(ItemLike item) {
                 return super.spawnAtLocation(ModItems.SPACE_PAINTING.get());
@@ -85,7 +91,7 @@ public class SpacePaintingItem extends HangingEntityItem {
             }
         };
         List<Holder<PaintingVariant>> list = new ArrayList<>();
-        BuiltInRegistries.PAINTING_VARIANT.getTagOrEmpty(variants).forEach(list::add);
+        registry.getTagOrEmpty(variants).forEach(list::add);
         if (!list.isEmpty()) {
             list.removeIf((holder) -> {
                 painting.setVariant(holder);
@@ -104,6 +110,6 @@ public class SpacePaintingItem extends HangingEntityItem {
     }
 
     private static int variantArea(Holder<PaintingVariant> variant) {
-        return variant.value().getWidth() * variant.value().getHeight();
+        return variant.value().width() * variant.value().height();
     }
 }

@@ -1,6 +1,5 @@
 package earth.terrarium.adastra.client.screens;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.Tesselator;
@@ -30,7 +29,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.renderer.GameRenderer;
+import com.mojang.blaze3d.vertex.BufferUploader;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -51,22 +50,22 @@ import java.util.List;
 
 public class PlanetsScreen extends AbstractContainerScreen<PlanetsMenu> {
 
-    public static final ResourceLocation SELECTION_MENU = new ResourceLocation(AdAstra.MOD_ID, "planets/selection_menu");
-    public static final ResourceLocation SMALL_SELECTION_MENU = new ResourceLocation(AdAstra.MOD_ID, "planets/small_selection_menu");
+    public static final ResourceLocation SELECTION_MENU = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "planets/selection_menu");
+    public static final ResourceLocation SMALL_SELECTION_MENU = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "planets/small_selection_menu");
 
     public static final WidgetSprites BUTTON_SPRITES = new WidgetSprites(
-        new ResourceLocation(AdAstra.MOD_ID, "planets/button"),
-        new ResourceLocation(AdAstra.MOD_ID, "planets/button_highlighted")
+        ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "planets/button"),
+        ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "planets/button_highlighted")
     );
 
     public static final WidgetSprites BACK_BUTTON_SPRITES = new WidgetSprites(
-        new ResourceLocation(AdAstra.MOD_ID, "planets/back_button"),
-        new ResourceLocation(AdAstra.MOD_ID, "planets/back_button_highlighted")
+        ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "planets/back_button"),
+        ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "planets/back_button_highlighted")
     );
 
     public static final WidgetSprites PLUS_BUTTON_SPRITES = new WidgetSprites(
-        new ResourceLocation(AdAstra.MOD_ID, "planets/plus_button"),
-        new ResourceLocation(AdAstra.MOD_ID, "planets/plus_button_highlighted")
+        ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "planets/plus_button"),
+        ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "planets/plus_button_highlighted")
     );
 
     private final List<Button> buttons = new ArrayList<>();
@@ -274,23 +273,19 @@ public class PlanetsScreen extends AbstractContainerScreen<PlanetsMenu> {
         graphics.fill(0, 0, width, height, 0xff000419);
 
         // Render diamond pattern lines
-        RenderSystem.setShader(GameRenderer::getRendertypeLinesShader);
-        Tesselator tessellator = Tesselator.getInstance();
-        BufferBuilder bufferBuilder = tessellator.getBuilder();
-        RenderSystem.setShader(GameRenderer::getPositionColorShader);
-        bufferBuilder.begin(VertexFormat.Mode.DEBUG_LINES, DefaultVertexFormat.POSITION_COLOR);
+        BufferBuilder bufferBuilder = Tesselator.getInstance().begin(VertexFormat.Mode.DEBUG_LINES, DefaultVertexFormat.POSITION_COLOR);
 
         for (int i = -height; i <= width; i += 24) {
-            bufferBuilder.vertex(i, 0, 0).color(0xff0f2559).endVertex();
-            bufferBuilder.vertex(i + height, height, 0).color(0xff0f2559).endVertex();
+            bufferBuilder.addVertex(i, 0, 0).setColor(0xff0f2559);
+            bufferBuilder.addVertex(i + height, height, 0).setColor(0xff0f2559);
         }
 
         for (int i = width + height; i >= 0; i -= 24) {
-            bufferBuilder.vertex(i, 0, 0).color(0xff0f2559).endVertex();
-            bufferBuilder.vertex(i - height, height, 0).color(0xff0f2559).endVertex();
+            bufferBuilder.addVertex(i, 0, 0).setColor(0xff0f2559);
+            bufferBuilder.addVertex(i - height, height, 0).setColor(0xff0f2559);
         }
 
-        tessellator.end();
+        BufferUploader.drawWithShader(bufferBuilder.buildOrThrow());
 
         AdAstraClientEvents.RenderSolarSystemEvent.fire(graphics, selectedSolarSystem, width, height);
         renderSelectionMenu(graphics);
@@ -331,8 +326,8 @@ public class PlanetsScreen extends AbstractContainerScreen<PlanetsMenu> {
                 double x2 = x + r * Math.cos(nextAngle);
                 double y2 = y + r * Math.sin(nextAngle);
 
-                bufferBuilder.vertex(x1, y1, 0).color(color).endVertex();
-                bufferBuilder.vertex(x2, y2, 0).color(color).endVertex();
+                bufferBuilder.addVertex((float) x1, (float) y1, 0).setColor(color);
+                bufferBuilder.addVertex((float) x2, (float) y2, 0).setColor(color);
             }
         }
     }
@@ -408,12 +403,9 @@ public class PlanetsScreen extends AbstractContainerScreen<PlanetsMenu> {
     static {
         AdAstraClientEvents.RenderSolarSystemEvent.register((graphics, solarSystem, width, height) -> {
             if (PlanetConstants.SOLAR_SYSTEM.equals(solarSystem)) {
-                Tesselator tessellator = Tesselator.getInstance();
-                BufferBuilder bufferBuilder = tessellator.getBuilder();
-                RenderSystem.setShader(GameRenderer::getPositionColorShader);
-                bufferBuilder.begin(VertexFormat.Mode.DEBUG_LINES, DefaultVertexFormat.POSITION_COLOR);
+                BufferBuilder bufferBuilder = Tesselator.getInstance().begin(VertexFormat.Mode.DEBUG_LINES, DefaultVertexFormat.POSITION_COLOR);
                 drawCircles(0, 4, 0xff24327b, bufferBuilder, width, height);
-                tessellator.end();
+                BufferUploader.drawWithShader(bufferBuilder.buildOrThrow());
 
                 graphics.blit(DimensionRenderingUtils.SUN, width / 2 - 8, height / 2 - 8, 0, 0, 16, 16, 16, 16);
                 float rotation = Util.getMillis() / 100f;
@@ -430,12 +422,9 @@ public class PlanetsScreen extends AbstractContainerScreen<PlanetsMenu> {
 
         AdAstraClientEvents.RenderSolarSystemEvent.register((graphics, solarSystem, width, height) -> {
             if (PlanetConstants.PROXIMA_CENTAURI.equals(solarSystem)) {
-                Tesselator tessellator = Tesselator.getInstance();
-                BufferBuilder bufferBuilder = tessellator.getBuilder();
-                RenderSystem.setShader(GameRenderer::getPositionColorShader);
-                bufferBuilder.begin(VertexFormat.Mode.DEBUG_LINES, DefaultVertexFormat.POSITION_COLOR);
+                BufferBuilder bufferBuilder = Tesselator.getInstance().begin(VertexFormat.Mode.DEBUG_LINES, DefaultVertexFormat.POSITION_COLOR);
                 drawCircles(1, 1, 0xff008080, bufferBuilder, width, height);
-                tessellator.end();
+                BufferUploader.drawWithShader(bufferBuilder.buildOrThrow());
 
                 graphics.blit(DimensionRenderingUtils.BLUE_SUN, width / 2 - 8, height / 2 - 8, 0, 0, 16, 16, 16, 16);
                 float rotation = Util.getMillis() / 100f % 360f;

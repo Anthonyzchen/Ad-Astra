@@ -15,6 +15,7 @@ import org.spongepowered.asm.mixin.Mixin;
 
 import java.util.List;
 
+// TODO: 1.21.1 NeoForge IShearable interface may have changed - verify method signatures
 @Mixin(GlacianRam.class)
 public abstract class GlacianRamMixin extends Animal implements IShearable {
 

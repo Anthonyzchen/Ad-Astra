@@ -25,7 +25,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class PlayerRendererMixin extends LivingEntityRenderer<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> {
 
     @Shadow
-    protected abstract void setupRotations(AbstractClientPlayer entityLiving, PoseStack matrixStack, float ageInTicks, float rotationYaw, float partialTicks);
+    protected abstract void setupRotations(AbstractClientPlayer entityLiving, PoseStack matrixStack, float ageInTicks, float rotationYaw, float partialTicks, float scale);
 
     @Shadow
     protected abstract void setModelProperties(AbstractClientPlayer clientPlayer);
@@ -57,16 +57,14 @@ public abstract class PlayerRendererMixin extends LivingEntityRenderer<AbstractC
         boolean isRightHand = rendererArm == spaceSuitModel.rightArm;
 
         int color = spaceSuit.getColor(stack);
-        float r = FastColor.ARGB32.red(color) / 255f;
-        float g = FastColor.ARGB32.green(color) / 255f;
-        float b = FastColor.ARGB32.blue(color) / 255f;
+        int packedColor = FastColor.ARGB32.color(255, FastColor.ARGB32.red(color), FastColor.ARGB32.green(color), FastColor.ARGB32.blue(color));
 
         if (isRightHand) {
             spaceSuitModel.rightArm.copyFrom(rendererArm);
-            spaceSuitModel.rightArm.render(poseStack, buffer.getBuffer(RenderType.entityTranslucent(texture)), packedLight, OverlayTexture.NO_OVERLAY, r, g, b, 1);
+            spaceSuitModel.rightArm.render(poseStack, buffer.getBuffer(RenderType.entityTranslucent(texture)), packedLight, OverlayTexture.NO_OVERLAY, packedColor);
         } else {
             spaceSuitModel.leftArm.copyFrom(rendererArm);
-            spaceSuitModel.leftArm.render(poseStack, buffer.getBuffer(RenderType.entityTranslucent(texture)), packedLight, OverlayTexture.NO_OVERLAY, r, g, b, 1);
+            spaceSuitModel.leftArm.render(poseStack, buffer.getBuffer(RenderType.entityTranslucent(texture)), packedLight, OverlayTexture.NO_OVERLAY, packedColor);
         }
     }
 }

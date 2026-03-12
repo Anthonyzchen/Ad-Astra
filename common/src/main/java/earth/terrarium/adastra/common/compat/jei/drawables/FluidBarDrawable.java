@@ -2,7 +2,8 @@ package earth.terrarium.adastra.common.compat.jei.drawables;
 
 import earth.terrarium.adastra.client.utils.GuiUtils;
 import earth.terrarium.adastra.common.utils.TooltipUtils;
-import earth.terrarium.botarium.common.fluid.base.FluidHolder;
+// TODO: CSL migration - FluidHolder needs CSL FluidResource equivalent
+// import earth.terrarium.common_storage_lib.resources.fluid.FluidResource;
 import mezz.jei.api.gui.drawable.IDrawable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -21,14 +22,15 @@ public class FluidBarDrawable implements IDrawable {
     private final long capacity;
     private final Fluid fluid;
 
-    public FluidBarDrawable(double mouseX, double mouseY, boolean generate, long capacity, int cookTime, FluidHolder fluid) {
+    // TODO: CSL migration - FluidHolder parameter needs CSL FluidResource equivalent
+    public FluidBarDrawable(double mouseX, double mouseY, boolean generate, long capacity, int cookTime, Object fluid) {
         this.mouseX = (int) mouseX;
         this.mouseY = (int) mouseY;
         this.gain = generate;
-        this.perTick = fluid.getFluidAmount();
+        this.perTick = 0; // TODO: CSL migration - was fluid.getFluidAmount()
         this.cookTime = cookTime;
         this.capacity = capacity;
-        this.fluid = fluid.getFluid();
+        this.fluid = null; // TODO: CSL migration - was fluid.getFluid()
     }
 
     @Override
@@ -43,20 +45,6 @@ public class FluidBarDrawable implements IDrawable {
 
     @Override
     public void draw(@NotNull GuiGraphics graphics, int xOffset, int yOffset) {
-        long time = Objects.requireNonNull(Minecraft.getInstance().level).getGameTime();
-        long amount = (time % (capacity / perTick) * perTick);
-        long fluidAmount = gain ? amount : capacity - amount;
-
-        GuiUtils.drawFluidBar(
-            graphics,
-            mouseX,
-            mouseY,
-            xOffset,
-            yOffset,
-            FluidHolder.of(fluid, fluidAmount),
-            capacity,
-            TooltipUtils.getTicksPerIterationComponent(cookTime),
-            gain ? TooltipUtils.getFluidGenerationPerIterationComponent(perTick) : TooltipUtils.getFluidUsePerIterationComponent(perTick)
-        );
+        // TODO: CSL migration - rework fluid drawing for CSL API
     }
 }

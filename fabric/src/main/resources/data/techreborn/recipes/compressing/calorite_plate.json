@@ -12,7 +12,7 @@
   "time": 400,
   "ingredients": [
     {
-      "tag": "c:calorite_ingots",
+      "tag": "c:ingots/calorite",
       "count": 1
     }
   ],

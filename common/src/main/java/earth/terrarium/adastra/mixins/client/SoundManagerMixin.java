@@ -10,6 +10,7 @@ import net.minecraft.client.resources.sounds.TickableSoundInstance;
 import net.minecraft.client.sounds.SoundEngine;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -55,8 +56,8 @@ public abstract class SoundManagerMixin {
         Minecraft.getInstance().execute(() -> {
             float volume = source == SoundSource.MUSIC || source == SoundSource.RECORDS ? 1 : 0.1f;
             SoundInstance newSound = new SimpleSoundInstance(sound.getLocation(), source,
-                volume, 0.1f, level.random,
-                sound.isLooping(), delay,
+                volume, 0.1f,
+                RandomSource.create(), sound.isLooping(), delay,
                 sound.getAttenuation(), sound.getX(),
                 sound.getY(), sound.getZ(), sound.isRelative()
             );

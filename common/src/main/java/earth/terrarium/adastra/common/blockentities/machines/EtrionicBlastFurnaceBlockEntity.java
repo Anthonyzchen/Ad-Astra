@@ -12,13 +12,15 @@ import earth.terrarium.adastra.common.registry.ModRecipeTypes;
 import earth.terrarium.adastra.common.utils.EnergyUtils;
 import earth.terrarium.adastra.common.utils.ItemUtils;
 import earth.terrarium.adastra.common.utils.TransferUtils;
-import earth.terrarium.botarium.common.energy.impl.WrappedBlockEnergyContainer;
+import earth.terrarium.common_storage_lib.storage.base.ValueStorage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
+import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -45,7 +47,7 @@ public class EtrionicBlastFurnaceBlockEntity extends EnergyContainerMachineBlock
 
     @Nullable
     private AlloyingRecipe alloyingRecipe;
-    protected final RecipeManager.CachedCheck<Container, AlloyingRecipe> alloyingQuickCheck = RecipeManager.createCheck(ModRecipeTypes.ALLOYING.get());
+    protected final RecipeManager.CachedCheck<RecipeInput, AlloyingRecipe> alloyingQuickCheck = RecipeManager.createCheck(ModRecipeTypes.ALLOYING.get());
 
     private final BlastingRecipe[] recipes = new BlastingRecipe[4];
 
@@ -55,6 +57,7 @@ public class EtrionicBlastFurnaceBlockEntity extends EnergyContainerMachineBlock
 
     public EtrionicBlastFurnaceBlockEntity(BlockPos pos, BlockState state) {
         super(pos, state, 9);
+        this.energyContainer = EnergyUtils.machineInsertOnlyEnergy(MachineConfig.STEEL);
     }
 
     @Override
@@ -62,13 +65,9 @@ public class EtrionicBlastFurnaceBlockEntity extends EnergyContainerMachineBlock
         return new EtrionicBlastFurnaceMenu(id, inventory, this);
     }
 
-    @Override
-    public WrappedBlockEnergyContainer getEnergyStorage(Level level, BlockPos pos, BlockState state, @Nullable BlockEntity entity, @Nullable Direction direction) {
+    public ValueStorage getEnergyStorage(Level level, BlockPos pos, BlockState state, @Nullable BlockEntity entity, @Nullable Direction direction) {
         if (energyContainer != null) return energyContainer;
-        return energyContainer = new WrappedBlockEnergyContainer(
-            this,
-            EnergyUtils.machineInsertOnlyEnergy(MachineConfig.STEEL)
-        );
+        return energyContainer = EnergyUtils.machineInsertOnlyEnergy(MachineConfig.STEEL);
     }
 
     @Override
@@ -93,10 +92,10 @@ public class EtrionicBlastFurnaceBlockEntity extends EnergyContainerMachineBlock
     public void tickSideInteractions(BlockPos pos, Predicate<Direction> filter, List<ConfigurationEntry> sideConfig) {
         TransferUtils.pullItemsNearby(this, pos, new int[]{1, 2, 3, 4}, sideConfig.get(0), filter);
         TransferUtils.pushItemsNearby(this, pos, new int[]{5, 6, 7, 8}, sideConfig.get(1), filter);
-        TransferUtils.pullEnergyNearby(this, pos, getEnergyStorage().maxInsert(), sideConfig.get(2), filter);
+        TransferUtils.pullEnergyNearby(this, pos, getEnergyStorage().getCapacity(), sideConfig.get(2), filter);
     }
 
-    public void recipeTick(WrappedBlockEnergyContainer energyStorage) {
+    public void recipeTick(ValueStorage energyStorage) {
         if (mode == Mode.ALLOYING) {
             alloyingRecipeTick(energyStorage);
             return;
@@ -109,7 +108,7 @@ public class EtrionicBlastFurnaceBlockEntity extends EnergyContainerMachineBlock
             if (canCraft(energyStorage, recipes[i], i + 1)) {
                 shouldClear = false;
             }
-            energyStorage.internalExtract(MachineConfig.etrionicBlastFurnaceBlastingEnergyPerItem, false);
+            energyStorage.extract(MachineConfig.etrionicBlastFurnaceBlastingEnergyPerItem, false);
             isCooking = true;
             if (cookTime < cookTimeTotal) continue;
             for (int j = 0; j < 4; j++) {
@@ -126,9 +125,9 @@ public class EtrionicBlastFurnaceBlockEntity extends EnergyContainerMachineBlock
         }
     }
 
-    protected boolean canCraft(WrappedBlockEnergyContainer energyStorage, BlastingRecipe recipe, int slot) {
+    protected boolean canCraft(ValueStorage energyStorage, BlastingRecipe recipe, int slot) {
         if (recipe == null) return false;
-        if (energyStorage.internalExtract(MachineConfig.etrionicBlastFurnaceBlastingEnergyPerItem, true) < MachineConfig.etrionicBlastFurnaceBlastingEnergyPerItem)
+        if (energyStorage.extract(MachineConfig.etrionicBlastFurnaceBlastingEnergyPerItem, true) < MachineConfig.etrionicBlastFurnaceBlastingEnergyPerItem)
             return false;
         if (!recipe.getIngredients().get(0).test(getItem(slot))) return false;
         return ItemUtils.canAddItem(this, recipe.getResultItem(level().registryAccess()), 5, 6, 7, 8);
@@ -143,14 +142,14 @@ public class EtrionicBlastFurnaceBlockEntity extends EnergyContainerMachineBlock
         cookTime = 0;
     }
 
-    public void alloyingRecipeTick(WrappedBlockEnergyContainer energyStorage) {
+    public void alloyingRecipeTick(ValueStorage energyStorage) {
         if (alloyingRecipe == null) return;
         if (!canCraftAlloying()) {
             clearAlloyingRecipe();
             return;
         }
 
-        energyStorage.internalExtract(alloyingRecipe.energy(), false);
+        energyStorage.extract(alloyingRecipe.energy(), false);
 
         cookTime++;
         if (cookTime < cookTimeTotal) return;
@@ -159,7 +158,7 @@ public class EtrionicBlastFurnaceBlockEntity extends EnergyContainerMachineBlock
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean canCraftAlloying() {
-        return alloyingRecipe != null && alloyingRecipe.matches(this, level());
+        return alloyingRecipe != null && alloyingRecipe.matches(toRecipeInput(), level());
     }
 
     public void craftAlloying() {
@@ -189,7 +188,7 @@ public class EtrionicBlastFurnaceBlockEntity extends EnergyContainerMachineBlock
                 createRecipe(i, i + 1);
             }
         } else {
-            alloyingQuickCheck.getRecipeFor(this, level()).ifPresent(r -> {
+            alloyingQuickCheck.getRecipeFor(toRecipeInput(), level()).ifPresent(r -> {
                 alloyingRecipe = r.value();
                 cookTimeTotal = r.value().cookingTime();
             });
@@ -209,16 +208,16 @@ public class EtrionicBlastFurnaceBlockEntity extends EnergyContainerMachineBlock
     }
 
     @Override
-    public void load(@NotNull CompoundTag tag) {
-        super.load(tag);
+    public void loadAdditional(@NotNull CompoundTag tag, HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
         cookTime = tag.getInt("CookTime");
         cookTimeTotal = tag.getInt("CookTimeTotal");
         mode = Mode.values()[tag.getByte("Mode")];
     }
 
     @Override
-    protected void saveAdditional(@NotNull CompoundTag tag) {
-        super.saveAdditional(tag);
+    protected void saveAdditional(@NotNull CompoundTag tag, HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
         tag.putInt("CookTime", cookTime);
         tag.putInt("CookTimeTotal", cookTimeTotal);
         tag.putByte("Mode", (byte) mode.ordinal());

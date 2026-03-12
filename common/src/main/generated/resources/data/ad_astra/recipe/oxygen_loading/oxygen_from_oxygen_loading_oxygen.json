@@ -1,0 +1,15 @@
+{
+  "type": "ad_astra:oxygen_loading",
+  "cookingtime": 1,
+  "energy": 30,
+  "input": {
+    "ingredient": {
+      "tag": "ad_astra:oxygen"
+    },
+    "millibuckets": 25
+  },
+  "result": {
+    "millibuckets": 25,
+    "id": "ad_astra:oxygen"
+  }
+}

@@ -70,15 +70,15 @@ public interface Pipe {
     default void transfer(ServerLevel level, long transferRate, Map<BlockPos, Direction> sources, Map<BlockPos, Direction> consumers) {
         for (var sourceEntry : sources.entrySet()) {
             var sourceEntity = level.getBlockEntity(sourceEntry.getKey());
-            if (sourceEntity == null || !isValid(sourceEntity, sourceEntry.getValue())) return;
+            if (sourceEntity == null || !isValid(sourceEntity, sourceEntry.getValue())) continue;
 
             long rate = transferRate / consumers.size();
             for (var consumerEntry : consumers.entrySet()) {
                 var pos = consumerEntry.getKey();
-                var direction = consumerEntry.getValue();
+                var consumerDirection = consumerEntry.getValue();
                 var consumerEntity = level.getBlockEntity(pos);
-                if (consumerEntity == null || !isValid(consumerEntity, direction)) continue;
-                moveContents(rate, sourceEntity, consumerEntity, direction);
+                if (consumerEntity == null || !isValid(consumerEntity, consumerDirection)) continue;
+                moveContents(rate, sourceEntity, consumerEntity, sourceEntry.getValue(), consumerDirection);
             }
         }
     }
@@ -86,12 +86,13 @@ public interface Pipe {
     /**
      * Moves the contents from the source to the consumer.
      *
-     * @param transferRate The transfer rate.
-     * @param source       The source block entity.
-     * @param consumer     The consumer block entity.
-     * @param direction    The direction of the consumer.
+     * @param transferRate      The transfer rate.
+     * @param source            The source block entity.
+     * @param consumer          The consumer block entity.
+     * @param sourceDirection   The direction from the pipe toward the source.
+     * @param consumerDirection The direction from the pipe toward the consumer.
      */
-    void moveContents(long transferRate, @NotNull BlockEntity source, @NotNull BlockEntity consumer, Direction direction);
+    void moveContents(long transferRate, @NotNull BlockEntity source, @NotNull BlockEntity consumer, Direction sourceDirection, Direction consumerDirection);
 
     /**
      * Checks if a block entity is valid for the pipe type.

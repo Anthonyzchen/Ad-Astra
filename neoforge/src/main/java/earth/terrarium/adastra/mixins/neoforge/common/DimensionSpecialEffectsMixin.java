@@ -15,9 +15,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class DimensionSpecialEffectsMixin {
 
     // Mixin directly instead of using the event because Ad Astra dimension renderers are added dynamically via resource pack.
+    // 1.21.1: DimensionType.effectsLocation() was renamed to effects()
     @Inject(method = "forType", at = @At("HEAD"), cancellable = true)
     private static void adastra$forType(DimensionType type, CallbackInfoReturnable<DimensionSpecialEffects> cir) {
-        ResourceKey<Level> dimension = ResourceKey.create(Registries.DIMENSION, type.effectsLocation());
+        ResourceKey<Level> dimension = ResourceKey.create(Registries.DIMENSION, type.effects());
         if (ClientPlatformUtilsImpl.DIMENSION_RENDERERS.containsKey(dimension)) {
             cir.setReturnValue(ClientPlatformUtilsImpl.DIMENSION_RENDERERS.get(dimension));
         }

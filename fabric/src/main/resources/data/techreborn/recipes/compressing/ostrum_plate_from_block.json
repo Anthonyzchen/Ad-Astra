@@ -12,7 +12,7 @@
   "time": 400,
   "ingredients": [
     {
-      "tag": "c:ostrum_blocks",
+      "tag": "c:storage_blocks/ostrum",
       "count": 1
     }
   ],

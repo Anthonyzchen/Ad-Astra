@@ -3,7 +3,6 @@ package earth.terrarium.adastra.common.planets;
 import earth.terrarium.adastra.api.planets.Planet;
 import earth.terrarium.adastra.api.planets.PlanetApi;
 import earth.terrarium.adastra.common.constants.PlanetConstants;
-import net.minecraft.Optionull;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
@@ -57,6 +56,7 @@ public class PlanetApiImpl implements PlanetApi {
 
     @Override
     public long getSolarPower(ResourceKey<Level> level) {
-        return Optionull.mapOrDefault(getPlanet(level), Planet::solarPower, PlanetConstants.EARTH_SOLAR_POWER);
+        Planet planet = getPlanet(level);
+        return planet != null ? planet.solarPower() : PlanetConstants.EARTH_SOLAR_POWER;
     }
 }

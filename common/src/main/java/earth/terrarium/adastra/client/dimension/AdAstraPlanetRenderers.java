@@ -28,7 +28,7 @@ public class AdAstraPlanetRenderers extends SimpleJsonResourceReloadListener {
         Map<ResourceKey<Level>, ModDimensionSpecialEffects> effects = new HashMap<>();
         object.forEach((key, value) -> {
             JsonObject json = GsonHelper.convertToJsonObject(value, "planets");
-            PlanetRenderer renderer = PlanetRenderer.CODEC.parse(JsonOps.INSTANCE, json).getOrThrow(false, AdAstra.LOGGER::error);
+            PlanetRenderer renderer = PlanetRenderer.CODEC.parse(JsonOps.INSTANCE, json).getOrThrow();
             effects.put(renderer.dimension(), new ModDimensionSpecialEffects(renderer));
         });
         ClientPlatformUtils.registerPlanetRenderers(effects);

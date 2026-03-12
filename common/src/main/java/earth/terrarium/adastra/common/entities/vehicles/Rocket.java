@@ -12,17 +12,14 @@ import earth.terrarium.adastra.common.planets.AdAstraData;
 import earth.terrarium.adastra.common.registry.*;
 import earth.terrarium.adastra.common.tags.ModFluidTags;
 import earth.terrarium.adastra.common.utils.FluidUtils;
-import earth.terrarium.botarium.common.fluid.FluidApi;
-import earth.terrarium.botarium.common.fluid.FluidConstants;
-import earth.terrarium.botarium.common.fluid.base.FluidContainer;
-import earth.terrarium.botarium.common.fluid.base.FluidHolder;
-import earth.terrarium.botarium.common.fluid.impl.SimpleFluidContainer;
-import earth.terrarium.botarium.common.item.ItemStackHolder;
-import earth.terrarium.botarium.common.menu.MenuHooks;
+import earth.terrarium.common_storage_lib.fluid.impl.SimpleFluidStorage;
+import earth.terrarium.common_storage_lib.fluid.util.FluidStorageData;
+import earth.terrarium.common_storage_lib.resources.fluid.FluidResource;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.protocol.game.ClientboundStopSoundPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -47,6 +44,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
@@ -54,6 +52,8 @@ import org.joml.Vector3f;
 import java.util.Map;
 
 public class Rocket extends Vehicle {
+
+    private static final long BUCKET = 81000L;
 
     private static final RocketProperties TIER_1_PROPERTIES = new RocketProperties(1, ModItems.TIER_1_ROCKET.get(), 1.0f, ModFluidTags.TIER_1_ROCKET_FUEL);
     private static final RocketProperties TIER_2_PROPERTIES = new RocketProperties(2, ModItems.TIER_2_ROCKET.get(), 1.0f, ModFluidTags.TIER_2_ROCKET_FUEL);
@@ -75,7 +75,7 @@ public class Rocket extends Vehicle {
     public static final EntityDataAccessor<Long> FUEL = SynchedEntityData.defineId(Rocket.class, EntityDataSerializers.LONG);
     public static final EntityDataAccessor<String> FUEL_TYPE = SynchedEntityData.defineId(Rocket.class, EntityDataSerializers.STRING);
 
-    private final SimpleFluidContainer fluidContainer;
+    private final SimpleFluidStorage fluidContainer;
     private final RocketProperties properties;
 
     private boolean launchpadBound;
@@ -92,18 +92,18 @@ public class Rocket extends Vehicle {
     public Rocket(EntityType<?> type, Level level, RocketProperties properties) {
         super(type, level);
         this.properties = properties;
-        fluidContainer = new SimpleFluidContainer(FluidConstants.fromMillibuckets(3000), 1, (amount, fluid) -> fluid.is(properties.fuel));
+        fluidContainer = new SimpleFluidStorage(1, 3000L * BUCKET / 1000L);
     }
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(IS_LAUNCHING, false);
-        this.entityData.define(LAUNCH_TICKS, -1);
-        this.entityData.define(HAS_LAUNCHED, false);
-        this.entityData.define(IS_IN_VALID_DIMENSION, AdAstraConfig.launchFromAnywhere || AdAstraData.canLaunchFrom(this.level().dimension()));
-        this.entityData.define(FUEL, 0L);
-        this.entityData.define(FUEL_TYPE, "air");
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(IS_LAUNCHING, false);
+        builder.define(LAUNCH_TICKS, -1);
+        builder.define(HAS_LAUNCHED, false);
+        builder.define(IS_IN_VALID_DIMENSION, AdAstraConfig.launchFromAnywhere || AdAstraData.canLaunchFrom(this.level().dimension()));
+        builder.define(FUEL, 0L);
+        builder.define(FUEL_TYPE, "air");
     }
 
     @Override
@@ -114,7 +114,10 @@ public class Rocket extends Vehicle {
         entityData.set(HAS_LAUNCHED, compound.getBoolean("HasLaunched"));
         speed = compound.getFloat("Speed");
         angle = compound.getFloat("Angle");
-        fluidContainer.deserialize(compound);
+        if (compound.contains("FluidData")) {
+            FluidStorageData.CODEC.parse(NbtOps.INSTANCE, compound.get("FluidData"))
+                .result().ifPresent(fluidContainer::readSnapshot);
+        }
     }
 
     @Override
@@ -125,10 +128,11 @@ public class Rocket extends Vehicle {
         compound.putBoolean("HasLaunched", hasLaunched());
         compound.putFloat("Speed", speed);
         compound.putFloat("Angle", angle);
-        fluidContainer.serialize(compound);
+        FluidStorageData.CODEC.encodeStart(NbtOps.INSTANCE, fluidContainer.createSnapshot())
+            .result().ifPresent(tag -> compound.put("FluidData", tag));
     }
 
-    public FluidContainer fluidContainer() {
+    public SimpleFluidStorage fluidContainer() {
         return fluidContainer;
     }
 
@@ -142,11 +146,8 @@ public class Rocket extends Vehicle {
 
     @Override
     public ItemStack getDropStack() {
-        ItemStackHolder stack = new ItemStackHolder(properties.item.getDefaultInstance());
-        var container = FluidContainer.of(stack);
-        if (container == null) return stack.getStack();
-        FluidApi.moveFluid(fluidContainer, container, fluidContainer.getFirstFluid(), false);
-        return stack.getStack();
+        // TODO: Migrate to CSL - re-implement fluid transfer from entity to item
+        return properties.item.getDefaultInstance();
     }
 
     public int tier() {
@@ -154,8 +155,8 @@ public class Rocket extends Vehicle {
     }
 
     @Override
-    protected Vector3f getPassengerAttachmentPoint(Entity entity, EntityDimensions dimensions, float scale) {
-        return new Vector3f(0, this.properties.ridingOffset + 0.3f, 0);
+    protected Vec3 getPassengerAttachmentPoint(Entity entity, EntityDimensions dimensions, float scale) {
+        return new Vec3(0, this.properties.ridingOffset + 0.3f, 0);
     }
 
     @Override
@@ -225,9 +226,9 @@ public class Rocket extends Vehicle {
             FluidUtils.moveItemToContainer(inventory, fluidContainer, 0, 1, 0);
             FluidUtils.moveContainerToItem(inventory, fluidContainer, 0, 1, 0);
 
-            var fluidHolder = fluidContainer.getFirstFluid();
-            entityData.set(FUEL, fluidHolder.getFluidAmount());
-            entityData.set(FUEL_TYPE, BuiltInRegistries.FLUID.getKey(fluidHolder.getFluid()).toString());
+            FluidResource fluidResource = fluidContainer.getResource(0);
+            entityData.set(FUEL, fluidContainer.getAmount(0));
+            entityData.set(FUEL_TYPE, BuiltInRegistries.FLUID.getKey(fluidResource.getType()).toString());
         }
     }
 
@@ -368,7 +369,7 @@ public class Rocket extends Vehicle {
             .inflate(2, 30, 2)
             .move(0, -37, 0), e -> true)) {
             if (entity.equals(getControllingPassenger())) continue;
-            entity.setSecondsOnFire(10);
+            entity.igniteForSeconds(10);
             entity.hurt(ModDamageSources.create(level(), ModDamageSources.ROCKET_FLAMES), 10);
         }
     }
@@ -389,8 +390,11 @@ public class Rocket extends Vehicle {
 
     public boolean consumeFuel(boolean simulate) {
         if (level().isClientSide()) return false;
-        long buckets = FluidConstants.fromMillibuckets(fluidContainer.getFirstFluid().is(ModFluidTags.EFFICIENT_FUEL) ? AdAstraConfig.launchEfficientFuelCost : AdAstraConfig.launchFuelCost);
-        return fluidContainer.extractFluid(fluidContainer.getFirstFluid().copyWithAmount(buckets), simulate).getFluidAmount() >= buckets;
+        FluidResource resource = fluidContainer.getResource(0);
+        if (resource.isBlank()) return false;
+        long cost = resource.is(ModFluidTags.EFFICIENT_FUEL) ? AdAstraConfig.launchEfficientFuelCost : AdAstraConfig.launchFuelCost;
+        long buckets = cost * BUCKET / 1000L;
+        return fluidContainer.extract(resource, buckets, simulate) >= buckets;
     }
 
     public boolean hasEnoughFuel() {
@@ -407,14 +411,20 @@ public class Rocket extends Vehicle {
         return new RocketMenu(containerId, inventory, this);
     }
 
-    public FluidHolder fluid() {
-        return FluidHolder.of(
-            BuiltInRegistries.FLUID.get(new ResourceLocation(entityData.get(FUEL_TYPE))),
-            entityData.get(FUEL));
+    public FluidResource fluidResource() {
+        return FluidResource.of(BuiltInRegistries.FLUID.get(ResourceLocation.parse(entityData.get(FUEL_TYPE))));
+    }
+
+    public long fluidAmount() {
+        return entityData.get(FUEL);
+    }
+
+    public long fluidCapacity() {
+        return fluidContainer.getLimit(0, FluidResource.BLANK);
     }
 
     public void openPlanetsScreen(ServerPlayer player) {
-        MenuHooks.openMenu(player, new PlanetsMenuProvider());
+        com.teamresourceful.resourcefullib.common.menu.MenuContentHelper.open(player, new PlanetsMenuProvider());
         var packet = new ClientboundStopSoundPacket(BuiltInRegistries.SOUND_EVENT
             .getKey(ModSoundEvents.ROCKET.get()), SoundSource.AMBIENT);
         player.connection.send(packet);

@@ -5,7 +5,6 @@ import com.google.gson.JsonObject;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
 import com.teamresourceful.resourcefullib.common.lib.Constants;
-import com.teamresourceful.resourcefullib.common.networking.PacketHelper;
 import earth.terrarium.adastra.AdAstra;
 import earth.terrarium.adastra.api.planets.Planet;
 import net.minecraft.network.FriendlyByteBuf;
@@ -36,7 +35,7 @@ public class AdAstraData extends SimpleJsonResourceReloadListener {
         DIMENSIONS_TO_PLANETS.clear();
         object.forEach((key, value) -> {
             JsonObject json = GsonHelper.convertToJsonObject(value, "planets");
-            Planet planet = Planet.CODEC.parse(JsonOps.INSTANCE, json).getOrThrow(false, AdAstra.LOGGER::error);
+            Planet planet = Planet.CODEC.parse(JsonOps.INSTANCE, json).getOrThrow();
             PLANETS.put(planet.dimension(), planet);
             DIMENSIONS_TO_PLANETS.put(planet.dimension(), planet.dimension());
             for (ResourceKey<Level> dimension : planet.additionalLaunchDimensions()) {
@@ -46,19 +45,23 @@ public class AdAstraData extends SimpleJsonResourceReloadListener {
     }
 
     public static void encodePlanets(FriendlyByteBuf buf) {
-        PacketHelper.writeWithYabn(buf, Planet.CODEC.listOf(), planets().values().stream().toList(), true)
-            .get()
-            .mapRight(DataResult.PartialResult::message)
-            .ifRight(AdAstra.LOGGER::error);
+        List<Planet> planetList = planets().values().stream().toList();
+        DataResult<JsonElement> result = Planet.CODEC.listOf().encodeStart(JsonOps.INSTANCE, planetList);
+        result.result().ifPresentOrElse(
+            json -> buf.writeUtf(json.toString()),
+            () -> {
+                result.error().ifPresent(e -> AdAstra.LOGGER.error(e.message()));
+                buf.writeUtf("[]");
+            }
+        );
     }
 
     public static Collection<Planet> decodePlanets(FriendlyByteBuf buf) {
-        return PacketHelper.readWithYabn(buf, Planet.CODEC.listOf(), true)
-            .get()
-            .mapRight(DataResult.PartialResult::message)
-            .ifRight(AdAstra.LOGGER::error)
-            .left()
-            .orElse(Collections.emptyList());
+        String json = buf.readUtf();
+        JsonElement element = com.google.gson.JsonParser.parseString(json);
+        DataResult<List<Planet>> result = Planet.CODEC.listOf().parse(JsonOps.INSTANCE, element);
+        result.error().ifPresent(e -> AdAstra.LOGGER.error(e.message()));
+        return result.result().orElse(Collections.emptyList());
     }
 
     public static ResourceKey<Level> getPlanetLocation(ResourceKey<Level> dimension) {

@@ -19,7 +19,6 @@ import it.unimi.dsi.fastutil.objects.Object2BooleanMap;
 import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -43,14 +42,6 @@ public class PlanetsMenu extends AbstractContainerMenu {
     protected final Map<ResourceKey<Level>, List<Pair<ItemStack, Integer>>> ingredients;
     protected final Object2BooleanMap<ResourceKey<Level>> claimedChunks = new Object2BooleanOpenHashMap<>();
     protected final Set<GlobalPos> spawnLocations;
-
-    public PlanetsMenu(int containerId, Inventory inventory, FriendlyByteBuf buf) {
-        this(containerId,
-            inventory,
-            PlanetsMenuProvider.createDisabledPlanetsFromBuf(buf),
-            PlanetsMenuProvider.createSpaceStationsFromBuf(buf),
-            PlanetsMenuProvider.createSpawnLocationsFromBuf(buf));
-    }
 
     public PlanetsMenu(int containerId,
                        Inventory inventory,

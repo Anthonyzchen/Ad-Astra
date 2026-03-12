@@ -10,6 +10,7 @@ import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jetbrains.annotations.NotNull;
@@ -109,9 +110,9 @@ public abstract class BaseContainerMenu<T extends BlockEntity> extends AbstractC
         broadcastFullState();
     }
 
-    public static <T extends BlockEntity> T getBlockEntityFromBuf(Level level, FriendlyByteBuf buf, Class<T> type) {
-        if (buf == null) return null;
+    public static <T extends BlockEntity> T getBlockEntityFromBuf(Level level, BlockPos pos, Class<T> type) {
+        if (pos == null) return null;
         if (!level.isClientSide) return null;
-        return WorldUtils.getTileEntity(type, level, buf.readBlockPos());
+        return WorldUtils.getTileEntity(type, level, pos);
     }
 }

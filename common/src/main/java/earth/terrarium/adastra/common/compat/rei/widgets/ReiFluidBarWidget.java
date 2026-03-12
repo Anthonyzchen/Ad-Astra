@@ -2,7 +2,8 @@ package earth.terrarium.adastra.common.compat.rei.widgets;
 
 import earth.terrarium.adastra.client.utils.GuiUtils;
 import earth.terrarium.adastra.common.utils.TooltipUtils;
-import earth.terrarium.botarium.common.fluid.base.FluidHolder;
+// TODO: CSL migration - FluidHolder needs CSL FluidResource equivalent
+// import earth.terrarium.common_storage_lib.resources.fluid.FluidResource;
 import me.shedaniel.math.Point;
 import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.api.client.gui.widgets.Widget;
@@ -24,32 +25,19 @@ public class ReiFluidBarWidget extends Widget {
     private final long capacity;
     private final Fluid fluid;
 
-    public ReiFluidBarWidget(Point point, boolean generate, long capacity, int cookTime, FluidHolder fluid) {
+    // TODO: CSL migration - FluidHolder parameter needs CSL FluidResource equivalent
+    public ReiFluidBarWidget(Point point, boolean generate, long capacity, int cookTime, Object fluid) {
         this.bounds = new Rectangle(new Rectangle(point.x, point.y, GuiUtils.FLUID_BAR_WIDTH, GuiUtils.FLUID_BAR_HEIGHT));
         this.gain = generate;
-        this.perTick = fluid.getFluidAmount();
+        this.perTick = 0; // TODO: CSL migration - was fluid.getFluidAmount()
         this.cookTime = cookTime;
         this.capacity = capacity;
-        this.fluid = fluid.getFluid();
+        this.fluid = null; // TODO: CSL migration - was fluid.getFluid()
     }
 
     @Override
     public void render(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        long time = Objects.requireNonNull(Minecraft.getInstance().level).getGameTime();
-        long amount = (time % (capacity / perTick) * perTick);
-        long fluidAmount = gain ? amount : capacity - amount;
-
-        GuiUtils.drawFluidBar(
-            graphics,
-            mouseX,
-            mouseY,
-            this.bounds.x,
-            this.bounds.y,
-            FluidHolder.of(fluid, fluidAmount),
-            capacity,
-            TooltipUtils.getTicksPerIterationComponent(cookTime),
-            gain ? TooltipUtils.getFluidGenerationPerIterationComponent(perTick) : TooltipUtils.getFluidUsePerIterationComponent(perTick)
-        );
+        // TODO: CSL migration - rework fluid rendering for CSL API
     }
 
     @Override

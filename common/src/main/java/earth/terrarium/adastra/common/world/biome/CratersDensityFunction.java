@@ -1,6 +1,7 @@
 package earth.terrarium.adastra.common.world.biome;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.util.KeyDispatchDataCodec;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.levelgen.DensityFunction;
@@ -13,11 +14,10 @@ public class CratersDensityFunction extends BlendedNoise {
     private final long seed;
     private final double scale;
 
-    public static final KeyDispatchDataCodec<CratersDensityFunction> CODEC = KeyDispatchDataCodec.of(Codec
+    public static final MapCodec<CratersDensityFunction> CODEC = Codec
         .doubleRange(Double.MIN_VALUE, 1)
         .fieldOf("scale")
-        .xmap(CratersDensityFunction::new, function -> function.scale)
-    );
+        .xmap(CratersDensityFunction::new, function -> function.scale);
 
     public CratersDensityFunction(double scale) {
         this(new XoroshiroRandomSource(0L), scale);
@@ -61,6 +61,6 @@ public class CratersDensityFunction extends BlendedNoise {
 
     @Override
     public KeyDispatchDataCodec<? extends DensityFunction> codec() {
-        return CODEC;
+        return KeyDispatchDataCodec.of(CODEC);
     }
 }

@@ -1,12 +1,13 @@
 package earth.terrarium.adastra.common.menus.base;
 
+import com.teamresourceful.resourcefullib.common.menu.ContentMenuProvider;
 import earth.terrarium.adastra.common.config.AdAstraConfig;
 import earth.terrarium.adastra.common.handlers.LaunchingDimensionHandler;
 import earth.terrarium.adastra.common.handlers.SpaceStationHandler;
 import earth.terrarium.adastra.common.handlers.base.SpaceStation;
 import earth.terrarium.adastra.common.menus.PlanetsMenu;
 import earth.terrarium.adastra.common.planets.AdAstraData;
-import earth.terrarium.botarium.common.menu.ExtraDataMenuProvider;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
@@ -23,7 +24,7 @@ import net.minecraft.world.level.Level;
 
 import java.util.*;
 
-public class PlanetsMenuProvider implements ExtraDataMenuProvider {
+public class PlanetsMenuProvider implements ContentMenuProvider<PlanetsMenuContent> {
 
     @Override
     public Component getDisplayName() {
@@ -36,41 +37,65 @@ public class PlanetsMenuProvider implements ExtraDataMenuProvider {
     }
 
     @Override
-    public void writeExtraData(ServerPlayer player, FriendlyByteBuf buffer) {
-        buffer.writeUtf(AdAstraConfig.disabledPlanets);
+    public PlanetsMenuContent createContent(ServerPlayer player) {
+        Set<ResourceLocation> disabledPlanets = new HashSet<>();
+        String[] planets = AdAstraConfig.disabledPlanets.split(",");
+        for (var planet : planets) {
+            if (!planet.isBlank()) {
+                disabledPlanets.add(ResourceLocation.parse(planet));
+            }
+        }
 
-        buffer.writeVarInt(AdAstraData.planets().size());
+        Map<ResourceKey<Level>, Map<UUID, Set<SpaceStation>>> spaceStationsMap = new HashMap<>();
         AdAstraData.planets().keySet().forEach(dimension -> {
-            buffer.writeResourceKey(dimension);
-
             ServerLevel targetLevel = player.server.getLevel(dimension);
             if (targetLevel == null) throw new IllegalStateException("Dimension " + dimension + " does not exist.");
-            var spaceStations = SpaceStationHandler.getAllSpaceStations(targetLevel);
-            buffer.writeVarInt(spaceStations.size());
-
-            spaceStations.forEach((id, stations) -> {
-                buffer.writeVarInt(stations.size());
-                stations.forEach(station -> {
-                    buffer.writeComponent(station.name());
-                    buffer.writeChunkPos(station.position());
-                });
-                buffer.writeUUID(id);
-            });
+            var stations = SpaceStationHandler.getAllSpaceStations(targetLevel);
+            spaceStationsMap.put(dimension, stations);
         });
 
         List<GlobalPos> locations = new ArrayList<>();
         AdAstraData.planets().forEach((dimension, planet) ->
             LaunchingDimensionHandler.getSpawningLocation(player, player.serverLevel(), planet).ifPresent(locations::add));
 
-        buffer.writeVarInt(locations.size());
-        locations.forEach(buffer::writeGlobalPos);
+        return new PlanetsMenuContent(
+            Collections.unmodifiableSet(disabledPlanets),
+            Collections.unmodifiableMap(spaceStationsMap),
+            Collections.unmodifiableSet(new HashSet<>(locations))
+        );
+    }
+
+    public static void writeToBuffer(FriendlyByteBuf buffer, PlanetsMenuContent content) {
+        buffer.writeUtf(String.join(",", content.disabledPlanets().stream().map(ResourceLocation::toString).toList()));
+
+        buffer.writeVarInt(content.spaceStations().size());
+        content.spaceStations().forEach((dimension, stationGroups) -> {
+            buffer.writeResourceKey(dimension);
+            buffer.writeVarInt(stationGroups.size());
+            stationGroups.forEach((id, stations) -> {
+                buffer.writeVarInt(stations.size());
+                stations.forEach(station -> {
+                    buffer.writeUtf(Component.Serializer.toJson(station.name(), net.minecraft.core.RegistryAccess.EMPTY));
+                    buffer.writeChunkPos(station.position());
+                });
+                buffer.writeUUID(id);
+            });
+        });
+
+        buffer.writeVarInt(content.spawnLocations().size());
+        content.spawnLocations().forEach(globalPos -> {
+            buffer.writeResourceKey(globalPos.dimension());
+            buffer.writeBlockPos(globalPos.pos());
+        });
     }
 
     public static Set<ResourceLocation> createDisabledPlanetsFromBuf(FriendlyByteBuf buf) {
         Set<ResourceLocation> disabledPlanets = new HashSet<>();
         String[] planets = buf.readUtf().split(",");
         for (var planet : planets) {
-            disabledPlanets.add(new ResourceLocation(planet));
+            if (!planet.isBlank()) {
+                disabledPlanets.add(ResourceLocation.parse(planet));
+            }
         }
         return Collections.unmodifiableSet(disabledPlanets);
     }
@@ -89,7 +114,7 @@ public class PlanetsMenuProvider implements ExtraDataMenuProvider {
                 Set<SpaceStation> spaceStations = new HashSet<>();
 
                 for (int k = 0; k < stationGroupSize; k++) {
-                    Component stationName = buf.readComponent();
+                    Component stationName = Component.Serializer.fromJson(buf.readUtf(), net.minecraft.core.RegistryAccess.EMPTY);
                     ChunkPos stationPos = buf.readChunkPos();
                     spaceStations.add(new SpaceStation(stationPos, stationName));
                 }
@@ -108,7 +133,9 @@ public class PlanetsMenuProvider implements ExtraDataMenuProvider {
         Set<GlobalPos> locations = new HashSet<>();
         int locationCount = buf.readVarInt();
         for (int i = 0; i < locationCount; i++) {
-            locations.add(buf.readGlobalPos());
+            ResourceKey<Level> dimension = buf.readResourceKey(Registries.DIMENSION);
+            BlockPos pos = buf.readBlockPos();
+            locations.add(GlobalPos.of(dimension, pos));
         }
         return Collections.unmodifiableSet(locations);
     }

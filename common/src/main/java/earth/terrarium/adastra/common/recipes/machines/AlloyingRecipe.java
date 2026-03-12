@@ -1,6 +1,7 @@
 package earth.terrarium.adastra.common.recipes.machines;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.teamresourceful.bytecodecs.base.ByteCodec;
 import com.teamresourceful.bytecodecs.base.object.ObjectByteCodec;
@@ -12,7 +13,7 @@ import earth.terrarium.adastra.common.blockentities.machines.EtrionicBlastFurnac
 import earth.terrarium.adastra.common.registry.ModRecipeSerializers;
 import earth.terrarium.adastra.common.registry.ModRecipeTypes;
 import earth.terrarium.adastra.common.utils.ItemUtils;
-import net.minecraft.world.Container;
+import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -24,9 +25,9 @@ import java.util.List;
 public record AlloyingRecipe(
     int cookingTime, int energy,
     List<Ingredient> ingredients, ItemStack result
-) implements CodecRecipe<Container> {
+) implements CodecRecipe<RecipeInput> {
 
-    public static final Codec<AlloyingRecipe> CODEC = RecordCodecBuilder.create(
+    public static final MapCodec<AlloyingRecipe> CODEC = RecordCodecBuilder.mapCodec(
         instance -> instance.group(
             Codec.INT.fieldOf("cookingtime").forGetter(AlloyingRecipe::cookingTime),
             Codec.INT.fieldOf("energy").forGetter(AlloyingRecipe::energy),
@@ -43,8 +44,8 @@ public record AlloyingRecipe(
     );
 
     @Override
-    public boolean matches(@NotNull Container container, @NotNull Level level) {
-        if (container.getContainerSize() < ingredients.size()) return false;
+    public boolean matches(@NotNull RecipeInput container, @NotNull Level level) {
+        if (container.size() < ingredients.size()) return false;
         for (int i = 0; i < Math.min(4, ingredients.size()); i++) {
             boolean found = false;
             for (int j = 0; j < 4; j++) {
@@ -57,12 +58,12 @@ public record AlloyingRecipe(
         }
 
         if (!(container instanceof EtrionicBlastFurnaceBlockEntity entity)) return true;
-        if (entity.getEnergyStorage().internalExtract(energy, true) < energy) return false;
-        return ItemUtils.canAddItem(container, result, 5, 6, 7, 8);
+        if (entity.getEnergyStorage().extract(energy, true) < energy) return false;
+        return ItemUtils.canAddItem(entity, result, 5, 6, 7, 8);
     }
 
     @Override
-    public CodecRecipeSerializer<? extends CodecRecipe<Container>> serializer() {
+    public CodecRecipeSerializer<? extends CodecRecipe<RecipeInput>> serializer() {
         return ModRecipeSerializers.ALLOYING.get();
     }
 

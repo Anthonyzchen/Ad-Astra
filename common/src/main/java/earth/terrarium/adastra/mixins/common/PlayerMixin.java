@@ -21,7 +21,9 @@ public abstract class PlayerMixin {
     private void adastra$wantsToStopRiding(CallbackInfoReturnable<Boolean> cir) {
         var player = (Player) (Object) this;
         if (player.getVehicle() instanceof Vehicle vehicle) {
-            if (player.isShiftKeyDown() && !vehicle.isSafeToDismount(player)) {
+            boolean shiftDown = player.isShiftKeyDown();
+            boolean safeToDismount = vehicle.isSafeToDismount(player);
+            if (shiftDown && !safeToDismount) {
                 adastra$dismountTicks++;
                 if (adastra$dismountTicks < 40) {
                     cir.setReturnValue(false);
@@ -30,7 +32,15 @@ public abstract class PlayerMixin {
                 } else {
                     player.displayClientMessage(CommonComponents.EMPTY, true);
                     adastra$dismountTicks = 0;
+                    cir.setReturnValue(true);
                 }
+            } else if (player.isShiftKeyDown()) {
+                // Safe to dismount — explicitly allow it
+                if (adastra$dismountTicks > 0) {
+                    player.displayClientMessage(CommonComponents.EMPTY, true);
+                    adastra$dismountTicks = 0;
+                }
+                cir.setReturnValue(true);
             } else if (adastra$dismountTicks > 0) {
                 player.displayClientMessage(CommonComponents.EMPTY, true);
                 adastra$dismountTicks = 0;

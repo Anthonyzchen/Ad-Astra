@@ -12,7 +12,7 @@
   "time": 400,
   "ingredients": [
     {
-      "tag": "c:ostrum_ingots",
+      "tag": "c:ingots/ostrum",
       "count": 1
     }
   ],

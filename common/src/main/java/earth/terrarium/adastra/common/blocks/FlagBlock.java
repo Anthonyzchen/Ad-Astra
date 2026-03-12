@@ -12,8 +12,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -75,18 +75,18 @@ public class FlagBlock extends BasicEntityBlock implements SimpleWaterloggedBloc
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable BlockGetter level, List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
         TooltipUtils.addDescriptionComponent(tooltip, ConstantComponents.FLAG_INFO);
     }
 
     @Override
-    public @NotNull InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    public @NotNull InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (level.isClientSide() && (AdAstraConfig.allowFlagImages || player.canUseGameMasterBlocks())) {
             if (state.getValue(HALF) == DoubleBlockHalf.LOWER) {
                 return action(level, pos.above(), player);
             } else return action(level, pos, player);
         }
-        return InteractionResult.sidedSuccess(level.isClientSide());
+        return InteractionResult.SUCCESS;
     }
 
     private InteractionResult action(Level level, BlockPos pos, Player player) {

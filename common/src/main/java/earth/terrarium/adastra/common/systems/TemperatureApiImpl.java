@@ -11,7 +11,6 @@ import earth.terrarium.adastra.common.items.armor.SpaceSuitItem;
 import earth.terrarium.adastra.common.tags.ModEntityTypeTags;
 import earth.terrarium.adastra.common.tags.ModItemTags;
 import earth.terrarium.adastra.common.utils.ModUtils;
-import net.minecraft.Optionull;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.ResourceKey;
@@ -33,7 +32,8 @@ public class TemperatureApiImpl implements TemperatureApi {
 
     @Override
     public short getTemperature(ResourceKey<Level> level) {
-        return Optionull.mapOrDefault(PlanetApi.API.getPlanet(level), Planet::temperature, PlanetConstants.EARTH_TEMPERATURE);
+        Planet planet = PlanetApi.API.getPlanet(level);
+        return planet != null ? planet.temperature() : PlanetConstants.EARTH_TEMPERATURE;
     }
 
     @Override
@@ -108,7 +108,7 @@ public class TemperatureApiImpl implements TemperatureApi {
 
     private void burnEntity(LivingEntity entity) {
         entity.hurt(entity.damageSources().onFire(), 6);
-        entity.setSecondsOnFire(10);
+        entity.igniteForSeconds(10);
     }
 
     private void freezeEntity(LivingEntity entity, ServerLevel level) {

@@ -1,9 +1,7 @@
 package earth.terrarium.adastra.common.utils;
 
 import earth.terrarium.adastra.common.constants.ConstantComponents;
-import earth.terrarium.botarium.common.fluid.FluidConstants;
-import earth.terrarium.botarium.common.fluid.base.FluidHolder;
-import earth.terrarium.botarium.common.fluid.utils.ClientFluidHooks;
+import earth.terrarium.common_storage_lib.resources.fluid.FluidResource;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
@@ -18,6 +16,8 @@ import java.util.List;
 import java.util.Locale;
 
 public class TooltipUtils {
+
+    private static final long BUCKET = 81000L;
 
     public static String getFormattedAmount(long number) {
         if (Screen.hasShiftDown()) {
@@ -70,49 +70,65 @@ public class TooltipUtils {
         };
     }
 
-    public static Component getFluidComponent(FluidHolder fluid, long capacity, Fluid fallback) {
-        if (fluid.isEmpty()) {
-            return Component.translatable("tooltip.ad_astra.fluid",
-                getFormattedAmount(0),
-                getFormattedAmount(FluidConstants.toMillibuckets(capacity)),
-                ClientFluidHooks.getDisplayName(FluidHolder.ofMillibuckets(fallback, capacity))
-            ).withStyle(ChatFormatting.GOLD);
+    public static Component getFluidComponent(FluidResource resource, long amount, long capacity) {
+        Component fluidName;
+        if (!resource.isBlank()) {
+            fluidName = resource.getType().getBucket().getDescription();
+        } else {
+            fluidName = Component.literal("Empty");
         }
-
-        return getFluidComponent(fluid, capacity);
+        return Component.translatable("tooltip.ad_astra.fluid",
+            getFormattedAmount(amount / 81L),
+            getFormattedAmount(capacity / 81L),
+            fluidName
+        ).withStyle(ChatFormatting.GOLD);
     }
 
-    public static Component getFluidComponent(FluidHolder fluid, long capacity) {
+    public static Component getFluidComponent(Object fluid, long capacity, Fluid fallback) {
+        Component fluidName;
+        if (fallback != null) {
+            fluidName = fallback.getBucket().getDescription();
+        } else {
+            fluidName = Component.literal("Empty");
+        }
         return Component.translatable("tooltip.ad_astra.fluid",
-            getFormattedAmount(FluidConstants.toMillibuckets(fluid.getFluidAmount())),
-            getFormattedAmount(FluidConstants.toMillibuckets(capacity)),
-            ClientFluidHooks.getDisplayName(fluid)
+            getFormattedAmount(0),
+            getFormattedAmount(capacity / 81L),
+            fluidName
+        ).withStyle(ChatFormatting.GOLD);
+    }
+
+    public static Component getFluidComponent(Object fluid, long capacity) {
+        return Component.translatable("tooltip.ad_astra.fluid",
+            getFormattedAmount(0),
+            getFormattedAmount(capacity / 81L),
+            Component.literal("Empty")
         ).withStyle(ChatFormatting.GOLD);
     }
 
     public static Component getFluidDifferenceComponent(long fluid) {
         return Component.translatable("tooltip.ad_astra.fluid_%s".formatted(fluid < 0 ? "out" : "in"),
-            getFormattedAmount(FluidConstants.toMillibuckets(Math.abs(fluid)))).withStyle(ChatFormatting.GOLD);
+            getFormattedAmount(Math.abs(fluid) / 81L)).withStyle(ChatFormatting.GOLD);
     }
 
     public static Component getMaxFluidInComponent(long maxIn) {
         return Component.translatable("tooltip.ad_astra.max_fluid_in",
-            getFormattedAmount(FluidConstants.toMillibuckets(maxIn))).withStyle(ChatFormatting.GREEN);
+            getFormattedAmount(maxIn / 81L)).withStyle(ChatFormatting.GREEN);
     }
 
     public static Component getMaxFluidOutComponent(long maxOut) {
         return Component.translatable("tooltip.ad_astra.max_fluid_out",
-            getFormattedAmount(FluidConstants.toMillibuckets(maxOut))).withStyle(ChatFormatting.GREEN);
+            getFormattedAmount(maxOut / 81L)).withStyle(ChatFormatting.GREEN);
     }
 
     public static Component getFluidUsePerIterationComponent(long usePerTick) {
         return Component.translatable("tooltip.ad_astra.fluid_use_per_iteration",
-            getFormattedAmount(FluidConstants.toMillibuckets(Math.abs(usePerTick)))).withStyle(ChatFormatting.AQUA);
+            getFormattedAmount(Math.abs(usePerTick) / 81L)).withStyle(ChatFormatting.AQUA);
     }
 
     public static Component getFluidGenerationPerIterationComponent(long gainPerTick) {
         return Component.translatable("tooltip.ad_astra.fluid_generation_per_iteration",
-            getFormattedAmount(FluidConstants.toMillibuckets(Math.abs(gainPerTick)))).withStyle(ChatFormatting.AQUA);
+            getFormattedAmount(Math.abs(gainPerTick) / 81L)).withStyle(ChatFormatting.AQUA);
     }
 
     public static Component getTicksPerIterationComponent(int time) {

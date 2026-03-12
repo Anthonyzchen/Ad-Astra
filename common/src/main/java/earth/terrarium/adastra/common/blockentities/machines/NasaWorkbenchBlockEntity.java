@@ -11,7 +11,6 @@ import earth.terrarium.adastra.common.recipes.machines.NasaWorkbenchRecipe;
 import earth.terrarium.adastra.common.registry.ModRecipeTypes;
 import earth.terrarium.adastra.common.utils.ModUtils;
 import earth.terrarium.adastra.common.utils.TransferUtils;
-import net.minecraft.Optionull;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -19,6 +18,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Container;
+import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -40,7 +40,7 @@ public class NasaWorkbenchBlockEntity extends ContainerMachineBlockEntity {
     );
 
     private static final int[] INPUT_SLOTS = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13};
-    protected final RecipeManager.CachedCheck<Container, NasaWorkbenchRecipe> quickCheck = RecipeManager.createCheck(ModRecipeTypes.NASA_WORKBENCH.get());
+    protected final RecipeManager.CachedCheck<RecipeInput, NasaWorkbenchRecipe> quickCheck = RecipeManager.createCheck(ModRecipeTypes.NASA_WORKBENCH.get());
 
     @Nullable
     protected NasaWorkbenchRecipe recipe;
@@ -84,11 +84,12 @@ public class NasaWorkbenchBlockEntity extends ContainerMachineBlockEntity {
     @Override
     public void update() {
         if (level().isClientSide()) return;
-        recipe = Optionull.map(quickCheck.getRecipeFor(this, level()).orElse(null), RecipeHolder::value);
+        RecipeHolder<NasaWorkbenchRecipe> holder = quickCheck.getRecipeFor(toRecipeInput(), level()).orElse(null);
+        recipe = holder != null ? holder.value() : null;
     }
 
     public boolean canCraft() {
-        return recipe != null && recipe.matches(this, level());
+        return recipe != null && recipe.matches(toRecipeInput(), level());
     }
 
     public void craft() {

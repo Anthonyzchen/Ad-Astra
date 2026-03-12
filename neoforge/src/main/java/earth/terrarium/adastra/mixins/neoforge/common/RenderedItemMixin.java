@@ -11,6 +11,10 @@ import org.spongepowered.asm.mixin.Mixin;
 
 import java.util.function.Consumer;
 
+// TODO: 1.21.1 NeoForge removed IClientItemExtensions - custom item rendering now uses
+// RegisterClientExtensionsEvent. This mixin needs to be reworked to use the new
+// NeoForge item rendering API. Consider moving this logic to RegisterClientExtensionsEvent
+// in the mod initializer instead of using a mixin.
 @Mixin({RenderedItem.class, RenderedBlockItem.class, TooltipRenderedBlockItem.class})
 public abstract class RenderedItemMixin extends Item {
 

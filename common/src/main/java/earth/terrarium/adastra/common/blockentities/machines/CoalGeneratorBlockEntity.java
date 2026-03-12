@@ -8,11 +8,11 @@ import earth.terrarium.adastra.common.config.MachineConfig;
 import earth.terrarium.adastra.common.constants.ConstantComponents;
 import earth.terrarium.adastra.common.menus.machines.CoalGeneratorMenu;
 import earth.terrarium.adastra.common.utils.TransferUtils;
-import earth.terrarium.botarium.common.energy.impl.ExtractOnlyEnergyContainer;
-import earth.terrarium.botarium.common.energy.impl.WrappedBlockEnergyContainer;
-import earth.terrarium.botarium.util.CommonHooks;
+import earth.terrarium.common_storage_lib.energy.impl.SimpleValueStorage;
+import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Inventory;
@@ -40,6 +40,7 @@ public class CoalGeneratorBlockEntity extends EnergyContainerMachineBlockEntity 
 
     public CoalGeneratorBlockEntity(BlockPos pos, BlockState state) {
         super(pos, state, 2);
+        this.energyContainer = new SimpleValueStorage(MachineConfig.IRON.energyCapacity);
     }
 
     @Override
@@ -48,23 +49,23 @@ public class CoalGeneratorBlockEntity extends EnergyContainerMachineBlockEntity 
     }
 
     @Override
-    public WrappedBlockEnergyContainer getEnergyStorage(Level level, BlockPos pos, BlockState state, @Nullable BlockEntity entity, @Nullable Direction direction) {
-        if (energyContainer != null) return energyContainer;
-        return energyContainer = new WrappedBlockEnergyContainer(
-            this,
-            new ExtractOnlyEnergyContainer(MachineConfig.IRON.energyCapacity, MachineConfig.IRON.maxEnergyInOut));
+    public void firstTick(Level level, BlockPos pos, BlockState state) {
+        super.firstTick(level, pos, state);
+        if (energyContainer == null) {
+            energyContainer = new SimpleValueStorage(MachineConfig.IRON.energyCapacity);
+        }
     }
 
     @Override
-    public void load(@NotNull CompoundTag tag) {
-        super.load(tag);
+    public void loadAdditional(@NotNull CompoundTag tag, HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
         cookTime = tag.getInt("CookTime");
         cookTimeTotal = tag.getInt("CookTimeTotal");
     }
 
     @Override
-    protected void saveAdditional(@NotNull CompoundTag tag) {
-        super.saveAdditional(tag);
+    protected void saveAdditional(@NotNull CompoundTag tag, HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
         tag.putInt("CookTime", cookTime);
         tag.putInt("CookTimeTotal", cookTimeTotal);
     }
@@ -81,18 +82,18 @@ public class CoalGeneratorBlockEntity extends EnergyContainerMachineBlockEntity 
             return;
         }
         var input = getItem(1);
-        if (getEnergyStorage().internalInsert(MachineConfig.coalGeneratorEnergyGenerationPerTick, true) == 0) {
+        if (getEnergyStorage().insert(MachineConfig.coalGeneratorEnergyGenerationPerTick, true) == 0) {
             if (time % 10 == 0) setLit(false);
             return;
         }
 
         if (cookTime > 0) {
             cookTime--;
-            getEnergyStorage().internalInsert(MachineConfig.coalGeneratorEnergyGenerationPerTick, false);
+            getEnergyStorage().insert(MachineConfig.coalGeneratorEnergyGenerationPerTick, false);
             if (time % 10 == 0) setLit(true);
         } else if (!input.isEmpty()
             && !(input.getItem() instanceof BucketItem)) {
-            int burnTime = Math.min(20_000, CommonHooks.getBurnTime(input));
+            int burnTime = Math.min(20_000, AbstractFurnaceBlockEntity.getFuel().getOrDefault(input.getItem(), 0));
             if (burnTime > 0) {
                 input.shrink(1);
                 cookTimeTotal = burnTime;
@@ -107,7 +108,7 @@ public class CoalGeneratorBlockEntity extends EnergyContainerMachineBlockEntity 
     public void tickSideInteractions(BlockPos pos, Predicate<Direction> filter, List<ConfigurationEntry> sideConfig) {
         TransferUtils.pushItemsNearby(this, pos, new int[]{1}, sideConfig.get(0), filter);
         TransferUtils.pullItemsNearby(this, pos, new int[]{1}, sideConfig.get(0), filter);
-        TransferUtils.pushEnergyNearby(this, pos, getEnergyStorage().maxExtract(), sideConfig.get(1), filter);
+        TransferUtils.pushEnergyNearby(this, pos, getEnergyStorage().getCapacity(), sideConfig.get(1), filter);
     }
 
     @Override

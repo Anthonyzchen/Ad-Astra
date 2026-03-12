@@ -12,7 +12,7 @@
   "time": 400,
   "ingredients": [
     {
-      "tag": "c:desh_ingots",
+      "tag": "c:ingots/desh",
       "count": 1
     }
   ],

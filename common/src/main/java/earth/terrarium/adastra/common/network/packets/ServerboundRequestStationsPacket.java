@@ -1,12 +1,13 @@
 package earth.terrarium.adastra.common.network.packets;
 
+import com.teamresourceful.bytecodecs.base.ByteCodec;
 import com.teamresourceful.resourcefullib.common.network.Packet;
 import com.teamresourceful.resourcefullib.common.network.base.PacketType;
 import com.teamresourceful.resourcefullib.common.network.base.ServerboundPacketType;
+import com.teamresourceful.resourcefullib.common.network.defaults.CodecPacketType;
 import earth.terrarium.adastra.AdAstra;
 import earth.terrarium.adastra.common.network.NetworkHandler;
 import earth.terrarium.adastra.common.utils.radio.StationLoader;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -17,29 +18,24 @@ public record ServerboundRequestStationsPacket() implements Packet<ServerboundRe
 
     public static final ServerboundPacketType<ServerboundRequestStationsPacket> TYPE = new Type();
 
+    // Unit ByteCodec: writes nothing, reads nothing, produces a new instance.
+    // ByteCodec.UNIT was removed; using passthrough with no-op encode and constant decode.
+    private static final ByteCodec<ServerboundRequestStationsPacket> UNIT_CODEC =
+        ByteCodec.passthrough((buf, value) -> {}, buf -> new ServerboundRequestStationsPacket());
+
     @Override
     public PacketType<ServerboundRequestStationsPacket> type() {
         return TYPE;
     }
 
-    private static class Type implements ServerboundPacketType<ServerboundRequestStationsPacket> {
+    private static class Type extends CodecPacketType<ServerboundRequestStationsPacket> implements ServerboundPacketType<ServerboundRequestStationsPacket> {
 
-        @Override
-        public Class<ServerboundRequestStationsPacket> type() {
-            return ServerboundRequestStationsPacket.class;
-        }
-
-        @Override
-        public ResourceLocation id() {
-            return new ResourceLocation(AdAstra.MOD_ID, "request_stations");
-        }
-
-        @Override
-        public void encode(ServerboundRequestStationsPacket message, FriendlyByteBuf buffer) {}
-
-        @Override
-        public ServerboundRequestStationsPacket decode(FriendlyByteBuf buffer) {
-            return new ServerboundRequestStationsPacket();
+        public Type() {
+            super(
+                ServerboundRequestStationsPacket.class,
+                ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "request_stations"),
+                UNIT_CODEC
+            );
         }
 
         @Override

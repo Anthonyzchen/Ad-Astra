@@ -8,7 +8,7 @@ plugins {
     java
     id("maven-publish")
     id("com.teamresourceful.resourcefulgradle") version "0.0.+"
-    id("dev.architectury.loom") version "1.6.9999-PR.207+kneelawk" apply false
+    id("dev.architectury.loom") version "1.7-SNAPSHOT" apply false
     id("architectury-plugin") version "3.4-SNAPSHOT"
     id("com.github.johnrengelman.shadow") version "7.1.2" apply false
 }
@@ -50,7 +50,9 @@ subprojects {
 
     repositories {
         mavenCentral()
+        maven(url = "https://maven.parchmentmc.org")
         maven(url = "https://maven.teamresourceful.com/repository/maven-public/")
+        maven(url = "https://maven.teamresourceful.com/repository/terrarium/")
         maven(url = "https://maven.neoforged.net/releases/")
         maven(url = "https://maven.firstdarkdev.xyz/snapshots")
         maven {
@@ -76,7 +78,7 @@ subprojects {
         val mixinExtrasVersion: String by project
         val resourcefulLibVersion: String by project
         val resourcefulConfigVersion: String by project
-        val botariumVersion: String by project
+        val commonStorageLibVersion: String by project
         val athenaVersion: String by project
         val cadmusVersion: String by project
         val argonautsVersion: String by project
@@ -93,27 +95,27 @@ subprojects {
 
             officialMojangMappings()
 
-            parchment(create(group = "org.parchmentmc.data", name = "parchment-1.20.6", version = parchmentVersion))
+            parchment(create(group = "org.parchmentmc.data", name = "parchment-1.21", version = parchmentVersion))
         })
 
         "modApi"(
             group = "com.teamresourceful.resourcefullib",
-            name = "resourcefullib-$modLoader-1.20.5",
+            name = "resourcefullib-$modLoader-1.21",
             version = resourcefulLibVersion
         )
         "modApi"(
             group = "com.teamresourceful.resourcefulconfig",
-            name = "resourcefulconfig-$modLoader-1.20.5",
+            name = "resourcefulconfig-$modLoader-1.21",
             version = resourcefulConfigVersion
         )
         "modApi"(
-            group = "earth.terrarium.botarium",
-            name = "botarium-$modLoader-1.20.4",
-            version = botariumVersion
+            group = "earth.terrarium.common_storage_lib",
+            name = "common-storage-lib-$modLoader-1.21.1",
+            version = commonStorageLibVersion
         )
         if (isCommon) {
             implementation(group = "javazoom", name = "jlayer", version = "1.0.1")
-            // "modApi"(group = "mezz.jei", name = "jei-$minecraftVersion-common-api", version = jeiVersion)
+            "modCompileOnly"(group = "mezz.jei", name = "jei-$minecraftVersion-common-api", version = jeiVersion)
             "modCompileOnly"(group = "me.shedaniel", name = "RoughlyEnoughItems-api", version = reiVersion)
             "modCompileOnly"(group = "me.shedaniel", name = "RoughlyEnoughItems-default-plugin", version = reiVersion)
             implementation(
@@ -124,14 +126,13 @@ subprojects {
                 )
             )
 
-            /*
-            "modCompileOnly"(group = "earth.terrarium.cadmus", name = "cadmus-$modLoader-$minecraftVersion", version = cadmusVersion) {
+            "modCompileOnly"(group = "earth.terrarium.cadmus", name = "cadmus-$modLoader-1.21", version = cadmusVersion) {
                 isTransitive = false
             }
-            "modCompileOnly"(group = "earth.terrarium.argonauts", name = "argonauts-$modLoader-$minecraftVersion", version = argonautsVersion) {
-                isTransitive = false
-            }
-             */
+            // Argonauts not yet available for 1.21
+            // "modCompileOnly"(group = "earth.terrarium.argonauts", name = "argonauts-$modLoader-1.21", version = argonautsVersion) {
+            //     isTransitive = false
+            // }
         } else {
             "include"(implementation(group = "javazoom", name = "jlayer", version = "1.0.1"))
             /*
@@ -149,7 +150,7 @@ subprojects {
 
             "modLocalRuntime"(
                 group = "earth.terrarium.athena",
-                name = "athena-$modLoader-1.20.5",
+                name = "athena-$modLoader-1.21",
                 version = athenaVersion
             )
             "modCompileOnly"(group = "me.shedaniel", name = "RoughlyEnoughItems-api-$modLoader", version = reiVersion)

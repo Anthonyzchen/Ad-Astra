@@ -12,7 +12,7 @@
   "time": 400,
   "ingredients": [
     {
-      "tag": "c:desh_blocks",
+      "tag": "c:storage_blocks/desh",
       "count": 1
     }
   ],

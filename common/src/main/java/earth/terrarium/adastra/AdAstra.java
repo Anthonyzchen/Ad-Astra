@@ -19,10 +19,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
-import net.minecraft.world.item.Item;
 import org.slf4j.Logger;
 
-import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
@@ -40,9 +38,10 @@ public class AdAstra {
         NetworkHandler.init();
         StationLoader.init();
 
-        ModFluidProperties.FLUID_PROPERTIES.initialize();
         ModFluids.FLUIDS.init();
+        ModFluidProperties.FLUID_PROPERTIES.init();
         ModBlocks.BLOCKS.init();
+        ModArmorMaterials.init();
         ModItems.ITEMS.init();
         ModCreativeTab.TABS.init();
         ModEntityTypes.ENTITY_TYPES.init();
@@ -51,7 +50,7 @@ public class AdAstra {
         ModRecipeTypes.RECIPE_TYPES.init();
         ModRecipeSerializers.RECIPE_SERIALIZERS.init();
         ModParticleTypes.PARTICLE_TYPES.init();
-        ModPaintingVariants.PAINTING_VARIANTS.init();
+        // Painting variants are data-driven in 1.21.1
         ModSoundEvents.SOUND_EVENTS.init();
         ModStructures.STRUCTURE_TYPES.init();
         ModStructures.STRUCTURE_PROCESSORS.init();
@@ -62,16 +61,15 @@ public class AdAstra {
     }
 
     public static void postInit() {
-        Map<Item, CauldronInteraction> map = CauldronInteraction.WATER.map();
-        map.put(ModItems.SPACE_HELMET.get(), CauldronInteraction.DYED_ITEM);
-        map.put(ModItems.SPACE_SUIT.get(), CauldronInteraction.DYED_ITEM);
-        map.put(ModItems.SPACE_PANTS.get(), CauldronInteraction.DYED_ITEM);
-        map.put(ModItems.SPACE_BOOTS.get(), CauldronInteraction.DYED_ITEM);
+        CauldronInteraction.WATER.map().put(ModItems.SPACE_HELMET.get(), CauldronInteraction.DYED_ITEM);
+        CauldronInteraction.WATER.map().put(ModItems.SPACE_SUIT.get(), CauldronInteraction.DYED_ITEM);
+        CauldronInteraction.WATER.map().put(ModItems.SPACE_PANTS.get(), CauldronInteraction.DYED_ITEM);
+        CauldronInteraction.WATER.map().put(ModItems.SPACE_BOOTS.get(), CauldronInteraction.DYED_ITEM);
         ModEntityTypes.registerSpawnPlacements();
     }
 
     public static void onAddReloadListener(BiConsumer<ResourceLocation, PreparableReloadListener> registry) {
-        registry.accept(new ResourceLocation(AdAstra.MOD_ID, "planets"), new AdAstraData());
+        registry.accept(ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "planets"), new AdAstraData());
     }
 
     public static void onDatapackSync(ServerPlayer player) {

@@ -4,6 +4,7 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeInput;
 import org.jetbrains.annotations.NotNull;
 
 public interface BasicContainer extends Container {
@@ -49,5 +50,20 @@ public interface BasicContainer extends Container {
     default void clearContent() {
         items().clear();
         update();
+    }
+
+    default RecipeInput toRecipeInput() {
+        BasicContainer self = this;
+        return new RecipeInput() {
+            @Override
+            public @NotNull ItemStack getItem(int slot) {
+                return self.getItem(slot);
+            }
+
+            @Override
+            public int size() {
+                return self.getContainerSize();
+            }
+        };
     }
 }

@@ -7,12 +7,13 @@ import earth.terrarium.adastra.common.entities.multipart.MultipartPartEntity;
 import earth.terrarium.adastra.common.network.NetworkHandler;
 import earth.terrarium.adastra.common.network.packets.ServerboundVehicleControlPacket;
 import earth.terrarium.adastra.mixins.common.LivingEntityAccessor;
-import earth.terrarium.botarium.common.menu.ExtraDataMenuProvider;
-import earth.terrarium.botarium.common.menu.MenuHooks;
+import com.teamresourceful.resourcefullib.common.menu.ContentMenuProvider;
+import com.teamresourceful.resourcefullib.common.menu.MenuContentHelper;
+import earth.terrarium.adastra.common.menus.base.EntityIdContent;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.DamageTypeTags;
@@ -35,7 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
 
-public abstract class Vehicle extends Entity implements PlayerRideable, ExtraDataMenuProvider, MultipartEntity, HasCustomInventoryScreen {
+public abstract class Vehicle extends Entity implements PlayerRideable, ContentMenuProvider<EntityIdContent>, MultipartEntity, HasCustomInventoryScreen {
 
     private int lerpSteps;
     private double lerpX;
@@ -63,16 +64,16 @@ public abstract class Vehicle extends Entity implements PlayerRideable, ExtraDat
     }
 
     @Override
-    protected void defineSynchedData() {}
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {}
 
     @Override
     protected void readAdditionalSaveData(CompoundTag compound) {
-        inventory.fromTag(compound.getList("Inventory", Tag.TAG_COMPOUND));
+        inventory.fromTag(compound.getList("Inventory", Tag.TAG_COMPOUND), this.registryAccess());
     }
 
     @Override
     protected void addAdditionalSaveData(CompoundTag compound) {
-        compound.put("Inventory", inventory.createTag());
+        compound.put("Inventory", inventory.createTag(this.registryAccess()));
     }
 
     @Override
@@ -199,7 +200,7 @@ public abstract class Vehicle extends Entity implements PlayerRideable, ExtraDat
     @Override
     public void openCustomInventoryScreen(Player player) {
         if (player instanceof ServerPlayer serverPlayer) {
-            MenuHooks.openMenu(serverPlayer, this);
+            MenuContentHelper.open(serverPlayer, this);
         }
     }
 
@@ -264,8 +265,8 @@ public abstract class Vehicle extends Entity implements PlayerRideable, ExtraDat
     }
 
     @Override
-    public void writeExtraData(ServerPlayer player, FriendlyByteBuf buffer) {
-        buffer.writeVarInt(getId());
+    public EntityIdContent createContent(ServerPlayer player) {
+        return new EntityIdContent(getId());
     }
 
     @Override

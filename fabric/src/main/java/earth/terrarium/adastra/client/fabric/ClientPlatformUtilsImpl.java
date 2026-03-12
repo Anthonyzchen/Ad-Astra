@@ -10,17 +10,19 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelManager;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import java.util.Map;
 
 public class ClientPlatformUtilsImpl {
 
     public static BakedModel getModel(ModelManager dispatcher, ResourceLocation id) {
-        return dispatcher.getModel(id);
+        return ((net.fabricmc.fabric.api.client.model.loading.v1.FabricBakedModelManager) dispatcher).getModel(id);
     }
 
     public static void registerArmor(ResourceLocation texture, ModelLayerLocation layer, ClientPlatformUtils.ArmorFactory factory, Item... items) {
@@ -32,7 +34,8 @@ public class ClientPlatformUtilsImpl {
                 suit.spawnParticles(entity.level(), entity, original, stack);
             }
 
-            model.renderToBuffer(poseStack, buffer.getBuffer(RenderType.entityTranslucent(texture)), packedLight, OverlayTexture.NO_OVERLAY, 1, 1, 1, 1);
+            VertexConsumer vc = buffer.getBuffer(RenderType.entityTranslucent(texture));
+            model.renderToBuffer(poseStack, vc, packedLight, OverlayTexture.NO_OVERLAY, -1);
         }, items);
     }
 

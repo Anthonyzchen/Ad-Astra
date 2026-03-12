@@ -123,7 +123,7 @@ public class ItemUtils {
      */
     public static boolean canAddItem(ItemStack input, ItemStack output) {
         return input.isEmpty()
-            || (ItemStack.isSameItemSameTags(input, output)
+            || (ItemStack.isSameItemSameComponents(input, output)
             && output.getCount() + input.getCount() <= input.getMaxStackSize());
     }
 

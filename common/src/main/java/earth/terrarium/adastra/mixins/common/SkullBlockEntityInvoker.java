@@ -11,7 +11,7 @@ import java.util.concurrent.CompletableFuture;
 @Mixin(SkullBlockEntity.class)
 public interface SkullBlockEntityInvoker {
 
-    @Invoker
+    @Invoker("fetchGameProfile")
     static CompletableFuture<Optional<GameProfile>> invokeFetchGameProfile(String profileName) {
         throw new AssertionError();
     }

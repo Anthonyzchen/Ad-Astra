@@ -8,7 +8,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.BiomeTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.MobSpawnType;
-import net.minecraft.world.entity.SpawnPlacements;
+import net.minecraft.world.entity.SpawnPlacementTypes;
 import net.minecraft.world.entity.ai.village.poi.PoiManager;
 import net.minecraft.world.entity.ai.village.poi.PoiTypes;
 import net.minecraft.world.entity.npc.WanderingTrader;
@@ -103,7 +103,7 @@ public class LunarianWanderingTraderSpawner implements CustomSpawner {
             int k;
             int j = pos.getX() + this.random.nextInt(range * 2) - range;
             BlockPos blockPos2 = BlockPos.containing(j, level.getHeight(Heightmap.Types.WORLD_SURFACE, j, k = pos.getZ() + this.random.nextInt(range * 2) - range), k);
-            if (!NaturalSpawner.isSpawnPositionOk(SpawnPlacements.Type.ON_GROUND, level, blockPos2, ModEntityTypes.LUNARIAN_WANDERING_TRADER.get()))
+            if (!SpawnPlacementTypes.ON_GROUND.isSpawnPositionOk(level, blockPos2, ModEntityTypes.LUNARIAN_WANDERING_TRADER.get()))
                 continue;
             blockPos = blockPos2;
             break;

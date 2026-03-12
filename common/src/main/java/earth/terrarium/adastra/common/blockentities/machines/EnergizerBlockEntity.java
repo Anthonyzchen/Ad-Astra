@@ -7,13 +7,11 @@ import earth.terrarium.adastra.common.blockentities.base.sideconfig.Configuratio
 import earth.terrarium.adastra.common.blocks.machines.EnergizerBlock;
 import earth.terrarium.adastra.common.config.MachineConfig;
 import earth.terrarium.adastra.common.constants.ConstantComponents;
+import earth.terrarium.adastra.common.utils.EnergyUtils;
 import earth.terrarium.adastra.common.utils.ModUtils;
 import earth.terrarium.adastra.common.utils.TransferUtils;
-import earth.terrarium.botarium.common.energy.EnergyApi;
-import earth.terrarium.botarium.common.energy.base.EnergyContainer;
-import earth.terrarium.botarium.common.energy.impl.SimpleEnergyContainer;
-import earth.terrarium.botarium.common.energy.impl.WrappedBlockEnergyContainer;
-import earth.terrarium.botarium.common.item.ItemStackHolder;
+import earth.terrarium.common_storage_lib.energy.impl.SimpleValueStorage;
+import earth.terrarium.common_storage_lib.storage.base.ValueStorage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -39,6 +37,27 @@ public class EnergizerBlockEntity extends EnergyContainerMachineBlockEntity {
 
     public EnergizerBlockEntity(BlockPos pos, BlockState state) {
         super(pos, state, 1);
+        this.energyContainer = new SimpleValueStorage(MachineConfig.energizerEnergyCapacity) {
+            @Override
+            public long insert(long amount, boolean simulate) {
+                long result = super.insert(amount, simulate);
+                if (!simulate && result > 0) notifyEnergyChange();
+                return result;
+            }
+
+            @Override
+            public long extract(long amount, boolean simulate) {
+                long result = super.extract(amount, simulate);
+                if (!simulate && result > 0) notifyEnergyChange();
+                return result;
+            }
+
+            private void notifyEnergyChange() {
+                if (level() == null) return;
+                if (level().getGameTime() % 2 != 0) return;
+                onEnergyChange();
+            }
+        };
     }
 
     @Override
@@ -46,19 +65,40 @@ public class EnergizerBlockEntity extends EnergyContainerMachineBlockEntity {
         return null;
     }
 
-    @Override
-    public WrappedBlockEnergyContainer getEnergyStorage(Level level, BlockPos pos, BlockState state, @Nullable BlockEntity entity, @Nullable Direction direction) {
+    public ValueStorage getEnergyStorage(Level level, BlockPos pos, BlockState state, @Nullable BlockEntity entity, @Nullable Direction direction) {
         if (energyContainer != null) return energyContainer;
-        return energyContainer = new WrappedBlockEnergyContainer(
-            this,
-            new SimpleEnergyContainer(MachineConfig.energizerEnergyCapacity, MachineConfig.OSTRUM.maxEnergyInOut, MachineConfig.OSTRUM.maxEnergyInOut) {
-                @Override
-                public void setEnergy(long energy) {
-                    super.setEnergy(energy);
-                    if (level().getGameTime() % 10 != 0) return;
-                    onEnergyChange();
-                }
-            });
+        return energyContainer = new SimpleValueStorage(MachineConfig.energizerEnergyCapacity) {
+            @Override
+            public long insert(long amount, boolean simulate) {
+                long result = super.insert(amount, simulate);
+                if (!simulate && result > 0) notifyEnergyChange();
+                return result;
+            }
+
+            @Override
+            public long extract(long amount, boolean simulate) {
+                long result = super.extract(amount, simulate);
+                if (!simulate && result > 0) notifyEnergyChange();
+                return result;
+            }
+
+            private void notifyEnergyChange() {
+                if (level() == null) return;
+                if (level().getGameTime() % 2 != 0) return;
+                onEnergyChange();
+            }
+        };
+    }
+
+    @Override
+    public void internalServerTick(ServerLevel level, long time, BlockState state, BlockPos pos) {
+        // Skip super.internalServerTick() to avoid periodic sync() calls that overwrite
+        // the POWER block state property set by onEnergyChange(). The Energizer uses
+        // block state (not block entity data) for client display, and its ChargeSlotType
+        // is NONE, so the battery slot handling in the parent is also unnecessary.
+        if (time % 2 == 0) {
+            setChanged();
+        }
     }
 
     @Override
@@ -70,8 +110,8 @@ public class EnergizerBlockEntity extends EnergyContainerMachineBlockEntity {
 
     @Override
     public void tickSideInteractions(BlockPos pos, Predicate<Direction> filter, List<ConfigurationEntry> sideConfig) {
-        TransferUtils.pushEnergyNearby(this, pos, getEnergyStorage().maxExtract(), sideConfig.get(0), filter);
-        TransferUtils.pullEnergyNearby(this, pos, getEnergyStorage().maxInsert(), sideConfig.get(0), filter);
+        TransferUtils.pushEnergyNearby(this, pos, getEnergyStorage().getCapacity(), sideConfig.get(0), filter);
+        TransferUtils.pullEnergyNearby(this, pos, getEnergyStorage().getCapacity(), sideConfig.get(0), filter);
     }
 
     @Override
@@ -90,17 +130,15 @@ public class EnergizerBlockEntity extends EnergyContainerMachineBlockEntity {
     }
 
     public void onEnergyChange() {
-        int charge = Math.round(getEnergyStorage().getStoredEnergy() / (float) getEnergyStorage().getMaxCapacity() * 5);
+        int charge = Math.round(getEnergyStorage().getStoredAmount() / (float) getEnergyStorage().getCapacity() * 5);
         level().setBlock(getBlockPos(), getBlockState().setValue(EnergizerBlock.POWER, charge), Block.UPDATE_CLIENTS);
     }
 
     public void distributeToChargeSlot(ServerLevel level, BlockPos pos) {
         var stack = getItem(0);
         if (stack.isEmpty()) return;
-        if (!EnergyContainer.holdsEnergy(stack)) return;
-        ItemStackHolder holder = new ItemStackHolder(stack);
-        if (EnergyApi.moveEnergy(this, null, holder, getEnergyStorage().maxExtract(), false) == 0) return;
-        setItem(0, holder.getStack());
+        if (!EnergyUtils.holdsEnergy(stack)) return;
+        if (EnergyUtils.transferToItem(energyContainer, stack, getEnergyStorage().getCapacity()) == 0) return;
         ModUtils.sendParticles(level,
             ParticleTypes.ELECTRIC_SPARK,
             pos.getX() + 0.5,

@@ -1,18 +1,21 @@
 package earth.terrarium.adastra.common.blockentities.flag;
 
 import com.mojang.authlib.GameProfile;
+import com.mojang.serialization.DataResult;
 import dev.architectury.injectables.annotations.PlatformOnly;
 import earth.terrarium.adastra.common.blockentities.flag.content.FlagContent;
 import earth.terrarium.adastra.common.blockentities.flag.content.UrlContent;
 import earth.terrarium.adastra.common.registry.ModBlockEntityTypes;
 import earth.terrarium.adastra.mixins.common.SkullBlockEntityInvoker;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtUtils;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.item.component.ResolvableProfile;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
@@ -32,12 +35,12 @@ public class FlagBlockEntity extends BlockEntity {
     }
 
     @Override
-    public void saveAdditional(CompoundTag tag) {
-        super.saveAdditional(tag);
+    public void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
         if (owner != null) {
-            CompoundTag compound = new CompoundTag();
-            NbtUtils.writeGameProfile(compound, owner);
-            tag.put("FlagOwner", compound);
+            ResolvableProfile resolvableProfile = new ResolvableProfile(owner);
+            DataResult<Tag> result = ResolvableProfile.CODEC.encodeStart(NbtOps.INSTANCE, resolvableProfile);
+            result.result().ifPresent(nbt -> tag.put("FlagOwner", nbt));
         }
         if (content != null) {
             tag.put("FlagContent", content.toFullTag());
@@ -45,10 +48,12 @@ public class FlagBlockEntity extends BlockEntity {
     }
 
     @Override
-    public void load(CompoundTag tag) {
-        super.load(tag);
+    public void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
         if (tag.contains("FlagOwner", Tag.TAG_COMPOUND)) {
-            setOwner(NbtUtils.readGameProfile(tag.getCompound("FlagOwner")));
+            ResolvableProfile.CODEC.parse(NbtOps.INSTANCE, tag.getCompound("FlagOwner"))
+                .result()
+                .ifPresent(profile -> setOwner(profile.gameProfile()));
         }
         if (tag.contains("FlagUrl", Tag.TAG_STRING)) {
             this.content = UrlContent.of("https://imgur.com/" + tag.getString("FlagUrl"));
@@ -95,8 +100,8 @@ public class FlagBlockEntity extends BlockEntity {
     }
 
     @Override
-    public @NotNull CompoundTag getUpdateTag() {
-        return saveWithoutMetadata();
+    public @NotNull CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        return saveWithoutMetadata(registries);
     }
 
     @PlatformOnly("neoforge")

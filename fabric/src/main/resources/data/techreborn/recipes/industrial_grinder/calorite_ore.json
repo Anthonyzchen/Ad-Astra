@@ -16,7 +16,7 @@
   },
   "ingredients": [
     {
-      "tag": "c:calorite_ores"
+      "tag": "c:ores/calorite"
     }
   ],
   "results": [

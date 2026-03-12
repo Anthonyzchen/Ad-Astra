@@ -2,12 +2,12 @@ package earth.terrarium.adastra.common.items.machines;
 
 import earth.terrarium.adastra.common.blockentities.machines.EnergizerBlockEntity;
 import earth.terrarium.adastra.common.constants.ConstantComponents;
+import earth.terrarium.adastra.common.utils.EnergyUtils;
 import earth.terrarium.adastra.common.utils.TooltipUtils;
-import earth.terrarium.botarium.common.energy.base.BotariumEnergyItem;
-import earth.terrarium.botarium.common.energy.base.EnergyContainer;
-import earth.terrarium.botarium.common.energy.impl.SimpleEnergyContainer;
-import earth.terrarium.botarium.common.energy.impl.WrappedItemEnergyContainer;
-import earth.terrarium.botarium.common.item.ItemStackHolder;
+import earth.terrarium.common_storage_lib.context.ItemContext;
+import earth.terrarium.common_storage_lib.energy.EnergyProvider;
+import earth.terrarium.common_storage_lib.energy.impl.SimpleValueStorage;
+import earth.terrarium.common_storage_lib.storage.base.ValueStorage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
@@ -19,11 +19,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class EnergizerBlockItem extends BlockItem implements BotariumEnergyItem<WrappedItemEnergyContainer> {
+public class EnergizerBlockItem extends BlockItem implements EnergyProvider.Item {
 
     public EnergizerBlockItem(Block block, Item.Properties properties) {
         super(block, properties);
@@ -35,41 +34,31 @@ public class EnergizerBlockItem extends BlockItem implements BotariumEnergyItem<
             return super.updateCustomBlockEntityTag(pos, level, player, stack, state);
         }
 
-        ItemStackHolder holder = new ItemStackHolder(stack);
-        EnergyContainer itemEnergyContainer = EnergyContainer.of(holder);
-        if (itemEnergyContainer == null) return super.updateCustomBlockEntityTag(pos, level, player, stack, state);
-        entity.getEnergyStorage().setEnergy(itemEnergyContainer.getStoredEnergy());
+        SimpleValueStorage itemEnergyContainer = getEnergyStorage(stack);
+        ((SimpleValueStorage) entity.getEnergyStorage()).set(itemEnergyContainer.getStoredAmount());
         entity.onEnergyChange();
 
         return super.updateCustomBlockEntityTag(pos, level, player, stack, state);
     }
 
-    @Override
-    public WrappedItemEnergyContainer getEnergyStorage(ItemStack holder) {
-        return new WrappedItemEnergyContainer(
-            holder,
-            new SimpleEnergyContainer(2_000_000) {
-                @Override
-                public long maxInsert() {
-                    return 1_000;
-                }
+    public SimpleValueStorage getEnergyStorage(ItemStack holder) {
+        return EnergyUtils.getItemEnergyStorage(holder, 2_000_000);
+    }
 
-                @Override
-                public long maxExtract() {
-                    return 1_000;
-                }
-            });
+    @Override
+    public ValueStorage getEnergy(ItemStack stack, ItemContext context) {
+        return getEnergyStorage(stack);
     }
 
     @Override
     public boolean isBarVisible(@NotNull ItemStack stack) {
-        return getEnergyStorage(stack).getStoredEnergy() > 0;
+        return getEnergyStorage(stack).getStoredAmount() > 0;
     }
 
     @Override
     public int getBarWidth(@NotNull ItemStack stack) {
         var energyStorage = getEnergyStorage(stack);
-        return (int) (((double) energyStorage.getStoredEnergy() / energyStorage.getMaxCapacity()) * 13);
+        return (int) (((double) energyStorage.getStoredAmount() / energyStorage.getCapacity()) * 13);
     }
 
     @Override
@@ -79,11 +68,11 @@ public class EnergizerBlockItem extends BlockItem implements BotariumEnergyItem<
 
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag isAdvanced) {
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents, TooltipFlag isAdvanced) {
         var energy = getEnergyStorage(stack);
-        tooltipComponents.add(TooltipUtils.getEnergyComponent(energy.getStoredEnergy(), energy.getMaxCapacity()));
-        tooltipComponents.add(TooltipUtils.getMaxEnergyInComponent(energy.maxInsert()));
-        tooltipComponents.add(TooltipUtils.getMaxEnergyOutComponent(energy.maxExtract()));
+        tooltipComponents.add(TooltipUtils.getEnergyComponent(energy.getStoredAmount(), energy.getCapacity()));
+        tooltipComponents.add(TooltipUtils.getMaxEnergyInComponent(energy.getCapacity()));
+        tooltipComponents.add(TooltipUtils.getMaxEnergyOutComponent(energy.getCapacity()));
         TooltipUtils.addDescriptionComponent(tooltipComponents, ConstantComponents.ENERGIZER_INFO);
     }
 }

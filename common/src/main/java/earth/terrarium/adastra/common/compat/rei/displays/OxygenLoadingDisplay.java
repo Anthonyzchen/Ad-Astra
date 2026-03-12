@@ -18,12 +18,14 @@ public record OxygenLoadingDisplay(OxygenLoadingRecipe recipe) implements Displa
 
     @Override
     public List<EntryIngredient> getInputEntries() {
-        return List.of(EntryIngredients.of(recipe.input().getFluids().get(0).getFluid()));
+        // TODO: CSL migration - fluid input was removed from recipe, re-add when CSL FluidResource is available
+        return List.of();
     }
 
     @Override
     public List<EntryIngredient> getOutputEntries() {
-        return List.of(EntryIngredients.of(recipe.result().getFluid()));
+        // TODO: CSL migration - fluid result was removed from recipe, re-add when CSL FluidResource is available
+        return List.of();
     }
 
     @Override

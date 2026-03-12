@@ -2,12 +2,13 @@ package earth.terrarium.adastra.common.blockentities.base;
 
 import earth.terrarium.adastra.common.blockentities.base.sideconfig.ConfigurationEntry;
 import earth.terrarium.adastra.common.blockentities.base.sideconfig.SideConfigurable;
-import earth.terrarium.botarium.common.menu.ExtraDataMenuProvider;
+import com.teamresourceful.resourcefullib.common.menu.ContentMenuProvider;
+import earth.terrarium.adastra.common.menus.base.BlockPosContent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -25,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
-public abstract class ContainerMachineBlockEntity extends MachineBlockEntity implements BasicContainer, WorldlyContainer, ExtraDataMenuProvider, SideConfigurable {
+public abstract class ContainerMachineBlockEntity extends MachineBlockEntity implements BasicContainer, WorldlyContainer, ContentMenuProvider<BlockPosContent>, SideConfigurable {
 
     private final List<ConfigurationEntry> sideConfig = new ArrayList<>();
     private final NonNullList<ItemStack> items;
@@ -58,24 +59,24 @@ public abstract class ContainerMachineBlockEntity extends MachineBlockEntity imp
     }
 
     @Override
-    public void load(@NotNull CompoundTag tag) {
-        super.load(tag);
-        ContainerHelper.loadAllItems(tag, this.items);
+    public void loadAdditional(@NotNull CompoundTag tag, HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
+        ContainerHelper.loadAllItems(tag, this.items, registries);
         ConfigurationEntry.load(tag, this.sideConfig, getDefaultConfig());
         this.redstoneControl = RedstoneControl.values()[tag.getByte("RedstoneControl")];
     }
 
     @Override
-    protected void saveAdditional(@NotNull CompoundTag tag) {
-        super.saveAdditional(tag);
-        ContainerHelper.saveAllItems(tag, this.items);
+    protected void saveAdditional(@NotNull CompoundTag tag, HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
+        ContainerHelper.saveAllItems(tag, this.items, registries);
         ConfigurationEntry.save(tag, this.sideConfig);
         tag.putByte("RedstoneControl", (byte) redstoneControl.ordinal());
     }
 
     @Override
-    public void writeExtraData(ServerPlayer player, FriendlyByteBuf buffer) {
-        buffer.writeBlockPos(getBlockPos());
+    public BlockPosContent createContent(ServerPlayer player) {
+        return new BlockPosContent(getBlockPos());
     }
 
     @Override

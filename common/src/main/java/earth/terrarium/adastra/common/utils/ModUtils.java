@@ -28,7 +28,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.portal.PortalInfo;
+import net.minecraft.world.level.portal.DimensionTransition;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.Locale;
@@ -102,7 +102,7 @@ public final class ModUtils {
     }
 
     public static Entity teleportToDimension(Entity entity, ServerLevel level) {
-        PortalInfo target = new PortalInfo(entity.position(), entity.getDeltaMovement(), entity.getYRot(), entity.getXRot());
+        DimensionTransition target = new DimensionTransition(level, entity.position(), entity.getDeltaMovement(), entity.getYRot(), entity.getXRot(), DimensionTransition.DO_NOTHING);
         return PlatformUtils.teleportToDimension(entity, level, target);
     }
 

@@ -33,7 +33,10 @@ import earth.terrarium.adastra.common.registry.*;
 import earth.terrarium.adastra.common.tags.ModItemTags;
 import earth.terrarium.adastra.common.utils.KeybindManager;
 import earth.terrarium.adastra.common.utils.radio.RadioHolder;
-import earth.terrarium.botarium.client.ClientHooks;
+// TODO: CSL migration - botarium ClientHooks provided registerBlockEntityRenderers, registerEntityRenderer,
+// registerItemProperty, setRenderLayer. These registration methods need platform-specific replacements.
+// import earth.terrarium.botarium.client.ClientHooks;
+import earth.terrarium.adastra.client.utils.ClientRegistrationHooks;
 import net.minecraft.client.Camera;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -52,7 +55,7 @@ import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.item.DyeableArmorItem;
+import net.minecraft.world.item.component.DyedItemColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 
@@ -78,7 +81,6 @@ public class AdAstraClient {
         AdAstra.CONFIGURATOR.register(AdAstraConfigClient.class);
         registerScreens();
         registerBlockEntityRenderers();
-        registerEntityRenderers();
         registerItemProperties();
         registerRenderLayers();
         registerArmor();
@@ -111,37 +113,16 @@ public class AdAstraClient {
     }
 
     private static void registerBlockEntityRenderers() {
-        ClientHooks.registerBlockEntityRenderers(ModBlockEntityTypes.ENERGIZER.get(), c -> new EnergizerBlockEntityRenderer());
-        ClientHooks.registerBlockEntityRenderers(ModBlockEntityTypes.GLOBE.get(), c -> new GlobeBlockEntityRenderer());
-        ClientHooks.registerBlockEntityRenderers(ModBlockEntityTypes.OXYGEN_DISTRIBUTOR.get(), c -> new OxygenDistributorBlockEntityRenderer());
-        ClientHooks.registerBlockEntityRenderers(ModBlockEntityTypes.GRAVITY_NORMALIZER.get(), c -> new GravityNormalizerBlockEntityRenderer());
-        ClientHooks.registerBlockEntityRenderers(ModBlockEntityTypes.FLAG.get(), c -> new FlagBlockEntityRenderer());
-        ClientHooks.registerBlockEntityRenderers(ModBlockEntityTypes.SLIDING_DOOR.get(), c -> new SlidingDoorBlockEntityRenderer());
+        ClientRegistrationHooks.registerBlockEntityRenderers(ModBlockEntityTypes.ENERGIZER.get(), c -> new EnergizerBlockEntityRenderer());
+        ClientRegistrationHooks.registerBlockEntityRenderers(ModBlockEntityTypes.GLOBE.get(), c -> new GlobeBlockEntityRenderer());
+        ClientRegistrationHooks.registerBlockEntityRenderers(ModBlockEntityTypes.OXYGEN_DISTRIBUTOR.get(), c -> new OxygenDistributorBlockEntityRenderer());
+        ClientRegistrationHooks.registerBlockEntityRenderers(ModBlockEntityTypes.GRAVITY_NORMALIZER.get(), c -> new GravityNormalizerBlockEntityRenderer());
+        ClientRegistrationHooks.registerBlockEntityRenderers(ModBlockEntityTypes.FLAG.get(), c -> new FlagBlockEntityRenderer());
+        ClientRegistrationHooks.registerBlockEntityRenderers(ModBlockEntityTypes.SLIDING_DOOR.get(), c -> new SlidingDoorBlockEntityRenderer());
     }
 
-    private static void registerEntityRenderers() {
-        ClientHooks.registerEntityRenderer(ModEntityTypes.AIR_VORTEX, NoopRenderer::new);
-        ClientHooks.registerEntityRenderer(ModEntityTypes.ROVER, RoverRenderer::new);
-        ClientHooks.registerEntityRenderer(ModEntityTypes.TIER_1_ROCKET, c -> new RocketRenderer(c, RocketModel.TIER_1_LAYER, RocketRenderer.TIER_1_TEXTURE));
-        ClientHooks.registerEntityRenderer(ModEntityTypes.TIER_2_ROCKET, c -> new RocketRenderer(c, RocketModel.TIER_2_LAYER, RocketRenderer.TIER_2_TEXTURE));
-        ClientHooks.registerEntityRenderer(ModEntityTypes.TIER_3_ROCKET, c -> new RocketRenderer(c, RocketModel.TIER_3_LAYER, RocketRenderer.TIER_3_TEXTURE));
-        ClientHooks.registerEntityRenderer(ModEntityTypes.TIER_4_ROCKET, c -> new RocketRenderer(c, RocketModel.TIER_4_LAYER, RocketRenderer.TIER_4_TEXTURE));
-        ClientHooks.registerEntityRenderer(ModEntityTypes.LANDER, c -> new LanderRenderer(c, LanderModel.LAYER));
-
-        ClientHooks.registerEntityRenderer(ModEntityTypes.LUNARIAN, LunarianRenderer::new);
-        ClientHooks.registerEntityRenderer(ModEntityTypes.CORRUPTED_LUNARIAN, CorruptedLunarianRenderer::new);
-        ClientHooks.registerEntityRenderer(ModEntityTypes.STAR_CRAWLER, StarCrawlerRenderer::new);
-        ClientHooks.registerEntityRenderer(ModEntityTypes.MARTIAN_RAPTOR, MartianRaptorRenderer::new);
-        ClientHooks.registerEntityRenderer(ModEntityTypes.PYGRO, PygroRenderer::new);
-        ClientHooks.registerEntityRenderer(ModEntityTypes.ZOMBIFIED_PYGRO, ZombifiedPygroRenderer::new);
-        ClientHooks.registerEntityRenderer(ModEntityTypes.PYGRO_BRUTE, PygroBruteRenderer::new);
-        ClientHooks.registerEntityRenderer(ModEntityTypes.MOGLER, MoglerRenderer::new);
-        ClientHooks.registerEntityRenderer(ModEntityTypes.ZOMBIFIED_MOGLER, ZombifiedMoglerRenderer::new);
-        ClientHooks.registerEntityRenderer(ModEntityTypes.SULFUR_CREEPER, SulfurCreeperRenderer::new);
-        ClientHooks.registerEntityRenderer(ModEntityTypes.LUNARIAN_WANDERING_TRADER, LunarianWanderingTraderRenderer::new);
-        ClientHooks.registerEntityRenderer(ModEntityTypes.GLACIAN_RAM, GlacianRamRenderer::new);
-        ClientHooks.registerEntityRenderer(ModEntityTypes.ICE_SPIT, ThrownItemRenderer::new);
-    }
+    // Entity renderers are registered in platform-specific code (Fabric/NeoForge)
+    // because EntityRenderers.register() is not accessible from the common module.
 
     public static void registerArmor() {
         ClientPlatformUtils.registerArmor(SpaceSuitModel.SPACE_SUIT_TEXTURE, SpaceSuitModel.SPACE_SUIT_LAYER, SpaceSuitModel::new,
@@ -174,16 +155,16 @@ public class AdAstraClient {
     }
 
     private static void registerItemProperties() {
-        ClientHooks.registerItemProperty(ModItems.ETRIONIC_CAPACITOR.get(), new ResourceLocation(AdAstra.MOD_ID, "toggled"), (stack, level, entity, i) -> EtrionicCapacitorItem.active(stack) ? 0 : 1);
+        ClientRegistrationHooks.registerItemProperty(ModItems.ETRIONIC_CAPACITOR.get(), ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "toggled"), (stack, level, entity, i) -> EtrionicCapacitorItem.active(stack) ? 0 : 1);
     }
 
     public static void registerRenderLayers() {
-        ClientHooks.setRenderLayer(ModBlocks.VENT.get(), RenderType.cutout());
-        ClientHooks.setRenderLayer(ModBlocks.STEEL_DOOR.get(), RenderType.cutout());
-        ClientHooks.setRenderLayer(ModBlocks.STEEL_TRAPDOOR.get(), RenderType.cutout());
-        ClientHooks.setRenderLayer(ModBlocks.AERONOS_LADDER.get(), RenderType.cutout());
-        ClientHooks.setRenderLayer(ModBlocks.STROPHAR_LADDER.get(), RenderType.cutout());
-        ClientHooks.setRenderLayer(ModBlocks.GLACIAN_TRAPDOOR.get(), RenderType.cutout());
+        ClientRegistrationHooks.setRenderLayer(ModBlocks.VENT.get(), RenderType.cutout());
+        ClientRegistrationHooks.setRenderLayer(ModBlocks.STEEL_DOOR.get(), RenderType.cutout());
+        ClientRegistrationHooks.setRenderLayer(ModBlocks.STEEL_TRAPDOOR.get(), RenderType.cutout());
+        ClientRegistrationHooks.setRenderLayer(ModBlocks.AERONOS_LADDER.get(), RenderType.cutout());
+        ClientRegistrationHooks.setRenderLayer(ModBlocks.STROPHAR_LADDER.get(), RenderType.cutout());
+        ClientRegistrationHooks.setRenderLayer(ModBlocks.GLACIAN_TRAPDOOR.get(), RenderType.cutout());
     }
 
     public static void onRegisterParticles(BiConsumer<ParticleType<SimpleParticleType>, ClientPlatformUtils.SpriteParticleRegistration<SimpleParticleType>> consumer) {
@@ -194,9 +175,9 @@ public class AdAstraClient {
     }
 
     public static void onRegisterModels(Consumer<ResourceLocation> consumer) {
-        ModBlocks.GLOBES.stream().forEach(b -> consumer.accept(new ResourceLocation(AdAstra.MOD_ID, "block/%s_cube".formatted(b.getId().getPath()))));
-        consumer.accept(new ResourceLocation(AdAstra.MOD_ID, "block/%s_flipped".formatted(ModBlocks.AIRLOCK.getId().getPath())));
-        consumer.accept(new ResourceLocation(AdAstra.MOD_ID, "block/%s_flipped".formatted(ModBlocks.REINFORCED_DOOR.getId().getPath())));
+        ModBlocks.GLOBES.stream().forEach(b -> consumer.accept(ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "block/%s_cube".formatted(b.getId().getPath()))));
+        consumer.accept(ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "block/%s_flipped".formatted(ModBlocks.AIRLOCK.getId().getPath())));
+        consumer.accept(ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "block/%s_flipped".formatted(ModBlocks.REINFORCED_DOOR.getId().getPath())));
         consumer.accept(OxygenDistributorBlockEntityRenderer.TOP);
         consumer.accept(GravityNormalizerBlockEntityRenderer.TOP);
         consumer.accept(GravityNormalizerBlockEntityRenderer.TOE);
@@ -218,9 +199,13 @@ public class AdAstraClient {
     }
 
     public static void onAddItemColors(BiConsumer<ItemColor, ItemLike[]> consumer) {
-        consumer.accept((stack, i) -> i > 0 ? -1 : ((DyeableArmorItem) stack.getItem()).getColor(stack), new ItemLike[]{ModItems.SPACE_HELMET.get(), ModItems.SPACE_SUIT.get(), ModItems.SPACE_PANTS.get(), ModItems.SPACE_BOOTS.get()});
-        consumer.accept((stack, i) -> i > 0 ? -1 : ((DyeableArmorItem) stack.getItem()).getColor(stack), new ItemLike[]{ModItems.NETHERITE_SPACE_HELMET.get(), ModItems.NETHERITE_SPACE_SUIT.get(), ModItems.NETHERITE_SPACE_PANTS.get(), ModItems.NETHERITE_SPACE_BOOTS.get()});
-        consumer.accept((stack, i) -> i > 0 ? -1 : ((DyeableArmorItem) stack.getItem()).getColor(stack), new ItemLike[]{ModItems.JET_SUIT_HELMET.get(), ModItems.JET_SUIT.get(), ModItems.JET_SUIT_PANTS.get(), ModItems.JET_SUIT_BOOTS.get()});
+        // Default color must include full alpha (0xFF000000) or items will be invisible.
+        // DyedItemColor.getOrDefault() only calls ARGB32.opaque() when the dye component exists,
+        // but passes through the raw default value when it doesn't, so alpha=0 (0x00FFFFFF) causes
+        // the ItemRenderer to render fully transparent items.
+        consumer.accept((stack, i) -> i > 0 ? -1 : DyedItemColor.getOrDefault(stack, 0xFFFFFFFF), new ItemLike[]{ModItems.SPACE_HELMET.get(), ModItems.SPACE_SUIT.get(), ModItems.SPACE_PANTS.get(), ModItems.SPACE_BOOTS.get()});
+        consumer.accept((stack, i) -> i > 0 ? -1 : DyedItemColor.getOrDefault(stack, 0xFFFFFFFF), new ItemLike[]{ModItems.NETHERITE_SPACE_HELMET.get(), ModItems.NETHERITE_SPACE_SUIT.get(), ModItems.NETHERITE_SPACE_PANTS.get(), ModItems.NETHERITE_SPACE_BOOTS.get()});
+        consumer.accept((stack, i) -> i > 0 ? -1 : DyedItemColor.getOrDefault(stack, 0xFFFFFFFF), new ItemLike[]{ModItems.JET_SUIT_HELMET.get(), ModItems.JET_SUIT.get(), ModItems.JET_SUIT_PANTS.get(), ModItems.JET_SUIT_BOOTS.get()});
     }
 
     public static void renderOverlays(PoseStack stack, Camera camera) {
@@ -229,7 +214,7 @@ public class AdAstraClient {
     }
 
     public static void onAddReloadListener(BiConsumer<ResourceLocation, PreparableReloadListener> consumer) {
-        consumer.accept(new ResourceLocation(AdAstra.MOD_ID, "planet_renderers"), new AdAstraPlanetRenderers());
+        consumer.accept(ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "planet_renderers"), new AdAstraPlanetRenderers());
     }
 
     public static void clientTick(Minecraft minecraft) {

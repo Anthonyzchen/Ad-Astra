@@ -10,7 +10,6 @@ import earth.terrarium.adastra.common.items.armor.SpaceSuitItem;
 import earth.terrarium.adastra.common.registry.ModDamageSources;
 import earth.terrarium.adastra.common.tags.ModEntityTypeTags;
 import earth.terrarium.adastra.common.tags.ModItemTags;
-import net.minecraft.Optionull;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
@@ -29,7 +28,8 @@ public class OxygenApiImpl implements OxygenApi {
 
     @Override
     public boolean hasOxygen(ResourceKey<Level> level) {
-        return Optionull.mapOrDefault(PlanetApi.API.getPlanet(level), Planet::oxygen, true);
+        Planet planet = PlanetApi.API.getPlanet(level);
+        return planet != null ? planet.oxygen() : true;
     }
 
     @Override

@@ -16,7 +16,7 @@
   },
   "ingredients": [
     {
-      "tag": "c:desh_ores"
+      "tag": "c:ores/desh"
     }
   ],
   "results": [

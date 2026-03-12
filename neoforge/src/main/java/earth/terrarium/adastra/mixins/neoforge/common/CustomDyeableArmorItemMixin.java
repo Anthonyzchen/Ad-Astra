@@ -20,6 +20,11 @@ import org.spongepowered.asm.mixin.Mixin;
 
 import java.util.function.Consumer;
 
+// TODO: 1.21.1 NeoForge removed IClientItemExtensions - armor rendering now uses
+// RegisterClientExtensionsEvent or the new armor layer system. This mixin needs to be
+// reworked to use the new NeoForge armor rendering API. The IClientItemExtensions
+// interface and initializeClient method no longer exist in 1.21.1 NeoForge.
+// Consider using RegisterClientExtensionsEvent in the mod initializer instead.
 @Mixin(CustomDyeableArmorItem.class)
 public abstract class CustomDyeableArmorItemMixin extends Item {
 

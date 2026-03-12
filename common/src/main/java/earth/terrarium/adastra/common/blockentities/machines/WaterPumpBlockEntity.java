@@ -9,16 +9,21 @@ import earth.terrarium.adastra.common.constants.ConstantComponents;
 import earth.terrarium.adastra.common.menus.machines.WaterPumpMenu;
 import earth.terrarium.adastra.common.registry.ModParticleTypes;
 import earth.terrarium.adastra.common.utils.EnergyUtils;
+import earth.terrarium.adastra.common.utils.FluidUtils;
 import earth.terrarium.adastra.common.utils.ModUtils;
 import earth.terrarium.adastra.common.utils.TransferUtils;
-import earth.terrarium.botarium.common.energy.impl.WrappedBlockEnergyContainer;
-import earth.terrarium.botarium.common.fluid.FluidConstants;
-import earth.terrarium.botarium.common.fluid.base.BotariumFluidBlock;
-import earth.terrarium.botarium.common.fluid.base.FluidHolder;
-import earth.terrarium.botarium.common.fluid.impl.ExtractOnlyFluidContainer;
-import earth.terrarium.botarium.common.fluid.impl.WrappedBlockFluidContainer;
+import earth.terrarium.common_storage_lib.fluid.util.FluidProvider;
+import earth.terrarium.common_storage_lib.resources.fluid.FluidResource;
+import earth.terrarium.common_storage_lib.storage.base.CommonStorage;
+import earth.terrarium.common_storage_lib.storage.base.ValueStorage;
+import earth.terrarium.common_storage_lib.fluid.impl.SimpleFluidStorage;
+import earth.terrarium.common_storage_lib.fluid.util.FluidStorageData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.entity.player.Inventory;
@@ -34,17 +39,20 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class WaterPumpBlockEntity extends EnergyContainerMachineBlockEntity implements BotariumFluidBlock<WrappedBlockFluidContainer> {
+public class WaterPumpBlockEntity extends EnergyContainerMachineBlockEntity implements FluidProvider.BlockEntity {
+
+    private static final long BUCKET = 81000L;
 
     public static final List<ConfigurationEntry> SIDE_CONFIG = List.of(
-        new ConfigurationEntry(ConfigurationType.ENERGY, Configuration.NONE, ConstantComponents.SIDE_CONFIG_ENERGY),
-        new ConfigurationEntry(ConfigurationType.FLUID, Configuration.NONE, ConstantComponents.SIDE_CONFIG_OUTPUT_FLUID)
+        new ConfigurationEntry(ConfigurationType.ENERGY, Configuration.PULL, ConstantComponents.SIDE_CONFIG_ENERGY),
+        new ConfigurationEntry(ConfigurationType.FLUID, Configuration.PUSH, ConstantComponents.SIDE_CONFIG_OUTPUT_FLUID)
     );
 
-    private WrappedBlockFluidContainer fluidContainer;
+    private SimpleFluidStorage fluidContainer;
 
     public WaterPumpBlockEntity(BlockPos pos, BlockState state) {
         super(pos, state, 1);
+        this.energyContainer = EnergyUtils.machineInsertOnlyEnergy(MachineConfig.DESH);
     }
 
     @Override
@@ -52,28 +60,23 @@ public class WaterPumpBlockEntity extends EnergyContainerMachineBlockEntity impl
         return new WaterPumpMenu(id, inventory, this);
     }
 
-    @Override
-    public WrappedBlockEnergyContainer getEnergyStorage(Level level, BlockPos pos, BlockState state, @Nullable BlockEntity entity, @Nullable Direction direction) {
+    public ValueStorage getEnergyStorage(Level level, BlockPos pos, BlockState state, @Nullable BlockEntity entity, @Nullable Direction direction) {
         if (energyContainer != null) return energyContainer;
-        return energyContainer = new WrappedBlockEnergyContainer(
-            this,
-            EnergyUtils.machineInsertOnlyEnergy(MachineConfig.DESH)
-        );
+        return energyContainer = EnergyUtils.machineInsertOnlyEnergy(MachineConfig.DESH);
     }
 
-    @Override
-    public @Nullable WrappedBlockFluidContainer getFluidContainer(Level level, BlockPos pos, BlockState state, @Nullable BlockEntity entity, @Nullable Direction direction) {
+    public @Nullable SimpleFluidStorage getFluidContainer(Level level, BlockPos pos, BlockState state, @Nullable BlockEntity entity, @Nullable Direction direction) {
         return getFluidContainer();
     }
 
-    public WrappedBlockFluidContainer getFluidContainer() {
+    public SimpleFluidStorage getFluidContainer() {
         if (fluidContainer != null) return fluidContainer;
-        return fluidContainer = new WrappedBlockFluidContainer(
-            this,
-            new ExtractOnlyFluidContainer(
-                i -> FluidConstants.fromMillibuckets(MachineConfig.DESH.fluidCapacity),
-                1,
-                (tank, holder) -> holder.is(FluidTags.WATER)));
+        return fluidContainer = new SimpleFluidStorage(1, MachineConfig.DESH.fluidCapacity * 81L);
+    }
+
+    @Override
+    public CommonStorage<FluidResource> getFluids(@Nullable Direction direction) {
+        return getFluidContainer();
     }
 
     @Override
@@ -82,16 +85,20 @@ public class WaterPumpBlockEntity extends EnergyContainerMachineBlockEntity impl
         if (canPump(pos, energyContainer)) pump(level, energyContainer);
     }
 
-    private boolean canPump(BlockPos pos, WrappedBlockEnergyContainer energyStorage) {
+    private boolean canPump(BlockPos pos, ValueStorage energyStorage) {
         if (!level().getFluidState(pos.below()).is(Fluids.WATER)) return false;
-        if (energyStorage.internalExtract(MachineConfig.waterPumpEnergyPerTick, true) < MachineConfig.waterPumpEnergyPerTick)
+        if (energyStorage.extract(MachineConfig.waterPumpEnergyPerTick, true) < MachineConfig.waterPumpEnergyPerTick)
             return false;
-        return fluidContainer.getFirstFluid().getFluidAmount() < fluidContainer.getTankCapacity(0);
+        SimpleFluidStorage fc = getFluidContainer();
+        FluidResource water = FluidResource.of(Fluids.WATER);
+        // Use slot-level insert with workaround for FluidResource reference equality
+        return FluidUtils.insertFluid(fc.get(0), water, 1, true) > 0;
     }
 
-    private void pump(ServerLevel level, WrappedBlockEnergyContainer energyStorage) {
-        energyStorage.internalExtract(MachineConfig.waterPumpEnergyPerTick, false);
-        fluidContainer.internalInsert(FluidHolder.ofMillibuckets(Fluids.WATER, FluidConstants.fromMillibuckets(MachineConfig.waterPumpFluidGenerationPerTick)), false);
+    private void pump(ServerLevel level, ValueStorage energyStorage) {
+        energyStorage.extract(MachineConfig.waterPumpEnergyPerTick, false);
+        FluidResource water = FluidResource.of(Fluids.WATER);
+        FluidUtils.insertFluid(getFluidContainer().get(0), water, MachineConfig.waterPumpFluidGenerationPerTick * 81L, false);
         ModUtils.sendParticles(level,
             ModParticleTypes.OXYGEN_BUBBLE.get(),
             getBlockPos().getX() + 0.5,
@@ -103,9 +110,27 @@ public class WaterPumpBlockEntity extends EnergyContainerMachineBlockEntity impl
     }
 
     @Override
+    public void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
+        if (tag.contains("FluidData")) {
+            FluidStorageData.CODEC.parse(NbtOps.INSTANCE, tag.get("FluidData"))
+                .resultOrPartial(s -> {})
+                .ifPresent(data -> getFluidContainer().readSnapshot(data));
+        }
+    }
+
+    @Override
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
+        FluidStorageData.CODEC.encodeStart(NbtOps.INSTANCE, getFluidContainer().createSnapshot())
+            .resultOrPartial(s -> {})
+            .ifPresent(nbt -> tag.put("FluidData", nbt));
+    }
+
+    @Override
     public void tickSideInteractions(BlockPos pos, Predicate<Direction> filter, List<ConfigurationEntry> sideConfig) {
-        TransferUtils.pullEnergyNearby(this, pos, getEnergyStorage().maxInsert(), sideConfig.get(0), filter);
-        TransferUtils.pushFluidNearby(this, pos, getFluidContainer(), FluidConstants.fromMillibuckets(MachineConfig.waterPumpFluidGenerationPerTick), 0, sideConfig.get(1), filter);
+        TransferUtils.pullEnergyNearby(this, pos, getEnergyStorage().getCapacity(), sideConfig.get(0), filter);
+        TransferUtils.pushFluidNearby(this, pos, getFluidContainer(), MachineConfig.waterPumpFluidGenerationPerTick * 81L, 0, sideConfig.get(1), filter);
     }
 
     @Override
