@@ -8,7 +8,6 @@ import earth.terrarium.adastra.common.systems.EnvironmentEffects;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.progress.ChunkProgressListener;
 import net.minecraft.world.level.CustomSpawner;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.LevelChunk;
@@ -45,7 +44,6 @@ public abstract class ServerLevelMixin {
         ServerLevelData serverLevelData,
         ResourceKey<Level> dimension,
         LevelStem levelStem,
-        ChunkProgressListener progressListener,
         boolean isDebug, long biomeZoomSeed,
         List<CustomSpawner> customSpawners,
         boolean tickTime,
@@ -59,18 +57,18 @@ public abstract class ServerLevelMixin {
             .build();
     }
 
-    @Inject(method = "tickChunk", at = @At("TAIL"))
+    @Inject(method = "method_18203", at = @At("TAIL"))
     public void tickChunk(LevelChunk chunk, int randomTickSpeed, CallbackInfo ci) {
         if (!OxygenApi.API.hasOxygen(chunk.getLevel())) {
             var level = chunk.getLevel();
-            level.getProfiler().popPush("adastra$spaceeffects");
+            net.minecraft.util.profiling.Profiler.get().popPush("adastra$spaceeffects");
             EnvironmentEffects.tickChunk((ServerLevel) level, chunk);
-            level.getProfiler().pop();
+            net.minecraft.util.profiling.Profiler.get().pop();
         }
     }
 
     @Inject(
-        method = "tick",
+        method = "method_18765",
         at = @At(
             value = "INVOKE",
             target = "Lnet/minecraft/server/level/ServerLevel;setDayTime(J)V",

@@ -21,11 +21,11 @@ import net.fabricmc.fabric.api.client.rendering.v1.*;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.DeltaTracker;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.entity.NoopRenderer;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
@@ -96,7 +96,7 @@ public class AdAstraClientFabric {
     public static void onAddReloadListener() {
         AdAstraClient.onAddReloadListener((id, listener) -> ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new IdentifiableResourceReloadListener() {
             @Override
-            public ResourceLocation getFabricId() {
+            public Identifier getFabricId() {
                 return id;
             }
 
@@ -109,7 +109,7 @@ public class AdAstraClientFabric {
 
     public static void registerDimensionEffects(Map<ResourceKey<Level>, ModDimensionSpecialEffects> renderers) {
         renderers.forEach((dimension, effects) -> {
-            DimensionRenderingRegistry.registerDimensionEffects(dimension.location(), effects);
+            DimensionRenderingRegistry.registerDimensionEffects(dimension.identifier(), effects);
             if (effects.renderer().customClouds()) {
                 DimensionRenderingRegistry.registerCloudRenderer(dimension, context -> {
                     var camera = context.camera().getPosition();

@@ -13,10 +13,9 @@ import earth.terrarium.adastra.common.blockentities.machines.EtrionicBlastFurnac
 import earth.terrarium.adastra.common.registry.ModRecipeSerializers;
 import earth.terrarium.adastra.common.registry.ModRecipeTypes;
 import earth.terrarium.adastra.common.utils.ItemUtils;
-import net.minecraft.world.item.crafting.RecipeInput;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,6 +25,8 @@ public record AlloyingRecipe(
     int cookingTime, int energy,
     List<Ingredient> ingredients, ItemStack result
 ) implements CodecRecipe<RecipeInput> {
+
+    private static final RecipeBookCategory BOOK_CATEGORY = new RecipeBookCategory();
 
     public static final MapCodec<AlloyingRecipe> CODEC = RecordCodecBuilder.mapCodec(
         instance -> instance.group(
@@ -63,12 +64,30 @@ public record AlloyingRecipe(
     }
 
     @Override
-    public CodecRecipeSerializer<? extends CodecRecipe<RecipeInput>> serializer() {
+    public @NotNull ItemStack assemble(@NotNull RecipeInput input, HolderLookup.@NotNull Provider provider) {
+        return result.copy();
+    }
+
+
+
+    @Override
+    public @NotNull CodecRecipeSerializer<? extends Recipe<RecipeInput>> getSerializer() {
         return ModRecipeSerializers.ALLOYING.get();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public @NotNull RecipeType<?> getType() {
-        return ModRecipeTypes.ALLOYING.get();
+    public @NotNull RecipeType<AlloyingRecipe> getType() {
+        return (RecipeType<AlloyingRecipe>) (RecipeType<?>) ModRecipeTypes.ALLOYING.get();
+    }
+
+    @Override
+    public @NotNull PlacementInfo placementInfo() {
+        return PlacementInfo.NOT_PLACEABLE;
+    }
+
+    @Override
+    public @NotNull RecipeBookCategory recipeBookCategory() {
+        return BOOK_CATEGORY;
     }
 }

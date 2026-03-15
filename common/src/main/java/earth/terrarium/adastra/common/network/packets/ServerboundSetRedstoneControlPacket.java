@@ -11,7 +11,7 @@ import earth.terrarium.adastra.AdAstra;
 import earth.terrarium.adastra.common.blockentities.base.RedstoneControl;
 import earth.terrarium.adastra.common.utils.ModUtils;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.function.Consumer;
@@ -27,12 +27,11 @@ public record ServerboundSetRedstoneControlPacket(
         return TYPE;
     }
 
-    private static class Type extends CodecPacketType<ServerboundSetRedstoneControlPacket> implements ServerboundPacketType<ServerboundSetRedstoneControlPacket> {
+    private static class Type extends CodecPacketType.Server<ServerboundSetRedstoneControlPacket> {
 
         public Type() {
             super(
-                ServerboundSetRedstoneControlPacket.class,
-                ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "set_redstone_control"),
+                Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "set_redstone_control"),
                 ObjectByteCodec.create(
                     ExtraByteCodecs.BLOCK_POS.fieldOf(ServerboundSetRedstoneControlPacket::machine),
                     ByteCodec.ofEnum(RedstoneControl.class).fieldOf(ServerboundSetRedstoneControlPacket::redstoneControl),

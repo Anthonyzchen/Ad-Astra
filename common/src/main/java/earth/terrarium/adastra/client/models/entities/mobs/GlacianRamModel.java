@@ -3,20 +3,18 @@ package earth.terrarium.adastra.client.models.entities.mobs;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import earth.terrarium.adastra.AdAstra;
-import earth.terrarium.adastra.common.entities.mob.GlacianRam;
 import net.minecraft.client.model.QuadrupedModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
+import net.minecraft.resources.Identifier;
 
 // LEGACY ENTITY. WILL BE REPLACED IN THE FUTURE.
-public class GlacianRamModel<T extends GlacianRam> extends QuadrupedModel<T> {
+public class GlacianRamModel<T extends LivingEntityRenderState> extends QuadrupedModel<T> {
 
-    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "glacian_ram"), "main");
-    private float headXRot;
-
+    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "glacian_ram"), "main");
     public GlacianRamModel(ModelPart modelPart) {
         super(modelPart, false, 8.0F, 8.0F, 2.0F, 2.0F, 24);
     }
@@ -55,19 +53,12 @@ public class GlacianRamModel<T extends GlacianRam> extends QuadrupedModel<T> {
         return LayerDefinition.create(meshdefinition, 64, 64);
     }
 
-    public void prepareMobModel(T entity, float limbSwing, float limbSwingAmount, float partialTick) {
-        super.prepareMobModel(entity, limbSwing, limbSwingAmount, partialTick);
-        this.head.y = 12.0f + entity.getNeckAngle(partialTick) * 9.0f;
+    @Override
+    public void setupAnim(T state) {
+        super.setupAnim(state);
+        this.head.y = 12.0f; // TODO: restore getNeckAngle from render state
         this.head.z = -2.0f;
-        this.headXRot = entity.getHeadAngle(partialTick);
-    }
-
-    /**
-     * Sets this entity's model rotation angles
-     */
-    public void setupAnim(T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-        super.setupAnim(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw + (this.young ? 0.0f : 180.0f), headPitch);
-        this.head.xRot = this.headXRot;
+        this.head.xRot = 0.0f; // TODO: restore getHeadAngle from render state
     }
 
     @Override

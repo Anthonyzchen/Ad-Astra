@@ -15,7 +15,7 @@ import earth.terrarium.adastra.common.handlers.base.SpaceStation;
 import earth.terrarium.adastra.common.utils.ModUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -37,12 +37,11 @@ public record ServerboundLandOnSpaceStationPacket(ResourceKey<Level> dimension,
         return TYPE;
     }
 
-    private static class Type extends CodecPacketType<ServerboundLandOnSpaceStationPacket> implements ServerboundPacketType<ServerboundLandOnSpaceStationPacket> {
+    private static class Type extends CodecPacketType.Server<ServerboundLandOnSpaceStationPacket> {
 
         public Type() {
             super(
-                ServerboundLandOnSpaceStationPacket.class,
-                ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "land_on_space_station"),
+                Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "land_on_space_station"),
                 ObjectByteCodec.create(
                     ExtraByteCodecs.DIMENSION.fieldOf(ServerboundLandOnSpaceStationPacket::dimension),
                     ExtraByteCodecs.CHUNK_POS.fieldOf(ServerboundLandOnSpaceStationPacket::spaceStationPos),
@@ -83,10 +82,10 @@ public record ServerboundLandOnSpaceStationPacket(ResourceKey<Level> dimension,
             .anyMatch(station -> station.position().equals(targetPos));
 
         for (var member : ArgonautsIntegration.getClientPartyMembers(player.getUUID())) {
-            stations.addAll(SpaceStationHandler.getOwnedSpaceStations(member.getId(), level));
+            stations.addAll(SpaceStationHandler.getOwnedSpaceStations(member.id(), level));
         }
         for (var member : ArgonautsIntegration.getClientGuildMembers(player.getUUID())) {
-            stations.addAll(SpaceStationHandler.getOwnedSpaceStations(member.getId(), level));
+            stations.addAll(SpaceStationHandler.getOwnedSpaceStations(member.id(), level));
         }
 
         return stations

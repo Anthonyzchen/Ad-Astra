@@ -99,7 +99,7 @@ public class InfernalSpireColumnFeature extends Feature<ColumnFeatureConfigurati
 
     @Nullable
     private static BlockPos findSurface(LevelAccessor level, int seaLevel, BlockPos.MutableBlockPos pos, int distance) {
-        while (pos.getY() > level.getMinBuildHeight() + 1 && distance > 0) {
+        while (pos.getY() > level.getMinY() + 1 && distance > 0) {
             --distance;
             if (canPlaceAt(level, seaLevel, pos)) {
                 return pos;
@@ -123,7 +123,7 @@ public class InfernalSpireColumnFeature extends Feature<ColumnFeatureConfigurati
 
     @Nullable
     private static BlockPos findAir(LevelAccessor level, BlockPos.MutableBlockPos pos, int distance) {
-        while (pos.getY() < level.getMaxBuildHeight() && distance > 0) {
+        while (pos.getY() < level.getMaxY() && distance > 0) {
             --distance;
             BlockState blockState = level.getBlockState(pos);
             if (CANNOT_PLACE_ON.contains(blockState.getBlock())) {

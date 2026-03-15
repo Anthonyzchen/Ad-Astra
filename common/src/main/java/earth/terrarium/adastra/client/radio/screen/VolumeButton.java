@@ -9,20 +9,20 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 
 public class VolumeButton extends Button {
 
     private static final Debouncer VOLUME_DEBOUNCER = new Debouncer();
 
-    private static final ResourceLocation VOLUME_UP = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "radio/volume_up");
-    private static final ResourceLocation VOLUME_DOWN = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "radio/volume_down");
-    private static final ResourceLocation VOLUME_UP_HOVER = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "radio/volume_up_hover");
-    private static final ResourceLocation VOLUME_DOWN_HOVER = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "radio/volume_down_hover");
+    private static final Identifier VOLUME_UP = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "radio/volume_up");
+    private static final Identifier VOLUME_DOWN = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "radio/volume_down");
+    private static final Identifier VOLUME_UP_HOVER = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "radio/volume_up_hover");
+    private static final Identifier VOLUME_DOWN_HOVER = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "radio/volume_down_hover");
 
-    private final ResourceLocation normal;
-    private final ResourceLocation hovered;
+    private final Identifier normal;
+    private final Identifier hovered;
 
     public VolumeButton(int x, int y, int width, int height, int amount) {
         super(x, y, width, height, CommonComponents.EMPTY, button -> {
@@ -38,7 +38,7 @@ public class VolumeButton extends Button {
 
     @Override
     public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        ResourceLocation sprite = this.isHoveredOrFocused() ? this.hovered : this.normal;
+        Identifier sprite = this.isHoveredOrFocused() ? this.hovered : this.normal;
         graphics.blitSprite(sprite, this.getX(), this.getY(), this.width, this.height);
     }
 

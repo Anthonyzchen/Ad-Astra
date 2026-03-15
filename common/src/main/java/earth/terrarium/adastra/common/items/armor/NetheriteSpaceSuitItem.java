@@ -6,18 +6,18 @@ import earth.terrarium.adastra.common.utils.FluidUtils;
 import earth.terrarium.adastra.common.utils.TooltipUtils;
 // FluidConstants removed - using BUCKET from parent class
 import net.minecraft.network.chat.Component;
-import net.minecraft.core.Holder;
-import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.equipment.ArmorMaterial;
+import net.minecraft.world.item.equipment.ArmorType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
 public class NetheriteSpaceSuitItem extends SpaceSuitItem {
 
-    public NetheriteSpaceSuitItem(Holder<ArmorMaterial> material, Type type, long tankSize, Properties properties) {
+    public NetheriteSpaceSuitItem(ArmorMaterial material, ArmorType type, long tankSize, Properties properties) {
         super(material, type, tankSize, properties);
     }
 

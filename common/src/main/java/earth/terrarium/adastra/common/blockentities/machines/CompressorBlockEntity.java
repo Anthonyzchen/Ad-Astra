@@ -87,7 +87,7 @@ public class CompressorBlockEntity extends RecipeMachineBlockEntity<CompressingR
     @Override
     public void update() {
         if (level().isClientSide()) return;
-        quickCheck.getRecipeFor(toRecipeInput(), level()).ifPresent(r -> {
+        quickCheck.getRecipeFor(toRecipeInput(), (ServerLevel) level()).ifPresent(r -> {
             recipe = r.value();
             cookTimeTotal = r.value().cookingTime();
         });

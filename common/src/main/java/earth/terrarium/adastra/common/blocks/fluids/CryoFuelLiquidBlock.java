@@ -10,6 +10,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.InsideBlockEffectApplier;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -18,7 +19,9 @@ import net.minecraft.world.level.block.LevelEvent;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings("deprecation")
 public class CryoFuelLiquidBlock extends ResourcefulLiquidBlock {
@@ -28,7 +31,7 @@ public class CryoFuelLiquidBlock extends ResourcefulLiquidBlock {
     }
 
     @Override
-    public void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
+    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier effectApplier, boolean isMoving) {
         if (entity instanceof LivingEntity) {
             entity.makeStuckInBlock(state, new Vec3(0.9f, 1.5, 0.9f));
             if (level.isClientSide()) {
@@ -55,7 +58,7 @@ public class CryoFuelLiquidBlock extends ResourcefulLiquidBlock {
     }
 
     @Override
-    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
+    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, @Nullable Orientation orientation, boolean isMoving) {
         if (this.shouldSpreadLiquid(level, pos, state)) {
             level.scheduleTick(pos, state.getFluidState().getType(), ModFluids.CRYO_FUEL.get().getTickDelay(level));
         }

@@ -11,7 +11,7 @@ import earth.terrarium.adastra.AdAstra;
 import earth.terrarium.adastra.common.blockentities.machines.EtrionicBlastFurnaceBlockEntity;
 import earth.terrarium.adastra.common.utils.ModUtils;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.function.Consumer;
@@ -27,12 +27,11 @@ public record ServerboundSetFurnaceModePacket(
         return TYPE;
     }
 
-    private static class Type extends CodecPacketType<ServerboundSetFurnaceModePacket> implements ServerboundPacketType<ServerboundSetFurnaceModePacket> {
+    private static class Type extends CodecPacketType.Server<ServerboundSetFurnaceModePacket> {
 
         public Type() {
             super(
-                ServerboundSetFurnaceModePacket.class,
-                ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "set_furnace_mode"),
+                Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "set_furnace_mode"),
                 ObjectByteCodec.create(
                     ExtraByteCodecs.BLOCK_POS.fieldOf(ServerboundSetFurnaceModePacket::machine),
                     ByteCodec.ofEnum(EtrionicBlastFurnaceBlockEntity.Mode.class).fieldOf(ServerboundSetFurnaceModePacket::mode),

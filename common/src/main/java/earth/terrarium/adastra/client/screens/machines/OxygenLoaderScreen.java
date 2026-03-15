@@ -6,12 +6,12 @@ import earth.terrarium.adastra.common.blockentities.machines.OxygenLoaderBlockEn
 import earth.terrarium.adastra.common.menus.machines.OxygenLoaderMenu;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 
 public class OxygenLoaderScreen extends MachineScreen<OxygenLoaderMenu, OxygenLoaderBlockEntity> {
 
-    public static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/gui/container/oxygen_loader.png");
+    public static final Identifier TEXTURE = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/gui/container/oxygen_loader.png");
     public static final Rect2i CLICK_AREA = new Rect2i(64, 34, 26, 25);
 
     public OxygenLoaderScreen(OxygenLoaderMenu menu, Inventory inventory, Component component) {

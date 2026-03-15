@@ -7,7 +7,7 @@ import earth.terrarium.adastra.datagen.provider.base.ModCodecProvider;
 import net.minecraft.core.Registry;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,14 +18,14 @@ import java.util.function.BiConsumer;
 
 public class ModPlanetProvider extends ModCodecProvider<Planet> {
 
-    public static final ResourceKey<Registry<Planet>> PLANET_REGISTRY = ResourceKey.createRegistryKey(new ResourceLocation(AdAstra.MOD_ID, "planets"));
+    public static final ResourceKey<Registry<Planet>> PLANET_REGISTRY = ResourceKey.createRegistryKey(new Identifier(AdAstra.MOD_ID, "planets"));
 
     public ModPlanetProvider(PackOutput packOutput) {
         super(packOutput, Planet.CODEC, PLANET_REGISTRY);
     }
 
     @Override
-    protected void build(BiConsumer<ResourceLocation, Planet> consumer) {
+    protected void build(BiConsumer<Identifier, Planet> consumer) {
         orbit(consumer, Planet.EARTH_ORBIT, PlanetConstants.SPACE_SOLAR_POWER, PlanetConstants.SOLAR_SYSTEM, 1);
         orbit(consumer, Planet.MOON_ORBIT, PlanetConstants.MOON_ORBIT_SOLAR_POWER, PlanetConstants.SOLAR_SYSTEM, 1);
         orbit(consumer, Planet.MARS_ORBIT, PlanetConstants.MARS_ORBIT_SOLAR_POWER, PlanetConstants.SOLAR_SYSTEM, 2);
@@ -34,7 +34,7 @@ public class ModPlanetProvider extends ModCodecProvider<Planet> {
         orbit(consumer, Planet.GLACIO_ORBIT, PlanetConstants.GLACIO_ORBIT_SOLAR_POWER, PlanetConstants.PROXIMA_CENTAURI, 4);
 
         consumer.accept(
-            new ResourceLocation(AdAstra.MOD_ID, "earth"),
+            new Identifier(AdAstra.MOD_ID, "earth"),
             new Planet(
                 Level.OVERWORLD,
                 true,
@@ -49,7 +49,7 @@ public class ModPlanetProvider extends ModCodecProvider<Planet> {
         );
 
         consumer.accept(
-            new ResourceLocation(AdAstra.MOD_ID, "moon"),
+            new Identifier(AdAstra.MOD_ID, "moon"),
             new Planet(Planet.MOON,
                 false,
                 PlanetConstants.MOON_TEMPERATURE,
@@ -63,7 +63,7 @@ public class ModPlanetProvider extends ModCodecProvider<Planet> {
         );
 
         consumer.accept(
-            new ResourceLocation(AdAstra.MOD_ID, "mars"),
+            new Identifier(AdAstra.MOD_ID, "mars"),
             new Planet(Planet.MARS,
                 false,
                 PlanetConstants.MARS_TEMPERATURE,
@@ -77,7 +77,7 @@ public class ModPlanetProvider extends ModCodecProvider<Planet> {
         );
 
         consumer.accept(
-            new ResourceLocation(AdAstra.MOD_ID, "venus"),
+            new Identifier(AdAstra.MOD_ID, "venus"),
             new Planet(Planet.VENUS,
                 false,
                 PlanetConstants.VENUS_TEMPERATURE,
@@ -91,7 +91,7 @@ public class ModPlanetProvider extends ModCodecProvider<Planet> {
         );
 
         consumer.accept(
-            new ResourceLocation(AdAstra.MOD_ID, "mercury"),
+            new Identifier(AdAstra.MOD_ID, "mercury"),
             new Planet(Planet.MERCURY,
                 false,
                 PlanetConstants.MERCURY_TEMPERATURE,
@@ -105,7 +105,7 @@ public class ModPlanetProvider extends ModCodecProvider<Planet> {
         );
 
         consumer.accept(
-            new ResourceLocation(AdAstra.MOD_ID, "glacio"),
+            new Identifier(AdAstra.MOD_ID, "glacio"),
             new Planet(Planet.GLACIO,
                 true,
                 PlanetConstants.GLACIO_TEMPERATURE,
@@ -119,9 +119,9 @@ public class ModPlanetProvider extends ModCodecProvider<Planet> {
         );
     }
 
-    private static void orbit(BiConsumer<ResourceLocation, Planet> consumer, ResourceKey<Level> planet, int solarPower, ResourceLocation galaxy, int tier) {
+    private static void orbit(BiConsumer<Identifier, Planet> consumer, ResourceKey<Level> planet, int solarPower, Identifier galaxy, int tier) {
         consumer.accept(
-            planet.location(),
+            planet.identifier(),
             new Planet(planet,
                 false,
                 PlanetConstants.SPACE_TEMPERATURE,

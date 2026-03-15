@@ -15,14 +15,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(IceBlock.class)
 public abstract class IceBlockMixin {
 
-    @Inject(method = "playerDestroy", at = @At("TAIL"))
+    @Inject(method = "method_9556", at = @At("TAIL"))
     private void adastra$playerDestroy(Level level, net.minecraft.world.entity.player.Player player, BlockPos pos, BlockState state, net.minecraft.world.level.block.entity.BlockEntity blockEntity, net.minecraft.world.item.ItemStack stack, CallbackInfo ci) {
         if (TemperatureApi.API.getTemperature(level, pos) < PlanetConstants.FREEZE_TEMPERATURE) {
             level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
         }
     }
 
-    @Inject(method = "melt", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "method_10275", at = @At("HEAD"), cancellable = true)
     private void adastra$melt(BlockState state, Level level, BlockPos pos, CallbackInfo ci) {
         if (TemperatureApi.API.getTemperature(level, pos) < PlanetConstants.FREEZE_TEMPERATURE) {
             ci.cancel();

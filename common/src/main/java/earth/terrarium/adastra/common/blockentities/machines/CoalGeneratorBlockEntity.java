@@ -12,9 +12,9 @@ import earth.terrarium.common_storage_lib.energy.impl.SimpleValueStorage;
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -57,17 +57,17 @@ public class CoalGeneratorBlockEntity extends EnergyContainerMachineBlockEntity 
     }
 
     @Override
-    public void loadAdditional(@NotNull CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
-        cookTime = tag.getInt("CookTime");
-        cookTimeTotal = tag.getInt("CookTimeTotal");
+    public void loadAdditional(@NotNull ValueInput input) {
+        super.loadAdditional(input);
+        cookTime = input.getIntOr("CookTime", 0);
+        cookTimeTotal = input.getIntOr("CookTimeTotal", 0);
     }
 
     @Override
-    protected void saveAdditional(@NotNull CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
-        tag.putInt("CookTime", cookTime);
-        tag.putInt("CookTimeTotal", cookTimeTotal);
+    protected void saveAdditional(@NotNull ValueOutput output) {
+        super.saveAdditional(output);
+        output.putInt("CookTime", cookTime);
+        output.putInt("CookTimeTotal", cookTimeTotal);
     }
 
     @Override
@@ -93,7 +93,7 @@ public class CoalGeneratorBlockEntity extends EnergyContainerMachineBlockEntity 
             if (time % 10 == 0) setLit(true);
         } else if (!input.isEmpty()
             && !(input.getItem() instanceof BucketItem)) {
-            int burnTime = Math.min(20_000, AbstractFurnaceBlockEntity.getFuel().getOrDefault(input.getItem(), 0));
+            int burnTime = Math.min(20_000, level().fuelValues().burnDuration(input));
             if (burnTime > 0) {
                 input.shrink(1);
                 cookTimeTotal = burnTime;

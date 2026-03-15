@@ -12,7 +12,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import org.jetbrains.annotations.NotNull;
@@ -87,7 +87,7 @@ public class ModHighlightBlockStateProvider implements DataProvider {
         return CompletableFuture.allOf(futures);
     }
 
-    private ResourceLocation key(Block block) {
+    private Identifier key(Block block) {
         return BuiltInRegistries.BLOCK.getKey(block);
     }
 
@@ -96,7 +96,7 @@ public class ModHighlightBlockStateProvider implements DataProvider {
     }
 
     private CompletableFuture<?> saveHighlight(CachedOutput cache, JsonObject stateJson, Block owner) {
-        ResourceLocation blockName = Preconditions.checkNotNull(key(owner));
+        Identifier blockName = Preconditions.checkNotNull(key(owner));
         Path outputPath = this.output.getOutputFolder(PackOutput.Target.RESOURCE_PACK)
             .resolve(blockName.getNamespace()).resolve("resourcefullib/highlights").resolve(blockName.getPath() + ".json");
         return DataProvider.saveStable(cache, stateJson, outputPath);

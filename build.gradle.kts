@@ -8,7 +8,7 @@ plugins {
     java
     id("maven-publish")
     id("com.teamresourceful.resourcefulgradle") version "0.0.+"
-    id("dev.architectury.loom") version "1.7-SNAPSHOT" apply false
+    id("dev.architectury.loom") version "1.13-SNAPSHOT" apply false
     id("architectury-plugin") version "3.4-SNAPSHOT"
     id("com.github.johnrengelman.shadow") version "7.1.2" apply false
 }
@@ -49,6 +49,7 @@ subprojects {
     }
 
     repositories {
+        mavenLocal()
         mavenCentral()
         maven(url = "https://maven.parchmentmc.org")
         maven(url = "https://maven.teamresourceful.com/repository/maven-public/")
@@ -95,22 +96,22 @@ subprojects {
 
             officialMojangMappings()
 
-            parchment(create(group = "org.parchmentmc.data", name = "parchment-1.21", version = parchmentVersion))
+            parchment(create(group = "org.parchmentmc.data", name = "parchment-1.21.8", version = parchmentVersion))
         })
 
         "modApi"(
             group = "com.teamresourceful.resourcefullib",
-            name = "resourcefullib-$modLoader-1.21",
+            name = "resourcefullib-$modLoader-1.21.11",
             version = resourcefulLibVersion
         )
         "modApi"(
             group = "com.teamresourceful.resourcefulconfig",
-            name = "resourcefulconfig-$modLoader-1.21",
+            name = "resourcefulconfig-$modLoader-1.21.11",
             version = resourcefulConfigVersion
         )
         "modApi"(
             group = "earth.terrarium.common_storage_lib",
-            name = "common-storage-lib-$modLoader-1.21.1",
+            name = "common-storage-lib-$modLoader-1.21.11",
             version = commonStorageLibVersion
         )
         if (isCommon) {
@@ -118,6 +119,8 @@ subprojects {
             "modCompileOnly"(group = "mezz.jei", name = "jei-$minecraftVersion-common-api", version = jeiVersion)
             "modCompileOnly"(group = "me.shedaniel", name = "RoughlyEnoughItems-api", version = reiVersion)
             "modCompileOnly"(group = "me.shedaniel", name = "RoughlyEnoughItems-default-plugin", version = reiVersion)
+            compileOnly(group = "net.fabricmc", name = "sponge-mixin", version = "0.17.0+mixin.0.8.7")
+            "annotationProcessor"(group = "net.fabricmc", name = "sponge-mixin", version = "0.17.0+mixin.0.8.7")
             implementation(
                 "annotationProcessor"(
                     group = "io.github.llamalad7",
@@ -126,9 +129,10 @@ subprojects {
                 )
             )
 
-            "modCompileOnly"(group = "earth.terrarium.cadmus", name = "cadmus-$modLoader-1.21", version = cadmusVersion) {
-                isTransitive = false
-            }
+            // Cadmus not yet available for 1.21.11
+            // "modCompileOnly"(group = "earth.terrarium.cadmus", name = "cadmus-$modLoader-1.21.11", version = cadmusVersion) {
+            //     isTransitive = false
+            // }
             // Argonauts not yet available for 1.21
             // "modCompileOnly"(group = "earth.terrarium.argonauts", name = "argonauts-$modLoader-1.21", version = argonautsVersion) {
             //     isTransitive = false
@@ -148,11 +152,12 @@ subprojects {
             }
              */
 
-            "modLocalRuntime"(
-                group = "earth.terrarium.athena",
-                name = "athena-$modLoader-1.21",
-                version = athenaVersion
-            )
+            // Athena not yet available for 1.21.11
+            // "modLocalRuntime"(
+            //     group = "earth.terrarium.athena",
+            //     name = "athena-$modLoader-1.21.11",
+            //     version = athenaVersion
+            // )
             "modCompileOnly"(group = "me.shedaniel", name = "RoughlyEnoughItems-api-$modLoader", version = reiVersion)
             "modCompileOnly"(
                 group = "me.shedaniel",

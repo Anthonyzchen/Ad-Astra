@@ -18,13 +18,12 @@ import earth.terrarium.common_storage_lib.resources.fluid.FluidResource;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.protocol.game.ClientboundStopSoundPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -45,6 +44,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
@@ -107,39 +108,34 @@ public class Rocket extends Vehicle {
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag compound) {
-        super.readAdditionalSaveData(compound);
-        entityData.set(IS_LAUNCHING, compound.getBoolean("Launching"));
-        entityData.set(LAUNCH_TICKS, compound.getInt("launchTicks"));
-        entityData.set(HAS_LAUNCHED, compound.getBoolean("HasLaunched"));
-        speed = compound.getFloat("Speed");
-        angle = compound.getFloat("Angle");
-        if (compound.contains("FluidData")) {
-            FluidStorageData.CODEC.parse(NbtOps.INSTANCE, compound.get("FluidData"))
-                .result().ifPresent(fluidContainer::readSnapshot);
-        }
+    protected void readAdditionalSaveData(ValueInput input) {
+        super.readAdditionalSaveData(input);
+        entityData.set(IS_LAUNCHING, input.getBooleanOr("Launching", false));
+        entityData.set(LAUNCH_TICKS, input.getIntOr("launchTicks", -1));
+        entityData.set(HAS_LAUNCHED, input.getBooleanOr("HasLaunched", false));
+        speed = input.getFloatOr("Speed", 0.05f);
+        angle = input.getFloatOr("Angle", 0f);
+        input.read("FluidData", FluidStorageData.CODEC).ifPresent(fluidContainer::readSnapshot);
     }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag compound) {
-        super.addAdditionalSaveData(compound);
-        compound.putBoolean("Launching", isLaunching());
-        compound.putInt("LaunchTicks", launchTicks());
-        compound.putBoolean("HasLaunched", hasLaunched());
-        compound.putFloat("Speed", speed);
-        compound.putFloat("Angle", angle);
-        FluidStorageData.CODEC.encodeStart(NbtOps.INSTANCE, fluidContainer.createSnapshot())
-            .result().ifPresent(tag -> compound.put("FluidData", tag));
+    protected void addAdditionalSaveData(ValueOutput output) {
+        super.addAdditionalSaveData(output);
+        output.putBoolean("Launching", isLaunching());
+        output.putInt("LaunchTicks", launchTicks());
+        output.putBoolean("HasLaunched", hasLaunched());
+        output.putFloat("Speed", speed);
+        output.putFloat("Angle", angle);
+        output.store("FluidData", FluidStorageData.CODEC, fluidContainer.createSnapshot());
     }
 
     public SimpleFluidStorage fluidContainer() {
         return fluidContainer;
     }
 
-    @Override
-    public boolean hurt(DamageSource source, float amount) {
+    public boolean hurtRocket(DamageSource source, float amount) {
         if (!isLaunching() && !hasLaunched()) {
-            super.hurt(source, amount);
+            hurtVehicle(source, amount);
         }
         return false;
     }
@@ -412,7 +408,7 @@ public class Rocket extends Vehicle {
     }
 
     public FluidResource fluidResource() {
-        return FluidResource.of(BuiltInRegistries.FLUID.get(ResourceLocation.parse(entityData.get(FUEL_TYPE))));
+        return FluidResource.of(BuiltInRegistries.FLUID.getValue(Identifier.parse(entityData.get(FUEL_TYPE))));
     }
 
     public long fluidAmount() {

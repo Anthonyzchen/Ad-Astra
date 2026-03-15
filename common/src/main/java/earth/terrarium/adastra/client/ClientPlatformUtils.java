@@ -9,11 +9,11 @@ import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.SpriteSet;
-import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
@@ -41,7 +41,7 @@ public class ClientPlatformUtils {
     @FunctionalInterface
     public interface ArmorFactory {
 
-        HumanoidModel<?> create(ModelPart root, EquipmentSlot slot, ItemStack stack, HumanoidModel<LivingEntity> parentModel);
+        HumanoidModel<?> create(ModelPart root, EquipmentSlot slot, ItemStack stack, HumanoidModel<?> parentModel);
     }
 
     @FunctionalInterface
@@ -51,12 +51,12 @@ public class ClientPlatformUtils {
     }
 
     @ExpectPlatform
-    public static BakedModel getModel(ModelManager dispatcher, ResourceLocation id) {
+    public static BlockStateModel getModel(ModelManager dispatcher, Identifier id) {
         throw new NotImplementedException();
     }
 
     @ExpectPlatform
-    public static void registerArmor(ResourceLocation texture, ModelLayerLocation layer, ArmorFactory factory, Item... items) {
+    public static void registerArmor(Identifier texture, ModelLayerLocation layer, ArmorFactory factory, Item... items) {
         throw new NotImplementedException();
     }
 

@@ -4,7 +4,7 @@ import earth.terrarium.adastra.common.registry.ModBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.Goal;
-import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -68,7 +68,7 @@ public class EatPermafrostGoal extends Goal {
         if (this.timer == this.adjustedTickDelay(4)) {
             BlockPos blockPos = this.mob.blockPosition();
             if (PERMAFROST_PREDICATE.test(this.level.getBlockState(blockPos))) {
-                if (this.level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) {
+                if ((Boolean) this.level.getGameRules().get(GameRules.MOB_GRIEFING)) {
                     this.level.destroyBlock(blockPos, false);
                 }
 
@@ -76,7 +76,7 @@ public class EatPermafrostGoal extends Goal {
             } else {
                 BlockPos blockPos2 = blockPos.below();
                 if (this.level.getBlockState(blockPos2).is(ModBlocks.PERMAFROST.get())) {
-                    if (this.level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) {
+                    if ((Boolean) this.level.getGameRules().get(GameRules.MOB_GRIEFING)) {
                         this.level.levelEvent(2001, blockPos2, Block.getId(ModBlocks.PERMAFROST.get().defaultBlockState()));
                         this.level.setBlock(blockPos2, Blocks.AIR.defaultBlockState(), 2);
                     }

@@ -1,12 +1,11 @@
 package earth.terrarium.adastra.client.renderers.ti69.apps;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.joml.Matrix4f;
 
 public interface Ti69App {
@@ -29,34 +28,16 @@ public interface Ti69App {
     int color();
 
     /**
-     * Renders an icon
+     * Renders an icon.
      *
-     * @param matrix4f      The matrix
-     * @param icon          The icon texture
-     * @param x             The x position
-     * @param y             The y position
-     * @param uOffset       The u offset
-     * @param vOffset       The v offset
-     * @param uWidth        The u width
-     * @param vHeight       The v height
-     * @param textureWidth  The texture width
-     * @param textureHeight The texture height
+     * TODO: 1.21.11 - RenderSystem.setShaderTexture() and BufferUploader.drawWithShader() are removed.
+     * This method needs to be reimplemented using the new rendering pipeline (e.g., using
+     * MultiBufferSource to get a VertexConsumer for the appropriate RenderType, or using
+     * a RenderPass with a custom RenderPipeline). For now, this method is a no-op stub.
      */
-    default void renderIcon(Matrix4f matrix4f, ResourceLocation icon, int x, int y, int uOffset, int vOffset, int uWidth, int vHeight, int textureWidth, int textureHeight) {
-        int x2 = x + uWidth;
-        int y2 = y + vHeight;
-        float minU = (float) uOffset / (float) textureWidth;
-        float maxU = ((float) uOffset + (float) uWidth) / (float) textureWidth;
-        float minV = (float) vOffset / (float) textureHeight;
-        float maxV = ((float) vOffset + (float) vHeight) / (float) textureHeight;
-
-        RenderSystem.setShaderTexture(0, icon);
-        BufferBuilder bufferBuilder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-        bufferBuilder.addVertex(matrix4f, (float) x, (float) y, 0).setUv(minU, minV);
-        bufferBuilder.addVertex(matrix4f, (float) x, (float) y2, 0).setUv(minU, maxV);
-        bufferBuilder.addVertex(matrix4f, (float) x2, (float) y2, 0).setUv(maxU, maxV);
-        bufferBuilder.addVertex(matrix4f, (float) x2, (float) y, 0).setUv(maxU, minV);
-        BufferUploader.drawWithShader(bufferBuilder.buildOrThrow());
+    default void renderIcon(Matrix4f matrix4f, Identifier icon, int x, int y, int uOffset, int vOffset, int uWidth, int vHeight, int textureWidth, int textureHeight) {
+        // Stubbed - RenderSystem.setShaderTexture() and BufferUploader.drawWithShader() are removed in 1.21.11
+        // The icon rendering needs to use the new pipeline (MultiBufferSource + RenderType or RenderPass)
     }
 
     /**

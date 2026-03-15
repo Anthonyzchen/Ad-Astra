@@ -19,12 +19,12 @@ import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.Ingredient;
 
 public record CompressingCategory(IGuiHelper guiHelper) implements IRecipeCategory<CompressingRecipe> {
 
-    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "compressing");
+    public static final Identifier ID = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "compressing");
     public static final RecipeType<CompressingRecipe> RECIPE = new RecipeType<>(ID, CompressingRecipe.class);
 
     @Override
@@ -38,8 +38,13 @@ public record CompressingCategory(IGuiHelper guiHelper) implements IRecipeCatego
     }
 
     @Override
-    public IDrawable getBackground() {
-        return guiHelper.createBlankDrawable(180, 110);
+    public int getWidth() {
+        return 180;
+    }
+
+    @Override
+    public int getHeight() {
+        return 110;
     }
 
     @Override
@@ -49,7 +54,7 @@ public record CompressingCategory(IGuiHelper guiHelper) implements IRecipeCatego
 
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, CompressingRecipe recipe, IFocusGroup focuses) {
-        builder.addInvisibleIngredients(RecipeIngredientRole.CATALYST).addIngredients(Ingredient.of(ModItems.COMPRESSOR.get()));
+        // Catalyst role removed in JEI for 1.21.1; catalyst registration handled in registerRecipeCatalysts
         builder.addSlot(RecipeIngredientRole.INPUT, 46, 54).addIngredients(recipe.ingredient());
         builder.addSlot(RecipeIngredientRole.OUTPUT, 94, 54).addItemStack(recipe.result());
     }

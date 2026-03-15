@@ -16,6 +16,7 @@ public abstract class DimensionSpecialEffectsMixin {
 
     // Mixin directly instead of using the event because Ad Astra dimension renderers are added dynamically via resource pack.
     // 1.21.1: DimensionType.effectsLocation() was renamed to effects()
+    // TODO: 1.21.11 - Verify DimensionSpecialEffects.forType() still exists and DimensionType.effects() is still the correct method.
     @Inject(method = "forType", at = @At("HEAD"), cancellable = true)
     private static void adastra$forType(DimensionType type, CallbackInfoReturnable<DimensionSpecialEffects> cir) {
         ResourceKey<Level> dimension = ResourceKey.create(Registries.DIMENSION, type.effects());

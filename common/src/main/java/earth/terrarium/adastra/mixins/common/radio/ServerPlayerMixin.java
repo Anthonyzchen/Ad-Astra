@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(ServerPlayer.class)
 public class ServerPlayerMixin {
 
-    @Inject(method = "startRiding", at = @At("RETURN"))
+    @Inject(method = "method_5873", at = @At("RETURN"))
     private void adastra$startRiding(Entity vehicle, boolean force, CallbackInfoReturnable<Boolean> cir) {
         if (cir.getReturnValue()) {
             Player player = (Player) ((Object) this);

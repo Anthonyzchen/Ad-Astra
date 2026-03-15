@@ -3,8 +3,9 @@ package earth.terrarium.adastra.common.blockentities.base.sideconfig;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 import java.util.EnumMap;
 import java.util.List;
@@ -31,37 +32,35 @@ public record ConfigurationEntry(
     }
 
 
-    public static void save(CompoundTag tag, List<ConfigurationEntry> sideConfig) {
-        ListTag list = new ListTag();
+    public static void save(ValueOutput output, List<ConfigurationEntry> sideConfig) {
+        ValueOutput.ValueOutputList list = output.childrenList("SideConfig");
 
         for (var entry : sideConfig) {
-            CompoundTag entryTag = new CompoundTag();
-            entryTag.putByte("Type", (byte) entry.type.ordinal());
+            ValueOutput entryOutput = list.addChild();
+            entryOutput.putByte("Type", (byte) entry.type.ordinal());
 
             entry.sides.forEach((direction, configuration) ->
-                entryTag.putByte(direction.getName(), (byte) configuration.ordinal()));
-
-            list.add(entryTag);
+                entryOutput.putByte(direction.getName(), (byte) configuration.ordinal()));
         }
 
-        tag.put("SideConfig", list);
     }
 
-    public static void load(CompoundTag tag, List<ConfigurationEntry> sideConfig, List<ConfigurationEntry> defaultConfig) {
-        ListTag list = tag.getList("SideConfig", Tag.TAG_COMPOUND);
+    public static void load(ValueInput input, List<ConfigurationEntry> sideConfig, List<ConfigurationEntry> defaultConfig) {
+        ValueInput.ValueInputList list = input.childrenListOrEmpty("SideConfig");
 
         sideConfig.clear();
-        for (int i = 0; i < list.size(); i++) {
-            CompoundTag entryTag = list.getCompound(i);
-            ConfigurationType type = ConfigurationType.values()[entryTag.getByte("Type")];
+        list.stream().forEach(entryInput -> {
+            int index = sideConfig.size();
+            if (index >= defaultConfig.size()) return;
+            ConfigurationType type = ConfigurationType.values()[entryInput.getByteOr("Type", (byte) 0)];
 
             EnumMap<Direction, Configuration> sides = new EnumMap<>(Direction.class);
             for (var direction : Direction.values()) {
-                sides.put(direction, Configuration.values()[entryTag.getByte(direction.getName())]);
+                sides.put(direction, Configuration.values()[entryInput.getByteOr(direction.getName(), (byte) 0)]);
             }
 
-            sideConfig.add(new ConfigurationEntry(type, sides, defaultConfig.get(i).title()));
-        }
+            sideConfig.add(new ConfigurationEntry(type, sides, defaultConfig.get(index).title()));
+        });
     }
 
     private static EnumMap<Direction, Configuration> createConfiguration(Configuration value) {

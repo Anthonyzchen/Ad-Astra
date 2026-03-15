@@ -3,19 +3,19 @@ package earth.terrarium.adastra.client.models.entities.mobs;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import earth.terrarium.adastra.AdAstra;
-import earth.terrarium.adastra.common.entities.mob.CorruptedLunarian;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 
 // LEGACY ENTITY. WILL BE REPLACED IN THE FUTURE.
-public class CorruptedLunarianModel extends EntityModel<CorruptedLunarian> {
+public class CorruptedLunarianModel extends EntityModel<LivingEntityRenderState> {
 
-    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "corrupted_lunarian"), "main");
+    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "corrupted_lunarian"), "main");
 
     private final ModelPart head;
     private final ModelPart body;
@@ -90,7 +90,13 @@ public class CorruptedLunarianModel extends EntityModel<CorruptedLunarian> {
 
 
     @Override
-    public void setupAnim(CorruptedLunarian entity, float limbAngle, float limbDistance, float animationProgress, float headYaw, float headPitch) {
+    public void setupAnim(LivingEntityRenderState state) {
+        float limbAngle = state.walkAnimationPos;
+        float limbDistance = state.walkAnimationSpeed;
+        float animationProgress = state.ageInTicks;
+        float headYaw = state.yRot;
+        float headPitch = state.xRot;
+
         this.arm2.yRot = 0.0f;
         this.arm1.yRot = 0.0f;
         this.arm2.zRot = 0.0f;

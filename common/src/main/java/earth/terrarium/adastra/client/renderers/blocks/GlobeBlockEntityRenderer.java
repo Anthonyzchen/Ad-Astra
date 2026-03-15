@@ -2,68 +2,88 @@ package earth.terrarium.adastra.client.renderers.blocks;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import com.teamresourceful.resourcefullib.client.CloseablePoseStack;
+
 import earth.terrarium.adastra.AdAstra;
 import earth.terrarium.adastra.client.ClientPlatformUtils;
 import earth.terrarium.adastra.common.blockentities.GlobeBlockEntity;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.Sheets;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
-import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.block.model.BlockStateModel;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 
-public class GlobeBlockEntityRenderer implements BlockEntityRenderer<GlobeBlockEntity> {
+public class GlobeBlockEntityRenderer implements BlockEntityRenderer<GlobeBlockEntity, GlobeBlockEntityRenderer.GlobeRenderState> {
 
-    @Override
-    public void render(GlobeBlockEntity entity, float partialTick, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay) {
-        float yRot = Mth.lerp(partialTick, entity.lastYRot(), entity.yRot());
-        render(entity.getBlockState(), yRot, poseStack, buffer, packedLight, packedOverlay);
+    public static class GlobeRenderState extends BlockEntityRenderState {
+        public float yRot;
     }
 
-    private static void render(BlockState state, float yRot, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay) {
-        String blockId = BuiltInRegistries.BLOCK.getKey(state.getBlock()).getPath();
-        BakedModel blockModel = ClientPlatformUtils.getModel(
-            Minecraft.getInstance().getModelManager(),
-            ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "block/%s_cube".formatted(blockId)));
+    @Override
+    public GlobeRenderState createRenderState() {
+        return new GlobeRenderState();
+    }
 
-        try (var ignored = new CloseablePoseStack(poseStack)) {
+    @Override
+    public void extractRenderState(GlobeBlockEntity entity, GlobeRenderState state, float partialTick, Vec3 cameraPos, ModelFeatureRenderer.CrumblingOverlay crumblingOverlay) {
+        state.yRot = Mth.lerp(partialTick, entity.lastYRot(), entity.yRot());
+    }
+
+    @Override
+    public void submit(GlobeRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState cameraState) {
+        // TODO: 1.21.11 - Migrate to new SubmitNodeCollector rendering pipeline.
+        // The old MultiBufferSource-based rendering needs to be converted to the new
+        // deferred rendering system. For now, this is a stub.
+    }
+
+    static void renderStatic(BlockState blockState, float yRot, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay) {
+        String blockId = BuiltInRegistries.BLOCK.getKey(blockState.getBlock()).getPath();
+        BlockStateModel blockModel = ClientPlatformUtils.getModel(
+            Minecraft.getInstance().getModelManager(),
+            Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "block/%s_cube".formatted(blockId)));
+
+        poseStack.pushPose();
+        try {
             poseStack.translate(0.5, 0, 0.5);
             poseStack.mulPose(Axis.YP.rotationDegrees(-yRot));
             poseStack.translate(-0.5, 0, -0.5);
             Minecraft.getInstance().getBlockRenderer().getModelRenderer().renderModel(
                 poseStack.last(),
                 buffer.getBuffer(Sheets.cutoutBlockSheet()),
-                state,
+                blockState,
                 blockModel,
                 1, 1, 1,
                 packedLight, packedOverlay);
+        } finally {
+            poseStack.popPose();
         }
     }
 
-    public static class ItemRenderer extends BlockEntityWithoutLevelRenderer {
+    public static class ItemRenderer {
 
         public ItemRenderer() {
-            super(Minecraft.getInstance().getBlockEntityRenderDispatcher(),
-                Minecraft.getInstance().getEntityModels());
         }
 
-        @Override
         public void renderByItem(ItemStack stack, ItemDisplayContext displayContext, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay) {
             BlockState state = BuiltInRegistries.BLOCK.get(BuiltInRegistries.ITEM.getKey(stack.getItem())).defaultBlockState();
 
             var minecraft = Minecraft.getInstance();
             float yRot = Util.getMillis() / 20f % 360f;
 
-            try (var ignored = new CloseablePoseStack(poseStack)) {
+            poseStack.pushPose();
+            try {
                 var model = minecraft.getBlockRenderer().getBlockModel(state);
                 minecraft.getBlockRenderer().getModelRenderer().renderModel(poseStack.last(),
                     buffer.getBuffer(Sheets.cutoutBlockSheet()),
@@ -71,7 +91,9 @@ public class GlobeBlockEntityRenderer implements BlockEntityRenderer<GlobeBlockE
                     model,
                     1, 1, 1,
                     packedLight, packedOverlay);
-                render(state, yRot, poseStack, buffer, packedLight, packedOverlay);
+                renderStatic(state, yRot, poseStack, buffer, packedLight, packedOverlay);
+            } finally {
+                poseStack.popPose();
             }
         }
     }

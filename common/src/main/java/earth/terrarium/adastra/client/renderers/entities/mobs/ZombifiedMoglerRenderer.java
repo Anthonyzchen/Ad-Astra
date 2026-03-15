@@ -5,20 +5,21 @@ import earth.terrarium.adastra.client.models.entities.mobs.MoglerModel;
 import earth.terrarium.adastra.common.entities.mob.ZombifiedMogler;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 // LEGACY ENTITY. WILL BE REPLACED IN THE FUTURE.
-public class ZombifiedMoglerRenderer extends MobRenderer<ZombifiedMogler, MoglerModel<ZombifiedMogler>> {
+public class ZombifiedMoglerRenderer extends MobRenderer<ZombifiedMogler, LivingEntityRenderState, MoglerModel<LivingEntityRenderState>> {
 
-    public static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/entity/mob/zombified_mogler.png");
+    public static final Identifier TEXTURE = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/entity/mob/zombified_mogler.png");
 
     public ZombifiedMoglerRenderer(EntityRendererProvider.Context context) {
         super(context, new MoglerModel<>(context.bakeLayer(MoglerModel.LAYER_LOCATION)), 0.7f);
     }
 
     @Override
-    public @NotNull ResourceLocation getTextureLocation(ZombifiedMogler entity) {
+    public @NotNull Identifier getTextureLocation(LivingEntityRenderState state) {
         return TEXTURE;
     }
 }

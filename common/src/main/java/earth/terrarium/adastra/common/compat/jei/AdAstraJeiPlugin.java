@@ -13,7 +13,7 @@ import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.registration.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import org.jetbrains.annotations.NotNull;
 
@@ -24,8 +24,8 @@ import java.util.Objects;
 public class AdAstraJeiPlugin implements IModPlugin {
 
     @Override
-    public @NotNull ResourceLocation getPluginUid() {
-        return ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "jei");
+    public @NotNull Identifier getPluginUid() {
+        return Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "jei");
     }
 
     @Override
@@ -42,14 +42,26 @@ public class AdAstraJeiPlugin implements IModPlugin {
 
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
-        ClientLevel level = Objects.requireNonNull(Minecraft.getInstance().level);
+        var server = Minecraft.getInstance().getSingleplayerServer();
+        if (server == null) return;
+        var allRecipes = server.getRecipeManager().getRecipes();
 
-        registration.addRecipes(CompressingCategory.RECIPE, level.getRecipeManager().getAllRecipesFor(ModRecipeTypes.COMPRESSING.get()).stream().map(RecipeHolder::value).toList());
-        registration.addRecipes(AlloyingCategory.RECIPE, level.getRecipeManager().getAllRecipesFor(ModRecipeTypes.ALLOYING.get()).stream().map(RecipeHolder::value).toList());
-        registration.addRecipes(OxygenLoadingCategory.RECIPE, level.getRecipeManager().getAllRecipesFor(ModRecipeTypes.OXYGEN_LOADING.get()).stream().map(RecipeHolder::value).toList());
-        registration.addRecipes(RefiningCategory.RECIPE, level.getRecipeManager().getAllRecipesFor(ModRecipeTypes.REFINING.get()).stream().map(RecipeHolder::value).toList());
-        registration.addRecipes(CryoFreezingCategory.RECIPE, level.getRecipeManager().getAllRecipesFor(ModRecipeTypes.CRYO_FREEZING.get()).stream().map(RecipeHolder::value).toList());
-        registration.addRecipes(NasaWorkbenchCategory.RECIPE, level.getRecipeManager().getAllRecipesFor(ModRecipeTypes.NASA_WORKBENCH.get()).stream().map(RecipeHolder::value).toList());
+        registration.addRecipes(CompressingCategory.RECIPE, filterRecipes(allRecipes, ModRecipeTypes.COMPRESSING.get()));
+        registration.addRecipes(AlloyingCategory.RECIPE, filterRecipes(allRecipes, ModRecipeTypes.ALLOYING.get()));
+        registration.addRecipes(OxygenLoadingCategory.RECIPE, filterRecipes(allRecipes, ModRecipeTypes.OXYGEN_LOADING.get()));
+        registration.addRecipes(RefiningCategory.RECIPE, filterRecipes(allRecipes, ModRecipeTypes.REFINING.get()));
+        registration.addRecipes(CryoFreezingCategory.RECIPE, filterRecipes(allRecipes, ModRecipeTypes.CRYO_FREEZING.get()));
+        registration.addRecipes(NasaWorkbenchCategory.RECIPE, filterRecipes(allRecipes, ModRecipeTypes.NASA_WORKBENCH.get()));
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T extends net.minecraft.world.item.crafting.Recipe<?>> java.util.List<T> filterRecipes(
+            java.util.Collection<RecipeHolder<?>> allRecipes,
+            net.minecraft.world.item.crafting.RecipeType<T> type) {
+        return allRecipes.stream()
+            .filter(holder -> holder.value().getType() == type)
+            .map(holder -> (T) holder.value())
+            .toList();
     }
 
     @Override

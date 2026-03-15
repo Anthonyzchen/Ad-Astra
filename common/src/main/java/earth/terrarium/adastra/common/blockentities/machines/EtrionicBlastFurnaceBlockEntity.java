@@ -15,9 +15,9 @@ import earth.terrarium.adastra.common.utils.TransferUtils;
 import earth.terrarium.common_storage_lib.storage.base.ValueStorage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.crafting.RecipeInput;
@@ -129,15 +129,15 @@ public class EtrionicBlastFurnaceBlockEntity extends EnergyContainerMachineBlock
         if (recipe == null) return false;
         if (energyStorage.extract(MachineConfig.etrionicBlastFurnaceBlastingEnergyPerItem, true) < MachineConfig.etrionicBlastFurnaceBlastingEnergyPerItem)
             return false;
-        if (!recipe.getIngredients().get(0).test(getItem(slot))) return false;
-        return ItemUtils.canAddItem(this, recipe.getResultItem(level().registryAccess()), 5, 6, 7, 8);
+        if (!recipe.input().test(getItem(slot))) return false;
+        return ItemUtils.canAddItem(this, recipe.assemble(new net.minecraft.world.item.crafting.SingleRecipeInput(getItem(slot)), level().registryAccess()), 5, 6, 7, 8);
     }
 
     protected void craft(BlastingRecipe recipe, int slot) {
         if (recipe == null) return;
 
         getItem(slot).shrink(1);
-        ItemUtils.addItem(this, recipe.getResultItem(level().registryAccess()), 5, 6, 7, 8);
+        ItemUtils.addItem(this, recipe.assemble(new net.minecraft.world.item.crafting.SingleRecipeInput(getItem(slot)), level().registryAccess()), 5, 6, 7, 8);
 
         cookTime = 0;
     }
@@ -188,7 +188,7 @@ public class EtrionicBlastFurnaceBlockEntity extends EnergyContainerMachineBlock
                 createRecipe(i, i + 1);
             }
         } else {
-            alloyingQuickCheck.getRecipeFor(toRecipeInput(), level()).ifPresent(r -> {
+            alloyingQuickCheck.getRecipeFor(toRecipeInput(), (ServerLevel) level()).ifPresent(r -> {
                 alloyingRecipe = r.value();
                 cookTimeTotal = r.value().cookingTime();
             });
@@ -197,30 +197,28 @@ public class EtrionicBlastFurnaceBlockEntity extends EnergyContainerMachineBlock
 
     protected void createRecipe(int recipe, int slot) {
         if (getItem(slot).isEmpty()) return;
-        level().getRecipeManager().getAllRecipesFor(RecipeType.BLASTING)
-            .stream()
-            .filter(r -> r.value().getIngredients().get(0).test(getItem(slot)))
-            .findFirst()
+        level().getServer().getRecipeManager()
+            .getRecipeFor(RecipeType.BLASTING, new net.minecraft.world.item.crafting.SingleRecipeInput(getItem(slot)), level())
             .ifPresent(r -> {
                 recipes[recipe] = r.value();
-                cookTimeTotal = r.value().getCookingTime();
+                cookTimeTotal = r.value().cookingTime();
             });
     }
 
     @Override
-    public void loadAdditional(@NotNull CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
-        cookTime = tag.getInt("CookTime");
-        cookTimeTotal = tag.getInt("CookTimeTotal");
-        mode = Mode.values()[tag.getByte("Mode")];
+    public void loadAdditional(@NotNull ValueInput input) {
+        super.loadAdditional(input);
+        cookTime = input.getIntOr("CookTime", 0);
+        cookTimeTotal = input.getIntOr("CookTimeTotal", 0);
+        mode = Mode.values()[input.getByteOr("Mode", (byte) 0)];
     }
 
     @Override
-    protected void saveAdditional(@NotNull CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
-        tag.putInt("CookTime", cookTime);
-        tag.putInt("CookTimeTotal", cookTimeTotal);
-        tag.putByte("Mode", (byte) mode.ordinal());
+    protected void saveAdditional(@NotNull ValueOutput output) {
+        super.saveAdditional(output);
+        output.putInt("CookTime", cookTime);
+        output.putInt("CookTimeTotal", cookTimeTotal);
+        output.putByte("Mode", (byte) mode.ordinal());
     }
 
     public void clearRecipe(int recipe) {

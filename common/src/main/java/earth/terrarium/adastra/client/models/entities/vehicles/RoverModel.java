@@ -3,19 +3,19 @@ package earth.terrarium.adastra.client.models.entities.vehicles;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import earth.terrarium.adastra.AdAstra;
-import earth.terrarium.adastra.common.entities.vehicles.Rover;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 
-public class RoverModel extends EntityModel<Rover> {
+public class RoverModel extends EntityModel<EntityRenderState> {
 
-    public static final ModelLayerLocation LAYER = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "rover"), "main");
+    public static final ModelLayerLocation LAYER = new ModelLayerLocation(Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "rover"), "main");
 
     private final ModelPart root;
 
@@ -95,18 +95,8 @@ public class RoverModel extends EntityModel<Rover> {
     }
 
     @Override
-    public void setupAnim(Rover entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-        if (Minecraft.getInstance().isPaused()) return;
-        ModelPart wheels = this.root.getChild("Wheels");
-        entity.wheelXRot += entity.speed() / 7.5f;
-        wheels.getChild("Wheel1").xRot = entity.wheelXRot;
-        wheels.getChild("Wheel2").xRot = entity.wheelXRot;
-        wheels.getChild("Wheel3").xRot = entity.wheelXRot;
-        wheels.getChild("Wheel4").xRot = entity.wheelXRot;
-
-        entity.wheelYRot = Mth.clamp(entity.angle() / 10, -0.3f, 0.3f) * Math.signum(entity.speed());
-        wheels.getChild("Wheel1").yRot = entity.wheelYRot;
-        wheels.getChild("Wheel2").yRot = entity.wheelYRot;
+    public void setupAnim(EntityRenderState state) {
+        // TODO: Migrate wheel animation to use render state instead of entity reference
     }
 
     @Override

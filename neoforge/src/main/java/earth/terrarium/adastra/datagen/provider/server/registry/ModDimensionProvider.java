@@ -5,7 +5,7 @@ import net.minecraft.core.HolderGetter;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.FixedBiomeSource;
 import net.minecraft.world.level.dimension.DimensionType;
@@ -29,11 +29,11 @@ public class ModDimensionProvider {
     public static final ResourceKey<LevelStem> GLACIO = register("glacio");
 
     private static ResourceKey<LevelStem> register(String name) {
-        return ResourceKey.create(Registries.LEVEL_STEM, new ResourceLocation(AdAstra.MOD_ID, name));
+        return ResourceKey.create(Registries.LEVEL_STEM, new Identifier(AdAstra.MOD_ID, name));
     }
 
     private static ResourceKey<NoiseGeneratorSettings> registerNoise(String name) {
-        return ResourceKey.create(Registries.NOISE_SETTINGS, new ResourceLocation(AdAstra.MOD_ID, name));
+        return ResourceKey.create(Registries.NOISE_SETTINGS, new Identifier(AdAstra.MOD_ID, name));
     }
 
     public static void bootstrap(BootstapContext<LevelStem> context) {

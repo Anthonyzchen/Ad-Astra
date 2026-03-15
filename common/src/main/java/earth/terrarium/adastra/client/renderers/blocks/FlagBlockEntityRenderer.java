@@ -3,7 +3,7 @@ package earth.terrarium.adastra.client.renderers.blocks;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import com.teamresourceful.resourcefullib.client.CloseablePoseStack;
+
 import earth.terrarium.adastra.client.renderers.textures.FlagImageTexture;
 import earth.terrarium.adastra.client.renderers.textures.FlagUrlTexture;
 import earth.terrarium.adastra.common.blockentities.flag.FlagBlockEntity;
@@ -12,85 +12,41 @@ import earth.terrarium.adastra.common.blockentities.flag.content.ImageContent;
 import earth.terrarium.adastra.common.blockentities.flag.content.UrlContent;
 import earth.terrarium.adastra.common.blocks.FlagBlock;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.model.SkullModel;
-import net.minecraft.client.model.SkullModelBase;
+import net.minecraft.client.model.object.skull.SkullModel;
+import net.minecraft.client.model.object.skull.SkullModelBase;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.blockentity.SkullBlockRenderer;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.core.Vec3i;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.component.ResolvableProfile;
 import net.minecraft.world.level.block.SkullBlock;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
+import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 
-public class FlagBlockEntityRenderer implements BlockEntityRenderer<FlagBlockEntity> {
+public class FlagBlockEntityRenderer implements BlockEntityRenderer<FlagBlockEntity, BlockEntityRenderState> {
 
     @Override
-    public void render(FlagBlockEntity entity, float partialTick, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay) {
-        var state = entity.getBlockState();
-        var direction = state.getValue(FlagBlock.FACING);
-        var minecraft = Minecraft.getInstance();
+    public void extractRenderState(FlagBlockEntity entity, BlockEntityRenderState state, float partialTick, Vec3 cameraPos, ModelFeatureRenderer.CrumblingOverlay crumblingOverlay) {
+        // TODO: 1.21.11 - Extract flag-specific render data into a custom render state
+    }
 
-        try (var pose = new CloseablePoseStack(poseStack)) {
-            pose.translate(0.5, 0.5, 0.5);
-            pose.mulPose(Axis.YP.rotationDegrees(direction.asRotation()));
-            pose.translate(-0.5, 0, -0.5);
-
-            if (state.getValue(FlagBlock.HALF).equals(DoubleBlockHalf.LOWER)) {
-                var model = minecraft.getBlockRenderer().getBlockModel(state);
-                minecraft.getBlockRenderer().getModelRenderer().renderModel(poseStack.last(),
-                    buffer.getBuffer(Sheets.cutoutBlockSheet()),
-                    state,
-                    model,
-                    1f, 1f, 1f,
-                    packedLight, packedOverlay);
-            } else {
-                FlagContent content = entity.getContent();
-                if (content == null) {
-                    pose.translate(-0.75, 0.19, 0.495);
-                    pose.scale(1, 1, 0.1f / 16f);
-                    SkullModelBase model = new SkullModel(minecraft.getEntityModels().bakeLayer(ModelLayers.PLAYER_HEAD));
-                    RenderType renderType = SkullBlockRenderer.getRenderType(SkullBlock.Types.PLAYER, entity.getOwner() != null ? new ResolvableProfile(entity.getOwner()) : null);
-                    SkullBlockRenderer.renderSkull(null, 0, 0, pose, buffer, packedLight, model, renderType);
-
-                    pose.translate(0.5, 0, 0.5);
-                    pose.mulPose(Axis.YP.rotationDegrees(180));
-                    pose.translate(-0.5, 0, -0.5);
-                    pose.translate(0, 0, -1);
-
-                    SkullBlockRenderer.renderSkull(null, 0, 0, pose, buffer, packedLight, model, renderType);
-                } else {
-                    var consumer = buffer.getBuffer(getFlagImage(content));
-                    Matrix4f matrix4f = poseStack.last().pose();
-                    PoseStack.Pose poseNormal = poseStack.last();
-                    Vec3i normal = direction.normal();
-
-                    pose.translate(0.5, 0, 0.5);
-                    pose.mulPose(Axis.XP.rotationDegrees(180));
-                    pose.translate(-0.5, 0, -0.5);
-
-                    pose.scale(1 + 5.8f / 16f, 1, 1);
-
-                    pose.translate(-11 / 16f, -15 / 16f, 0.495);
-                    renderQuad(matrix4f, poseNormal, normal, consumer, 1, 1, 0, 0, 1, 1, packedLight, packedOverlay);
-
-                    pose.translate(0.5, 0, 0.5);
-                    pose.mulPose(Axis.YP.rotationDegrees(180));
-                    pose.translate(-0.5, 0, -0.5);
-
-                    pose.translate(0, 0, 0.99);
-
-                    renderQuad(matrix4f, poseNormal, normal, consumer, 1, 1, 0, 0, 1, 1, packedLight, packedOverlay);
-                }
-            }
-        }
+    @Override
+    public void submit(BlockEntityRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState cameraState) {
+        // TODO: 1.21.11 - Migrate flag rendering to new SubmitNodeCollector pipeline.
+        // The old render method used MultiBufferSource for VertexConsumer-based rendering
+        // which needs to be adapted to the new deferred rendering system.
     }
 
     private static void renderQuad(Matrix4f pose, PoseStack.Pose poseNormal, Vec3i normal, VertexConsumer consumer, float width, float height, float u, float v, float uWidth, float vHeight, int light, int overlay) {
@@ -101,7 +57,7 @@ public class FlagBlockEntityRenderer implements BlockEntityRenderer<FlagBlockEnt
     }
 
     private static RenderType getFlagImage(FlagContent content) {
-        ResourceLocation id = content.toTexture();
+        Identifier id = content.toTexture();
         TextureManager manager = Minecraft.getInstance().getTextureManager();
         AbstractTexture texture = manager.getTexture(id, MissingTextureAtlasSprite.getTexture());
         if (texture == MissingTextureAtlasSprite.getTexture()) {

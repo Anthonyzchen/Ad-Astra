@@ -13,7 +13,7 @@ import earth.terrarium.adastra.common.utils.TooltipUtils;
 import earth.terrarium.common_storage_lib.energy.EnergyApi;
 import earth.terrarium.common_storage_lib.fluid.FluidApi;
 import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -25,8 +25,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
@@ -106,7 +108,6 @@ public class PipeBlock extends BasicEntityBlock implements SimpleWaterloggedBloc
             CONNECTED_SOUTH, CONNECTED_WEST);
     }
 
-    @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
         if (type == Type.ENERGY) {
             tooltip.add(Component.translatable("tooltip.ad_astra.energy_transfer_tick", transferRate).withStyle(ChatFormatting.GOLD));
@@ -182,15 +183,17 @@ public class PipeBlock extends BasicEntityBlock implements SimpleWaterloggedBloc
     }
 
     @Override
-    public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+    public BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess tickAccess, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, RandomSource random) {
         if (state.getValue(WATERLOGGED)) {
-            level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
+            tickAccess.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
         }
-        update((Level) level, pos, state, direction);
-        if (level.getBlockEntity(pos) instanceof PipeBlockEntity pipe) {
-            pipe.pipeChanged((Level) level, pos);
+        if (level instanceof Level actualLevel) {
+            update(actualLevel, pos, state, direction);
+            if (level.getBlockEntity(pos) instanceof PipeBlockEntity pipe) {
+                pipe.pipeChanged(actualLevel, pos);
+            }
         }
-        return super.updateShape(state, direction, neighborState, level, pos, neighborPos);
+        return super.updateShape(state, level, tickAccess, pos, direction, neighborPos, neighborState, random);
     }
 
     private void update(Level level, BlockPos pos) {

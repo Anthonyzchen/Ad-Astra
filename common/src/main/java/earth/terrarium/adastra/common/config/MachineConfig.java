@@ -4,7 +4,6 @@ import com.teamresourceful.resourcefulconfig.api.annotations.Category;
 import com.teamresourceful.resourcefulconfig.api.annotations.Comment;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigEntry;
 import com.teamresourceful.resourcefulconfig.api.annotations.ConfigInfo;
-import com.teamresourceful.resourcefulconfig.api.types.options.EntryType;
 import earth.terrarium.adastra.common.config.machines.MachineTypeConfigObject;
 
 @Category("config.ad_astra.machines")
@@ -16,7 +15,6 @@ public final class MachineConfig {
 
     @ConfigEntry(
         id = "ironTier",
-        type = EntryType.OBJECT,
         translation = "config.ad_astra.ironTier"
     )
     public static final MachineTypeConfigObject IRON = new MachineTypeConfigObject(
@@ -25,7 +23,6 @@ public final class MachineConfig {
 
     @ConfigEntry(
         id = "steelTier",
-        type = EntryType.OBJECT,
         translation = "config.ad_astra.steelTier"
     )
     public static final MachineTypeConfigObject STEEL = new MachineTypeConfigObject(
@@ -34,7 +31,6 @@ public final class MachineConfig {
 
     @ConfigEntry(
         id = "deshTier",
-        type = EntryType.OBJECT,
         translation = "config.ad_astra.deshTier"
     )
     public static final MachineTypeConfigObject DESH = new MachineTypeConfigObject(
@@ -43,7 +39,6 @@ public final class MachineConfig {
 
     @ConfigEntry(
         id = "ostrumTier",
-        type = EntryType.OBJECT,
         translation = "config.ad_astra.ostrumTier"
     )
     public static final MachineTypeConfigObject OSTRUM = new MachineTypeConfigObject(
@@ -52,42 +47,36 @@ public final class MachineConfig {
 
     @ConfigEntry(
         id = "coalGeneratorEnergyGenerationPerTick",
-        type = EntryType.LONG,
         translation = "config.ad_astra.coalGeneratorEnergyGenerationPerTick"
     )
     public static long coalGeneratorEnergyGenerationPerTick = 20;
 
     @ConfigEntry(
         id = "etrionicBlastFurnaceBlastingEnergyPerItem",
-        type = EntryType.LONG,
         translation = "config.ad_astra.etrionicBlastFurnaceBlastingEnergyPerItem"
     )
     public static long etrionicBlastFurnaceBlastingEnergyPerItem = 10;
 
     @ConfigEntry(
         id = "waterPumpEnergyPerTick",
-        type = EntryType.LONG,
         translation = "config.ad_astra.waterPumpEnergyPerTick"
     )
     public static long waterPumpEnergyPerTick = 20;
 
     @ConfigEntry(
         id = "waterPumpFluidGenerationPerTick",
-        type = EntryType.LONG,
         translation = "config.ad_astra.waterPumpFluidGenerationPerTick"
     )
     public static long waterPumpFluidGenerationPerTick = 50;
 
     @ConfigEntry(
         id = "energizerEnergyCapacity",
-        type = EntryType.LONG,
         translation = "config.ad_astra.energizerEnergyCapacity"
     )
     public static long energizerEnergyCapacity = 2_000_000;
 
     @ConfigEntry(
         id = "maxDistributionBlocks",
-        type = EntryType.INTEGER,
         translation = "config.ad_astra.maxDistributionBlocks"
     )
     @Comment("The maximum number of blocks that an oxygen distributor and gravity normalizer can distribute to.")
@@ -95,7 +84,6 @@ public final class MachineConfig {
 
     @ConfigEntry(
         id = "distributionRefreshRate",
-        type = EntryType.INTEGER,
         translation = "config.ad_astra.distributionRefreshRate"
     )
     @Comment("The tick rate (20 ticks = 1 second) at which the oxygen distributor and gravity normalizer will recalculate the distribution area.")
@@ -103,7 +91,6 @@ public final class MachineConfig {
 
     @ConfigEntry(
         id = "pipeRefreshRate",
-        type = EntryType.INTEGER,
         translation = "config.ad_astra.pipeRefreshRate"
     )
     @Comment("The tick rate (20 ticks = 1 second) at which cables and fluid pipes will recalculate their connections.")

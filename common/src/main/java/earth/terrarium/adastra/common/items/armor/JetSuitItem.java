@@ -17,11 +17,11 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.core.Holder;
-import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.equipment.ArmorMaterial;
+import net.minecraft.world.item.equipment.ArmorType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.Vec3;
@@ -33,7 +33,7 @@ public class JetSuitItem extends SpaceSuitItem implements EnergyProvider.Item {
 
     private final long energyCapacity;
 
-    public JetSuitItem(Holder<ArmorMaterial> material, Type type, int tankSize, int energy, Properties properties) {
+    public JetSuitItem(ArmorMaterial material, ArmorType type, int tankSize, int energy, Properties properties) {
         super(material, type, tankSize, properties);
         this.energyCapacity = energy;
     }
@@ -152,7 +152,7 @@ public class JetSuitItem extends SpaceSuitItem implements EnergyProvider.Item {
     @SuppressWarnings("unused") // NeoForge
     public boolean elytraFlightTick(ItemStack stack, LivingEntity entity, int flightTicks) {
         if (entity.level().isClientSide()) return true;
-        if (this.type != Type.CHESTPLATE) return true;
+        if (this.type != ArmorType.CHESTPLATE) return true;
         int nextFlightTick = flightTicks + 1;
         if (nextFlightTick % 10 != 0) return true;
 

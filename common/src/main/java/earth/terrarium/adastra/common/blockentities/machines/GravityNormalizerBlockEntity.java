@@ -29,6 +29,8 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -61,27 +63,26 @@ public class GravityNormalizerBlockEntity extends EnergyContainerMachineBlockEnt
 
 
     @Override
-    public void loadAdditional(@NotNull CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
-        if (tag.contains("LastDistributedBlocks")) {
-            lastDistributedBlocks.clear();
-            for (var pos : tag.getLongArray("LastDistributedBlocks")) {
-                lastDistributedBlocks.add(BlockPos.of(pos));
-            }
-        }
-        energyPerTick = tag.getLong("EnergyPerTick");
-        distributedBlocksCount = tag.getInt("DistributedBlocksCount");
-        limit = tag.getInt("Limit");
-        targetGravity = tag.getFloat("TargetGravity");
+    public void loadAdditional(@NotNull ValueInput input) {
+        super.loadAdditional(input);
+        input.read("LastDistributedBlocks", com.mojang.serialization.Codec.LONG_STREAM)
+            .ifPresent(longStream -> {
+                lastDistributedBlocks.clear();
+                longStream.forEach(pos -> lastDistributedBlocks.add(BlockPos.of(pos)));
+            });
+        energyPerTick = input.getLongOr("EnergyPerTick", 0L);
+        distributedBlocksCount = input.getIntOr("DistributedBlocksCount", 0);
+        limit = input.getIntOr("Limit", MachineConfig.maxDistributionBlocks);
+        targetGravity = input.getFloatOr("TargetGravity", 1f);
     }
 
     @Override
-    protected void saveAdditional(@NotNull CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
-        tag.putLong("EnergyPerTick", energyPerTick);
-        tag.putInt("DistributedBlocksCount", distributedBlocksCount);
-        tag.putInt("Limit", limit);
-        tag.putFloat("TargetGravity", targetGravity);
+    protected void saveAdditional(@NotNull ValueOutput output) {
+        super.saveAdditional(output);
+        output.putLong("EnergyPerTick", energyPerTick);
+        output.putInt("DistributedBlocksCount", distributedBlocksCount);
+        output.putInt("Limit", limit);
+        output.putFloat("TargetGravity", targetGravity);
     }
 
     @Override

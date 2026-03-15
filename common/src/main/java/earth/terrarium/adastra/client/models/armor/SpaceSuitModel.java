@@ -16,24 +16,25 @@ import net.minecraft.client.model.geom.PartNames;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.FastColor;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.ARGB;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.component.DyedItemColor;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
-public class SpaceSuitModel extends HumanoidModel<LivingEntity> {
+public class SpaceSuitModel extends HumanoidModel<HumanoidRenderState> {
 
-    public static final ModelLayerLocation SPACE_SUIT_LAYER = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "space_suit"), "main");
-    public static final ModelLayerLocation NETHERITE_SPACE_SUIT_LAYER = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "netherite_space_suit"), "main");
-    public static final ModelLayerLocation JET_SUIT_LAYER = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "jet_suit"), "main");
+    public static final ModelLayerLocation SPACE_SUIT_LAYER = new ModelLayerLocation(Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "space_suit"), "main");
+    public static final ModelLayerLocation NETHERITE_SPACE_SUIT_LAYER = new ModelLayerLocation(Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "netherite_space_suit"), "main");
+    public static final ModelLayerLocation JET_SUIT_LAYER = new ModelLayerLocation(Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "jet_suit"), "main");
 
-    public static final ResourceLocation SPACE_SUIT_TEXTURE = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/entity/armor/space_suit.png");
-    public static final ResourceLocation NETHERITE_SPACE_SUIT_TEXTURE = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/entity/armor/netherite_space_suit.png");
-    public static final ResourceLocation JET_SUIT_TEXTURE = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/entity/armor/jet_suit.png");
+    public static final Identifier SPACE_SUIT_TEXTURE = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/entity/armor/space_suit.png");
+    public static final Identifier NETHERITE_SPACE_SUIT_TEXTURE = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/entity/armor/netherite_space_suit.png");
+    public static final Identifier JET_SUIT_TEXTURE = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/entity/armor/jet_suit.png");
 
     private final ModelPart visor;
     private final ModelPart belt;
@@ -41,14 +42,14 @@ public class SpaceSuitModel extends HumanoidModel<LivingEntity> {
     private final ModelPart leftBoot;
 
     @Nullable
-    private final ResourceLocation texture;
+    private final Identifier texture;
     private final EquipmentSlot slot;
     @Nullable
-    private final HumanoidModel<LivingEntity> parentModel;
+    private final HumanoidModel<HumanoidRenderState> parentModel;
 
     private float r, g, b;
 
-    public SpaceSuitModel(ModelPart root, EquipmentSlot slot, ItemStack stack, @Nullable HumanoidModel<LivingEntity> parentModel) {
+    public SpaceSuitModel(ModelPart root, EquipmentSlot slot, ItemStack stack, @Nullable HumanoidModel<HumanoidRenderState> parentModel) {
         super(root, RenderType::entityTranslucent);
 
         this.visor = root.getChild("visor");
@@ -62,9 +63,9 @@ public class SpaceSuitModel extends HumanoidModel<LivingEntity> {
 
         {
             int color = DyedItemColor.getOrDefault(stack, 0xFFFFFFFF);
-            r = FastColor.ARGB32.red(color) / 255f;
-            g = FastColor.ARGB32.green(color) / 255f;
-            b = FastColor.ARGB32.blue(color) / 255f;
+            r = ARGB.red(color) / 255f;
+            g = ARGB.green(color) / 255f;
+            b = ARGB.blue(color) / 255f;
         }
     }
 
@@ -82,7 +83,7 @@ public class SpaceSuitModel extends HumanoidModel<LivingEntity> {
         this.leftBoot.copyFrom(parentModel.leftLeg);
         parentModel.copyPropertiesTo(this);
 
-        int packedColor = FastColor.ARGB32.color(255, (int)(r * 255), (int)(g * 255), (int)(b * 255));
+        int packedColor = ARGB.color(255, (int)(r * 255), (int)(g * 255), (int)(b * 255));
         super.renderToBuffer(poseStack, buffer, packedLight, packedOverlay, packedColor);
     }
 
@@ -143,7 +144,7 @@ public class SpaceSuitModel extends HumanoidModel<LivingEntity> {
     }
 
     @Nullable
-    public static ResourceLocation getTextureLocation(ItemStack stack) {
+    public static Identifier getTextureLocation(ItemStack stack) {
         if (stack.is(ModItemTags.JET_SUITS)) {
             return SpaceSuitModel.JET_SUIT_TEXTURE;
         } else if (stack.is(ModItemTags.NETHERITE_SPACE_SUITS)) {

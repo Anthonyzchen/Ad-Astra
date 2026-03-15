@@ -6,13 +6,13 @@ import earth.terrarium.adastra.common.entities.vehicles.Rocket;
 import earth.terrarium.adastra.common.menus.vehicles.RocketMenu;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import org.jetbrains.annotations.NotNull;
 
 public class RocketScreen extends VehicleScreen<RocketMenu, Rocket> {
 
-    public static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/gui/container/rocket.png");
+    public static final Identifier TEXTURE = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/gui/container/rocket.png");
 
     public RocketScreen(RocketMenu menu, Inventory inventory, Component component) {
         super(menu, inventory, component, TEXTURE, 177, 174);

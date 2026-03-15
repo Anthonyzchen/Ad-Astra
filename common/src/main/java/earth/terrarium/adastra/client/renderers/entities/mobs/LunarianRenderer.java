@@ -8,38 +8,39 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.client.renderer.entity.layers.CrossedArmsItemLayer;
 import net.minecraft.client.renderer.entity.layers.CustomHeadLayer;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.npc.VillagerProfession;
+import net.minecraft.client.renderer.entity.state.VillagerRenderState;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.entity.npc.villager.VillagerProfession;
 import org.jetbrains.annotations.NotNull;
 
 // LEGACY ENTITY. WILL BE REPLACED IN THE FUTURE.
-public class LunarianRenderer extends MobRenderer<Lunarian, LunarianModel<Lunarian>> {
+public class LunarianRenderer extends MobRenderer<Lunarian, VillagerRenderState, LunarianModel> {
 
-    public static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/entity/mob/lunarian/lunarian.png");
-    public static final ResourceLocation FARMER_TEXTURE = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/entity/mob/lunarian/farmer_lunarian.png");
-    public static final ResourceLocation FISHERMAN_TEXTURE = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/entity/mob/lunarian/fisherman_lunarian.png");
-    public static final ResourceLocation SHEPHERD_TEXTURE = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/entity/mob/lunarian/shepherd_lunarian.png");
-    public static final ResourceLocation FLETCHER_TEXTURE = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/entity/mob/lunarian/fletcher_lunarian.png");
-    public static final ResourceLocation LIBRARIAN_TEXTURE = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/entity/mob/lunarian/librarian_lunarian.png");
-    public static final ResourceLocation CARTOGRAPHER_TEXTURE = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/entity/mob/lunarian/cartographer_lunarian.png");
-    public static final ResourceLocation CLERIC_TEXTURE = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/entity/mob/lunarian/cleric_lunarian.png");
-    public static final ResourceLocation ARMORER_TEXTURE = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/entity/mob/lunarian/armorer_lunarian.png");
-    public static final ResourceLocation WEAPONSMITH_TEXTURE = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/entity/mob/lunarian/weaponsmith_lunarian.png");
-    public static final ResourceLocation TOOLSMITH_TEXTURE = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/entity/mob/lunarian/toolsmith_lunarian.png");
-    public static final ResourceLocation BUTCHER_TEXTURE = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/entity/mob/lunarian/butcher_lunarian.png");
-    public static final ResourceLocation LEATHERWORKER_TEXTURE = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/entity/mob/lunarian/leatherworker_lunarian.png");
-    public static final ResourceLocation MASON_TEXTURE = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/entity/mob/lunarian/mason_lunarian.png");
+    public static final Identifier TEXTURE = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/entity/mob/lunarian/lunarian.png");
+    public static final Identifier FARMER_TEXTURE = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/entity/mob/lunarian/farmer_lunarian.png");
+    public static final Identifier FISHERMAN_TEXTURE = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/entity/mob/lunarian/fisherman_lunarian.png");
+    public static final Identifier SHEPHERD_TEXTURE = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/entity/mob/lunarian/shepherd_lunarian.png");
+    public static final Identifier FLETCHER_TEXTURE = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/entity/mob/lunarian/fletcher_lunarian.png");
+    public static final Identifier LIBRARIAN_TEXTURE = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/entity/mob/lunarian/librarian_lunarian.png");
+    public static final Identifier CARTOGRAPHER_TEXTURE = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/entity/mob/lunarian/cartographer_lunarian.png");
+    public static final Identifier CLERIC_TEXTURE = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/entity/mob/lunarian/cleric_lunarian.png");
+    public static final Identifier ARMORER_TEXTURE = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/entity/mob/lunarian/armorer_lunarian.png");
+    public static final Identifier WEAPONSMITH_TEXTURE = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/entity/mob/lunarian/weaponsmith_lunarian.png");
+    public static final Identifier TOOLSMITH_TEXTURE = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/entity/mob/lunarian/toolsmith_lunarian.png");
+    public static final Identifier BUTCHER_TEXTURE = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/entity/mob/lunarian/butcher_lunarian.png");
+    public static final Identifier LEATHERWORKER_TEXTURE = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/entity/mob/lunarian/leatherworker_lunarian.png");
+    public static final Identifier MASON_TEXTURE = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/entity/mob/lunarian/mason_lunarian.png");
 
     public LunarianRenderer(EntityRendererProvider.Context context) {
-        super(context, new LunarianModel<>(context.bakeLayer(LunarianModel.LAYER_LOCATION)), 0.5f);
+        super(context, new LunarianModel(context.bakeLayer(LunarianModel.LAYER_LOCATION)), 0.5f);
         this.addLayer(new CustomHeadLayer<>(this, context.getModelSet(), context.getItemInHandRenderer()));
         this.addLayer(new CrossedArmsItemLayer<>(this, context.getItemInHandRenderer()));
     }
 
     @Override
-    public @NotNull ResourceLocation getTextureLocation(Lunarian entity) {
+    public @NotNull Identifier getTextureLocation(VillagerRenderState state) {
 
-        VillagerProfession profession = entity.getVillagerData().getProfession();
+        VillagerProfession profession = state.villagerData.getProfession();
         if (profession.equals(VillagerProfession.ARMORER)) {
             return ARMORER_TEXTURE;
         } else if (profession.equals(VillagerProfession.BUTCHER)) {
@@ -71,9 +72,10 @@ public class LunarianRenderer extends MobRenderer<Lunarian, LunarianModel<Lunari
         }
     }
 
-    protected void scale(Lunarian villagerEntity, PoseStack poseStack, float f) {
+    @Override
+    protected void scale(VillagerRenderState state, PoseStack poseStack) {
         float g = 0.9375f;
-        if (villagerEntity.isBaby()) {
+        if (state.isBaby) {
             g *= 0.5f;
             this.shadowRadius = 0.25f;
         } else {

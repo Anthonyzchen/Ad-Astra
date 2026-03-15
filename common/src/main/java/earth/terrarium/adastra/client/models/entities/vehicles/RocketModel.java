@@ -4,20 +4,20 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import earth.terrarium.adastra.AdAstra;
 import earth.terrarium.adastra.client.ClientPlatformUtils;
-import earth.terrarium.adastra.common.entities.vehicles.Rocket;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.resources.Identifier;
 
-public class RocketModel<T extends Rocket> extends EntityModel<T> {
+public class RocketModel extends EntityModel<EntityRenderState> {
 
-    public static final ModelLayerLocation TIER_1_LAYER = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "tier_1_rocket"), "main");
-    public static final ModelLayerLocation TIER_2_LAYER = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "tier_2_rocket"), "main");
-    public static final ModelLayerLocation TIER_3_LAYER = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "tier_3_rocket"), "main");
-    public static final ModelLayerLocation TIER_4_LAYER = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "tier_4_rocket"), "main");
+    public static final ModelLayerLocation TIER_1_LAYER = new ModelLayerLocation(Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "tier_1_rocket"), "main");
+    public static final ModelLayerLocation TIER_2_LAYER = new ModelLayerLocation(Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "tier_2_rocket"), "main");
+    public static final ModelLayerLocation TIER_3_LAYER = new ModelLayerLocation(Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "tier_3_rocket"), "main");
+    public static final ModelLayerLocation TIER_4_LAYER = new ModelLayerLocation(Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "tier_4_rocket"), "main");
 
     private final ModelPart root;
 
@@ -383,7 +383,7 @@ public class RocketModel<T extends Rocket> extends EntityModel<T> {
     }
 
     @Override
-    public void setupAnim(T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
+    public void setupAnim(EntityRenderState state) {
     }
 
     @Override

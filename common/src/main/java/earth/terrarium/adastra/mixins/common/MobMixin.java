@@ -22,7 +22,7 @@ public abstract class MobMixin extends LivingEntity {
 
     // Prevent mobs that can't survive without oxygen from spawning on planets without oxygen. Fixes
     // mobs like Alex's Mobs flies.
-    @Inject(method = "checkSpawnObstruction", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "method_5957", at = @At("HEAD"), cancellable = true)
     public void adastra$checkSpawnObstruction(LevelReader levelReader, CallbackInfoReturnable<Boolean> cir) {
         if (levelReader instanceof Level level
             && PlanetApi.API.isPlanet(level)

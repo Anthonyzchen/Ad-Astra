@@ -1,23 +1,21 @@
 package earth.terrarium.adastra.common.blockentities.flag;
 
 import com.mojang.authlib.GameProfile;
-import com.mojang.serialization.DataResult;
 import dev.architectury.injectables.annotations.PlatformOnly;
 import earth.terrarium.adastra.common.blockentities.flag.content.FlagContent;
 import earth.terrarium.adastra.common.blockentities.flag.content.UrlContent;
 import earth.terrarium.adastra.common.registry.ModBlockEntityTypes;
-import earth.terrarium.adastra.mixins.common.SkullBlockEntityInvoker;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtOps;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.item.component.ResolvableProfile;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -35,32 +33,35 @@ public class FlagBlockEntity extends BlockEntity {
     }
 
     @Override
-    public void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
+    public void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
         if (owner != null) {
-            ResolvableProfile resolvableProfile = new ResolvableProfile(owner);
-            DataResult<Tag> result = ResolvableProfile.CODEC.encodeStart(NbtOps.INSTANCE, resolvableProfile);
-            result.result().ifPresent(nbt -> tag.put("FlagOwner", nbt));
+            ResolvableProfile resolvableProfile = ResolvableProfile.createResolved(owner);
+            output.store("FlagOwner", ResolvableProfile.CODEC, resolvableProfile);
         }
         if (content != null) {
-            tag.put("FlagContent", content.toFullTag());
+            CompoundTag contentTag = content.toFullTag();
+            ValueOutput child = output.child("FlagContent");
+            for (String key : contentTag.keySet()) {
+                child.putString(key, contentTag.getStringOr(key, ""));
+            }
         }
     }
 
     @Override
-    public void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
-        if (tag.contains("FlagOwner", Tag.TAG_COMPOUND)) {
-            ResolvableProfile.CODEC.parse(NbtOps.INSTANCE, tag.getCompound("FlagOwner"))
-                .result()
-                .ifPresent(profile -> setOwner(profile.gameProfile()));
-        }
-        if (tag.contains("FlagUrl", Tag.TAG_STRING)) {
-            this.content = UrlContent.of("https://imgur.com/" + tag.getString("FlagUrl"));
-        }
-        if (tag.contains("FlagContent", Tag.TAG_COMPOUND)) {
-            this.content = FlagContent.fromTag(tag.getCompound("FlagContent"));
-        }
+    public void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        input.read("FlagOwner", ResolvableProfile.CODEC)
+            .ifPresent(profile -> setOwner(profile.partialProfile()));
+        input.getString("FlagUrl")
+            .ifPresent(url -> this.content = UrlContent.of("https://imgur.com/" + url));
+        input.child("FlagContent").ifPresent(child -> {
+            child.getString("type").ifPresent(type -> {
+                child.getString("content").ifPresent(contentStr -> {
+                    this.content = FlagContent.fromTypeAndContent(type, contentStr);
+                });
+            });
+        });
     }
 
     @Nullable
@@ -77,12 +78,10 @@ public class FlagBlockEntity extends BlockEntity {
 
     private void loadOwnerProperties() {
         if (owner == null) return;
-        SkullBlockEntityInvoker.invokeFetchGameProfile(this.owner.getName()).thenAccept(owner -> {
-            if (owner.isPresent()) {
-                this.owner = owner.get();
-                this.setChanged();
-            }
-        });
+        // In 1.21.11, SkullBlockEntity.fetchGameProfile no longer exists.
+        // Profile resolution is now handled through ResolvableProfile.resolveProfile().
+        // For flags, we just keep the partial profile as-is since it has the name/UUID already.
+        this.setChanged();
     }
 
     @Nullable

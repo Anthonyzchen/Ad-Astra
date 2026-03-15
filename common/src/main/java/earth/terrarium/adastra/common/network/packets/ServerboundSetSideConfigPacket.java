@@ -12,7 +12,7 @@ import earth.terrarium.adastra.common.blockentities.base.sideconfig.Configuratio
 import earth.terrarium.adastra.common.utils.ModUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.function.Consumer;
@@ -29,12 +29,11 @@ public record ServerboundSetSideConfigPacket(
         return TYPE;
     }
 
-    private static class Type extends CodecPacketType<ServerboundSetSideConfigPacket> implements ServerboundPacketType<ServerboundSetSideConfigPacket> {
+    private static class Type extends CodecPacketType.Server<ServerboundSetSideConfigPacket> {
 
         public Type() {
             super(
-                ServerboundSetSideConfigPacket.class,
-                ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "set_side_config"),
+                Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "set_side_config"),
                 ObjectByteCodec.create(
                     ExtraByteCodecs.BLOCK_POS.fieldOf(ServerboundSetSideConfigPacket::machine),
                     ByteCodec.INT.fieldOf(ServerboundSetSideConfigPacket::configIndex),

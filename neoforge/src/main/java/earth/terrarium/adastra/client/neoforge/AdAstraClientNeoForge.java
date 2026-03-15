@@ -3,7 +3,6 @@ package earth.terrarium.adastra.client.neoforge;
 import earth.terrarium.adastra.client.AdAstraClient;
 import earth.terrarium.adastra.common.entities.vehicles.Vehicle;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.world.item.Item;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
@@ -17,10 +16,11 @@ import net.neoforged.neoforge.event.TickEvent;
 import java.util.HashMap;
 import java.util.Map;
 
+// TODO: 1.21.11 - NeoForge annotation may have changed to @EventBusSubscriber(value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
 @Mod.EventBusSubscriber(value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class AdAstraClientNeoForge {
 
-    public static final Map<Item, BlockEntityWithoutLevelRenderer> ITEM_RENDERERS = new HashMap<>();
+    public static final Map<Item, AdAstraClient.CustomItemRenderer> ITEM_RENDERERS = new HashMap<>();
 
     public static void init(IEventBus bus) {
         bus.addListener(AdAstraClientNeoForge::onSetupItemColors);
@@ -62,12 +62,15 @@ public class AdAstraClientNeoForge {
         AdAstraClient.onAddReloadListener((id, listener) -> event.registerReloadListener(listener));
     }
 
+    // TODO: 1.21.11 - NeoForge may have changed TickEvent.ClientTickEvent. In newer NeoForge,
+    // it may be split into ClientTickEvent.Pre and ClientTickEvent.Post instead of using Phase.
     private static void onClientTick(TickEvent.ClientTickEvent event) {
         if (event.phase.equals(TickEvent.Phase.START)) {
             AdAstraClient.clientTick(Minecraft.getInstance());
         }
     }
 
+    // TODO: 1.21.11 - RenderLevelStageEvent may have changed. Verify Stage.AFTER_PARTICLES still exists.
     private static void onRenderLevelStage(RenderLevelStageEvent event) {
         if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_PARTICLES) {
             AdAstraClient.renderOverlays(event.getPoseStack(), event.getCamera());
@@ -79,7 +82,9 @@ public class AdAstraClientNeoForge {
     }
 
     private static void onSetupItemColors(RegisterColorHandlersEvent.Item event) {
-        AdAstraClient.onAddItemColors(event::register);
+        // TODO: 1.21.11 - Item color registration has changed. The old ItemColor interface is gone.
+        // NeoForge RegisterColorHandlersEvent.Item may use a different API now.
+        // AdAstraClient.onAddItemColors(event::register);
     }
 
     private static void onCalculateCameraDistance(CalculateDetachedCameraDistanceEvent event) {

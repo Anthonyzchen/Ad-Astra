@@ -13,12 +13,10 @@ import earth.terrarium.common_storage_lib.fluid.impl.SimpleFluidStorage;
 import earth.terrarium.common_storage_lib.fluid.util.FluidStorageData;
 import earth.terrarium.common_storage_lib.resources.fluid.FluidResource;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
@@ -30,6 +28,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
@@ -65,7 +65,7 @@ public class Rover extends Vehicle implements PlayerRideable, RadioHolder {
                 if (player.level().isClientSide()) {
                     RadioHandler.open(null);
                 }
-                return InteractionResult.sidedSuccess(player.level().isClientSide());
+                return InteractionResult.SUCCESS;
             }
             return InteractionResult.PASS;
         });
@@ -74,7 +74,7 @@ public class Rover extends Vehicle implements PlayerRideable, RadioHolder {
             if (!level().isClientSide()) {
                 this.openCustomInventoryScreen(player);
             }
-            return InteractionResult.sidedSuccess(level().isClientSide());
+            return InteractionResult.SUCCESS;
         });
     }
 
@@ -91,23 +91,19 @@ public class Rover extends Vehicle implements PlayerRideable, RadioHolder {
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag compound) {
-        super.readAdditionalSaveData(compound);
-        speed = compound.getFloat("Speed");
-        angle = compound.getFloat("Angle");
-        if (compound.contains("FluidData")) {
-            FluidStorageData.CODEC.parse(NbtOps.INSTANCE, compound.get("FluidData"))
-                .result().ifPresent(fluidContainer::readSnapshot);
-        }
+    protected void readAdditionalSaveData(ValueInput input) {
+        super.readAdditionalSaveData(input);
+        speed = input.getFloatOr("Speed", 0f);
+        angle = input.getFloatOr("Angle", 0f);
+        input.read("FluidData", FluidStorageData.CODEC).ifPresent(fluidContainer::readSnapshot);
     }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag compound) {
-        super.addAdditionalSaveData(compound);
-        compound.putFloat("Speed", speed);
-        compound.putFloat("Angle", angle);
-        FluidStorageData.CODEC.encodeStart(NbtOps.INSTANCE, fluidContainer.createSnapshot())
-            .result().ifPresent(tag -> compound.put("FluidData", tag));
+    protected void addAdditionalSaveData(ValueOutput output) {
+        super.addAdditionalSaveData(output);
+        output.putFloat("Speed", speed);
+        output.putFloat("Angle", angle);
+        output.store("FluidData", FluidStorageData.CODEC, fluidContainer.createSnapshot());
     }
 
     public SimpleFluidStorage fluidContainer() {
@@ -295,7 +291,7 @@ public class Rover extends Vehicle implements PlayerRideable, RadioHolder {
     }
 
     public FluidResource fluidResource() {
-        return FluidResource.of(BuiltInRegistries.FLUID.get(ResourceLocation.parse(entityData.get(FUEL_TYPE))));
+        return FluidResource.of(BuiltInRegistries.FLUID.getValue(Identifier.parse(entityData.get(FUEL_TYPE))));
     }
 
     public long fluidAmount() {

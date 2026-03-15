@@ -1,6 +1,5 @@
 package earth.terrarium.adastra.common.recipes.machines;
 
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.teamresourceful.bytecodecs.base.ByteCodec;
@@ -11,10 +10,9 @@ import com.teamresourceful.resourcefullib.common.recipe.CodecRecipe;
 import com.teamresourceful.resourcefullib.common.recipe.CodecRecipeSerializer;
 import earth.terrarium.adastra.common.registry.ModRecipeSerializers;
 import earth.terrarium.adastra.common.registry.ModRecipeTypes;
-import net.minecraft.world.item.crafting.RecipeInput;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
@@ -24,6 +22,8 @@ public record NasaWorkbenchRecipe(
     List<Ingredient> ingredients,
     ItemStack result
 ) implements CodecRecipe<RecipeInput> {
+
+    private static final RecipeBookCategory BOOK_CATEGORY = new RecipeBookCategory();
 
     public static final MapCodec<NasaWorkbenchRecipe> CODEC = RecordCodecBuilder.mapCodec(
         instance -> instance.group(
@@ -49,12 +49,30 @@ public record NasaWorkbenchRecipe(
     }
 
     @Override
-    public CodecRecipeSerializer<? extends CodecRecipe<RecipeInput>> serializer() {
+    public @NotNull ItemStack assemble(@NotNull RecipeInput input, HolderLookup.@NotNull Provider provider) {
+        return result.copy();
+    }
+
+
+
+    @Override
+    public @NotNull CodecRecipeSerializer<? extends Recipe<RecipeInput>> getSerializer() {
         return ModRecipeSerializers.NASA_WORKBENCH_SERIALIZER.get();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public @NotNull RecipeType<?> getType() {
-        return ModRecipeTypes.NASA_WORKBENCH.get();
+    public @NotNull RecipeType<NasaWorkbenchRecipe> getType() {
+        return (RecipeType<NasaWorkbenchRecipe>) (RecipeType<?>) ModRecipeTypes.NASA_WORKBENCH.get();
+    }
+
+    @Override
+    public @NotNull PlacementInfo placementInfo() {
+        return PlacementInfo.NOT_PLACEABLE;
+    }
+
+    @Override
+    public @NotNull RecipeBookCategory recipeBookCategory() {
+        return BOOK_CATEGORY;
     }
 }

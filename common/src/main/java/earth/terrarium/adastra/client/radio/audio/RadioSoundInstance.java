@@ -3,7 +3,7 @@ package earth.terrarium.adastra.client.radio.audio;
 import com.google.common.hash.Hashing;
 import earth.terrarium.adastra.AdAstra;
 import earth.terrarium.adastra.client.config.RadioConfig;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.AbstractSoundInstance;
 import net.minecraft.client.resources.sounds.Sound;
@@ -12,7 +12,7 @@ import net.minecraft.client.sounds.AudioStream;
 import net.minecraft.client.sounds.SoundBufferLibrary;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.client.sounds.WeighedSoundEvents;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.valueproviders.ConstantFloat;
@@ -29,7 +29,7 @@ public sealed class RadioSoundInstance extends AbstractSoundInstance implements 
     @SuppressWarnings("deprecation")
     public RadioSoundInstance(String url, RandomSource randomSource) {
         super(
-            ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "radio/" + Hashing.sha1().hashUnencodedChars(url)),
+            Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "radio/" + Hashing.sha1().hashUnencodedChars(url)),
             SoundSource.MASTER,
             randomSource
         );
@@ -38,9 +38,9 @@ public sealed class RadioSoundInstance extends AbstractSoundInstance implements 
 
     @Override
     public WeighedSoundEvents resolve(@NotNull SoundManager manager) {
-        WeighedSoundEvents soundEvents = new WeighedSoundEvents(this.getLocation(), null);
+        WeighedSoundEvents soundEvents = new WeighedSoundEvents(this.getIdentifier(), null);
         soundEvents.addSound(new Sound(
-            getLocation(),
+            getIdentifier(),
             ConstantFloat.of(1f),
             ConstantFloat.of(1f),
             1,
@@ -101,7 +101,7 @@ public sealed class RadioSoundInstance extends AbstractSoundInstance implements 
 
     // THIS IS USED BY FABRIC, THIS IS A SOFT OVERRIDE DO NOT REMOVE
     @SuppressWarnings("unused")
-    public CompletableFuture<AudioStream> getAudioStream(SoundBufferLibrary library, ResourceLocation id, boolean loop) {
+    public CompletableFuture<AudioStream> getAudioStream(SoundBufferLibrary library, Identifier id, boolean loop) {
         return getStream();
     }
 

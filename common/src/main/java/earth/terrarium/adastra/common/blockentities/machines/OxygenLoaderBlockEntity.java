@@ -21,11 +21,9 @@ import earth.terrarium.common_storage_lib.fluid.impl.SimpleFluidStorage;
 import earth.terrarium.common_storage_lib.fluid.util.FluidStorageData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtOps;
-import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -90,21 +88,16 @@ public class OxygenLoaderBlockEntity extends RecipeMachineBlockEntity<OxygenLoad
     }
 
     @Override
-    public void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
-        if (tag.contains("FluidData")) {
-            FluidStorageData.CODEC.parse(NbtOps.INSTANCE, tag.get("FluidData"))
-                .resultOrPartial(s -> {})
-                .ifPresent(data -> getFluidContainer().readSnapshot(data));
-        }
+    public void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        input.read("FluidData", FluidStorageData.CODEC)
+            .ifPresent(data -> getFluidContainer().readSnapshot(data));
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
-        FluidStorageData.CODEC.encodeStart(NbtOps.INSTANCE, getFluidContainer().createSnapshot())
-            .resultOrPartial(s -> {})
-            .ifPresent(nbt -> tag.put("FluidData", nbt));
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        output.store("FluidData", FluidStorageData.CODEC, getFluidContainer().createSnapshot());
     }
 
     @Override
@@ -195,8 +188,9 @@ public class OxygenLoaderBlockEntity extends RecipeMachineBlockEntity<OxygenLoad
         // so we use FluidUtils.ingredientMatches() which checks getMatchingFluids() instead.
         FluidResource inputResource = getFluidContainer().get(0).getResource();
         if (!inputResource.isBlank()) {
-            for (var holder : level().getRecipeManager().getAllRecipesFor(ModRecipeTypes.OXYGEN_LOADING.get())) {
-                OxygenLoadingRecipe r = holder.value();
+            for (var holder : level().getServer().getRecipeManager().getRecipes()) {
+                if (holder.value().getType() != ModRecipeTypes.OXYGEN_LOADING.get()) continue;
+                OxygenLoadingRecipe r = (OxygenLoadingRecipe) holder.value();
                 if (FluidUtils.ingredientMatches(r.input().ingredient(), inputResource)
                     && getFluidContainer().get(0).getAmount() >= r.input().getAmount()) {
                     recipe = r;

@@ -9,7 +9,7 @@ import earth.terrarium.adastra.AdAstra;
 import earth.terrarium.adastra.api.planets.Planet;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.GsonHelper;
@@ -30,7 +30,7 @@ public class AdAstraData extends SimpleJsonResourceReloadListener {
     }
 
     @Override
-    protected void apply(Map<ResourceLocation, JsonElement> object, ResourceManager resourceManager, ProfilerFiller profiler) {
+    protected void apply(Map<Identifier, JsonElement> object, ResourceManager resourceManager, ProfilerFiller profiler) {
         PLANETS.clear();
         DIMENSIONS_TO_PLANETS.clear();
         object.forEach((key, value) -> {
@@ -89,7 +89,7 @@ public class AdAstraData extends SimpleJsonResourceReloadListener {
         return PLANETS;
     }
 
-    public static Set<ResourceLocation> solarSystems() {
+    public static Set<Identifier> solarSystems() {
         return PLANETS.values().stream().map(Planet::solarSystem).collect(Collectors.toUnmodifiableSet());
     }
 

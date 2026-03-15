@@ -8,14 +8,14 @@ import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.Entity;
 
 // LEGACY ENTITY. WILL BE REPLACED IN THE FUTURE.
-public class SulfurCreeperModel<T extends Entity> extends EntityModel<T> {
+public class SulfurCreeperModel<T extends LivingEntityRenderState> extends EntityModel<T> {
 
-    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "sulfur_creeper"), "main");
+    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "sulfur_creeper"), "main");
 
     private final ModelPart body;
 
@@ -45,7 +45,12 @@ public class SulfurCreeperModel<T extends Entity> extends EntityModel<T> {
     }
 
     @Override
-    public void setupAnim(Entity entity, float limbAngle, float limbDistance, float animationProgress, float headYaw, float headPitch) {
+    public void setupAnim(LivingEntityRenderState state) {
+        float limbAngle = state.walkAnimationPos;
+        float limbDistance = state.walkAnimationSpeed;
+        float headYaw = state.yRot;
+        float headPitch = state.xRot;
+
         this.body.getChild("head").yRot = (float) (headYaw * Math.PI / 180.0);
         this.body.getChild("head").xRot = (float) (headPitch * Math.PI / 180.0);
         this.body.getChild("BackLeftLeg").xRot = Mth.cos(limbAngle * 0.6662f) * 1.4f * limbDistance;

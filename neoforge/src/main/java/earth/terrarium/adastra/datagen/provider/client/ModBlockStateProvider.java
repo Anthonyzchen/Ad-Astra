@@ -10,7 +10,7 @@ import earth.terrarium.adastra.common.registry.ModBlocks;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.properties.AttachFace;
@@ -22,7 +22,7 @@ import net.neoforged.neoforge.common.data.ExistingFileHelper;
 
 public class ModBlockStateProvider extends BlockStateProvider {
 
-    public static final ResourceLocation WATER_STILL = new ResourceLocation("block/water_still");
+    public static final Identifier WATER_STILL = new Identifier("block/water_still");
     protected static final ExistingFileHelper.ResourceType TEXTURE = new ExistingFileHelper.ResourceType(PackType.CLIENT_RESOURCES, ".png", "textures");
 
     public ModBlockStateProvider(PackOutput output, ExistingFileHelper existingFileHelper) {
@@ -142,7 +142,7 @@ public class ModBlockStateProvider extends BlockStateProvider {
         simpleBlock(block, models().getBuilder(name(block)).texture("particle", WATER_STILL.toString()));
     }
 
-    private ResourceLocation key(Block block) {
+    private Identifier key(Block block) {
         return BuiltInRegistries.BLOCK.getKey(block);
     }
 
@@ -160,7 +160,7 @@ public class ModBlockStateProvider extends BlockStateProvider {
             Direction facing = state.getValue(MachineBlock.FACING);
             boolean lit = state.getValue(MachineBlock.LIT);
             String name = this.name(block);
-            ResourceLocation texture = modLoc((lit ? "block/%s_front_on" : "block/%s_front").formatted(name, name));
+            Identifier texture = modLoc((lit ? "block/%s_front_on" : "block/%s_front").formatted(name, name));
 
             return ConfiguredModel.builder()
                 .modelFile(models().getBuilder(lit ? name + "_on" : name)
@@ -171,7 +171,7 @@ public class ModBlockStateProvider extends BlockStateProvider {
                     .texture("east", modLoc("block/machine_side"))
                     .texture("west", modLoc("block/machine_side"))
                     .texture("particle", texture)
-                    .parent(models().getExistingFile(new ResourceLocation("block/cube"))))
+                    .parent(models().getExistingFile(new Identifier("block/cube"))))
                 .rotationY((int) (facing.toYRot() + 180) % 360)
                 .build();
         });
@@ -183,7 +183,7 @@ public class ModBlockStateProvider extends BlockStateProvider {
             Direction facing = state.getValue(MachineBlock.FACING);
             boolean lit = state.getValue(MachineBlock.LIT);
             String name = this.name(block);
-            ResourceLocation texture = modLoc((lit ? "block/%s_front_on" : "block/%s_front").formatted(name, name));
+            Identifier texture = modLoc((lit ? "block/%s_front_on" : "block/%s_front").formatted(name, name));
 
             return ConfiguredModel.builder()
                 .modelFile(models().getBuilder(lit ? name + "_on" : name)
@@ -194,7 +194,7 @@ public class ModBlockStateProvider extends BlockStateProvider {
                     .texture("east", modLoc("block/steel_machine_side"))
                     .texture("west", modLoc("block/steel_machine_side"))
                     .texture("particle", texture)
-                    .parent(models().getExistingFile(new ResourceLocation("block/cube"))))
+                    .parent(models().getExistingFile(new Identifier("block/cube"))))
                 .rotationY((int) (facing.toYRot() + 180) % 360)
                 .build();
         });
@@ -226,7 +226,7 @@ public class ModBlockStateProvider extends BlockStateProvider {
                 default -> "blue";
             };
 
-            ResourceLocation texture = modLoc("block/%s_side_%s".formatted(name, type));
+            Identifier texture = modLoc("block/%s_side_%s".formatted(name, type));
 
             return ConfiguredModel.builder()
                 .modelFile(models().getBuilder(name + "_" + type)
@@ -260,7 +260,7 @@ public class ModBlockStateProvider extends BlockStateProvider {
             Direction facing = state.getValue(MachineBlock.FACING);
             boolean powered = state.getValue(MachineBlock.POWERED);
             String name = this.name(block);
-            ResourceLocation texture = modLoc((powered ? "block/%s_front_on" : "block/%s_front").formatted(name, name));
+            Identifier texture = modLoc((powered ? "block/%s_front_on" : "block/%s_front").formatted(name, name));
 
             return ConfiguredModel.builder()
                 .modelFile(models().getBuilder(powered ? name + "_on" : name)
@@ -271,7 +271,7 @@ public class ModBlockStateProvider extends BlockStateProvider {
                     .texture("east", texture)
                     .texture("west", texture)
                     .texture("particle", texture)
-                    .parent(models().getExistingFile(new ResourceLocation("block/cube"))))
+                    .parent(models().getExistingFile(new Identifier("block/cube"))))
                 .rotationY((int) (facing.toYRot() + 180) % 360)
                 .build();
         });
@@ -281,7 +281,7 @@ public class ModBlockStateProvider extends BlockStateProvider {
         itemModels().getBuilder(key(block).getPath()).parent(itemModels().getExistingFile(modLoc("item/rendered_item")));
         getVariantBuilder(block).forAllStates(state -> {
             String name = this.name(block);
-            ResourceLocation texture = modLoc("block/globe/%s".formatted(name));
+            Identifier texture = modLoc("block/globe/%s".formatted(name));
 
             ConfiguredModel.builder()
                 .modelFile(models().getBuilder(name + "_cube")
@@ -302,7 +302,7 @@ public class ModBlockStateProvider extends BlockStateProvider {
         simpleBlockItem(block, models().getBuilder("block/%s".formatted(name(block))));
         getVariantBuilder(block).forAllStates(state -> {
             String name = this.name(block);
-            ResourceLocation texture = modLoc("block/flag/%s".formatted(name));
+            Identifier texture = modLoc("block/flag/%s".formatted(name));
 
             return ConfiguredModel.builder()
                 .modelFile(models().getBuilder(name)
@@ -316,7 +316,7 @@ public class ModBlockStateProvider extends BlockStateProvider {
     public void slidingDoor(Block block) {
         getVariantBuilder(block).forAllStates(state -> {
             String name = this.name(block);
-            ResourceLocation texture = modLoc("block/sliding_door/%s".formatted(name));
+            Identifier texture = modLoc("block/sliding_door/%s".formatted(name));
 
             return ConfiguredModel.builder()
                 .modelFile(models().getBuilder(name)
@@ -477,7 +477,7 @@ public class ModBlockStateProvider extends BlockStateProvider {
         getVariantBuilder(block).forAllStates(state -> {
             Direction facing = state.getValue(MachineBlock.FACING);
             boolean lit = state.getValue(MachineBlock.LIT);
-            ResourceLocation texture = lit ? modLoc("block/etrionic_blast_furnace/etrionic_blast_furnace_on") : modLoc("block/etrionic_blast_furnace/etrionic_blast_furnace");
+            Identifier texture = lit ? modLoc("block/etrionic_blast_furnace/etrionic_blast_furnace_on") : modLoc("block/etrionic_blast_furnace/etrionic_blast_furnace");
 
             return ConfiguredModel.builder()
                 .modelFile(models().getBuilder("etrionic_blast_furnace" + (lit ? "_on" : ""))
@@ -493,7 +493,7 @@ public class ModBlockStateProvider extends BlockStateProvider {
         simpleBlockItem(block, models().getBuilder("block/%s".formatted(name(block))));
         getVariantBuilder(block).forAllStates(state -> {
             String name = this.name(block);
-            ResourceLocation texture = modLoc("block/lamp/%s".formatted(name));
+            Identifier texture = modLoc("block/lamp/%s".formatted(name));
 
             return ConfiguredModel.builder()
                 .modelFile(models().getBuilder(name)
@@ -517,14 +517,14 @@ public class ModBlockStateProvider extends BlockStateProvider {
         });
     }
 
-    private ResourceLocation findTexture(Block block, String replace) {
-        ResourceLocation path = new ResourceLocation(AdAstra.MOD_ID, blockTexture(block).getPath().replace(replace, ""));
+    private Identifier findTexture(Block block, String replace) {
+        Identifier path = new Identifier(AdAstra.MOD_ID, blockTexture(block).getPath().replace(replace, ""));
         if (!models().existingFileHelper.exists(path, TEXTURE)) {
-            path = new ResourceLocation(AdAstra.MOD_ID, blockTexture(block).getPath().replace(replace, "s"));
+            path = new Identifier(AdAstra.MOD_ID, blockTexture(block).getPath().replace(replace, "s"));
             if (!models().existingFileHelper.exists(path, TEXTURE)) {
-                path = new ResourceLocation(AdAstra.MOD_ID, blockTexture(block).getPath().replace(replace, "_bricks"));
+                path = new Identifier(AdAstra.MOD_ID, blockTexture(block).getPath().replace(replace, "_bricks"));
                 if (!models().existingFileHelper.exists(path, TEXTURE)) {
-                    path = new ResourceLocation(AdAstra.MOD_ID, blockTexture(block).getPath().replace(replace, "_planks"));
+                    path = new Identifier(AdAstra.MOD_ID, blockTexture(block).getPath().replace(replace, "_planks"));
                 }
             }
         }

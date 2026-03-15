@@ -6,13 +6,13 @@ import earth.terrarium.adastra.common.blocks.SlidingDoorBlock;
 import earth.terrarium.adastra.common.registry.ModBlockEntityTypes;
 import earth.terrarium.adastra.common.registry.ModSoundEvents;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 
 public class SlidingDoorBlockEntity extends BlockEntity implements TickableBlockEntity {
@@ -25,15 +25,15 @@ public class SlidingDoorBlockEntity extends BlockEntity implements TickableBlock
     }
 
     @Override
-    public void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
-        slideTicks = tag.getInt("SlideTicks");
+    public void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        slideTicks = input.getIntOr("SlideTicks", 0);
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
-        tag.putInt("SlideTicks", slideTicks);
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        output.putInt("SlideTicks", slideTicks);
     }
 
     public int slideTicks() {

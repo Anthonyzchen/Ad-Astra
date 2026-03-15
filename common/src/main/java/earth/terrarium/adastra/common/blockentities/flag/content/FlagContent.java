@@ -4,7 +4,8 @@ import com.google.common.hash.HashCode;
 import earth.terrarium.adastra.AdAstra;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
+import org.jetbrains.annotations.Nullable;
 
 public interface FlagContent {
 
@@ -14,8 +15,8 @@ public interface FlagContent {
 
     Tag toTag();
 
-    default ResourceLocation toTexture() {
-        return ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "flagtextures/" + type() + "/" + hash());
+    default Identifier toTexture() {
+        return Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "flagtextures/" + type() + "/" + hash());
     }
 
     default CompoundTag toFullTag() {
@@ -26,12 +27,21 @@ public interface FlagContent {
     }
 
     static FlagContent fromTag(CompoundTag tag) {
-        String type = tag.getString("type");
+        String type = tag.getStringOr("type", "");
         Tag content = tag.get("content");
         if (content == null) return null;
         return switch (type) {
-            case ImageContent.TYPE -> ImageContent.of(content.getAsString());
-            case UrlContent.TYPE -> UrlContent.of(content.getAsString());
+            case ImageContent.TYPE -> ImageContent.of(content.asString().orElse(""));
+            case UrlContent.TYPE -> UrlContent.of(content.asString().orElse(""));
+            default -> null;
+        };
+    }
+
+    @Nullable
+    static FlagContent fromTypeAndContent(String type, String content) {
+        return switch (type) {
+            case ImageContent.TYPE -> ImageContent.of(content);
+            case UrlContent.TYPE -> UrlContent.of(content);
             default -> null;
         };
     }

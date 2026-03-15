@@ -13,9 +13,10 @@ import earth.terrarium.common_storage_lib.resources.ResourceStack;
 import earth.terrarium.common_storage_lib.resources.fluid.FluidResource;
 import earth.terrarium.common_storage_lib.resources.fluid.ingredient.SizedFluidIngredient;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.crafting.RecipeInput;
-import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.resources.Identifier;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,6 +26,8 @@ public record RefiningRecipe(
     FluidResource result,
     long resultAmount
 ) implements CodecRecipe<RecipeInput> {
+
+    private static final RecipeBookCategory BOOK_CATEGORY = new RecipeBookCategory();
 
     public static final MapCodec<RefiningRecipe> CODEC = RecordCodecBuilder.mapCodec(
         instance -> instance.group(
@@ -36,14 +39,14 @@ public record RefiningRecipe(
             new RefiningRecipe(cookingTime, energy, input, resultStack.resource(), resultStack.amount())));
 
     private static final ByteCodec<FluidResource> FLUID_RESOURCE_BYTE_CODEC = ByteCodec.STRING.map(
-        str -> FluidResource.of(BuiltInRegistries.FLUID.get(ResourceLocation.parse(str))),
+        str -> FluidResource.of(BuiltInRegistries.FLUID.getValue(Identifier.parse(str))),
         res -> BuiltInRegistries.FLUID.getKey(res.getType()).toString()
     );
 
     private static final ByteCodec<SizedFluidIngredient> SIZED_FLUID_INGREDIENT_BYTE_CODEC = ObjectByteCodec.create(
         ByteCodec.STRING.fieldOf(i -> BuiltInRegistries.FLUID.getKey(i.getFluids().getFirst().resource().getType()).toString()),
         ByteCodec.LONG.fieldOf(SizedFluidIngredient::getAmount),
-        (fluidStr, amount) -> SizedFluidIngredient.of(FluidResource.of(BuiltInRegistries.FLUID.get(ResourceLocation.parse(fluidStr))), (int) (long) amount)
+        (fluidStr, amount) -> SizedFluidIngredient.of(FluidResource.of(BuiltInRegistries.FLUID.getValue(Identifier.parse(fluidStr))), (int) (long) amount)
     );
 
     public static final ByteCodec<RefiningRecipe> NETWORK_CODEC = ObjectByteCodec.create(
@@ -62,12 +65,30 @@ public record RefiningRecipe(
     }
 
     @Override
-    public CodecRecipeSerializer<? extends CodecRecipe<RecipeInput>> serializer() {
+    public @NotNull ItemStack assemble(@NotNull RecipeInput input, HolderLookup.@NotNull Provider provider) {
+        return ItemStack.EMPTY;
+    }
+
+
+
+    @Override
+    public @NotNull CodecRecipeSerializer<? extends Recipe<RecipeInput>> getSerializer() {
         return ModRecipeSerializers.REFINING.get();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public @NotNull RecipeType<?> getType() {
-        return ModRecipeTypes.REFINING.get();
+    public @NotNull RecipeType<RefiningRecipe> getType() {
+        return (RecipeType<RefiningRecipe>) (RecipeType<?>) ModRecipeTypes.REFINING.get();
+    }
+
+    @Override
+    public @NotNull PlacementInfo placementInfo() {
+        return PlacementInfo.NOT_PLACEABLE;
+    }
+
+    @Override
+    public @NotNull RecipeBookCategory recipeBookCategory() {
+        return BOOK_CATEGORY;
     }
 }

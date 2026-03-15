@@ -1,13 +1,13 @@
 package earth.terrarium.adastra.common.constants;
 
 import earth.terrarium.adastra.AdAstra;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 // Source: https://www.windows2universe.org/our_solar_system/planets_table.html
 public class PlanetConstants {
 
-    public static final ResourceLocation SOLAR_SYSTEM = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "solar_system");
-    public static final ResourceLocation PROXIMA_CENTAURI = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "proxima_centauri");
+    public static final Identifier SOLAR_SYSTEM = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "solar_system");
+    public static final Identifier PROXIMA_CENTAURI = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "proxima_centauri");
 
     public static final float EARTH_GRAVITY = 9.807f;
     public static final short EARTH_TEMPERATURE = 15;

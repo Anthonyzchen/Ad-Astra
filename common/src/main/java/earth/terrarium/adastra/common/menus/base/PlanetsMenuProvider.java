@@ -13,7 +13,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
@@ -38,11 +38,11 @@ public class PlanetsMenuProvider implements ContentMenuProvider<PlanetsMenuConte
 
     @Override
     public PlanetsMenuContent createContent(ServerPlayer player) {
-        Set<ResourceLocation> disabledPlanets = new HashSet<>();
+        Set<Identifier> disabledPlanets = new HashSet<>();
         String[] planets = AdAstraConfig.disabledPlanets.split(",");
         for (var planet : planets) {
             if (!planet.isBlank()) {
-                disabledPlanets.add(ResourceLocation.parse(planet));
+                disabledPlanets.add(Identifier.fromNamespaceAndPath(planet));
             }
         }
 
@@ -69,7 +69,7 @@ public class PlanetsMenuProvider implements ContentMenuProvider<PlanetsMenuConte
     }
 
     public static void writeToBuffer(FriendlyByteBuf buffer, PlanetsMenuContent content) {
-        buffer.writeUtf(String.join(",", content.disabledPlanets().stream().map(ResourceLocation::toString).toList()));
+        buffer.writeUtf(String.join(",", content.disabledPlanets().stream().map(Identifier::toString).toList()));
 
         buffer.writeVarInt(content.spaceStations().size());
         content.spaceStations().forEach((dimension, stationGroups) -> {
@@ -92,12 +92,12 @@ public class PlanetsMenuProvider implements ContentMenuProvider<PlanetsMenuConte
         });
     }
 
-    public static Set<ResourceLocation> createDisabledPlanetsFromBuf(FriendlyByteBuf buf) {
-        Set<ResourceLocation> disabledPlanets = new HashSet<>();
+    public static Set<Identifier> createDisabledPlanetsFromBuf(FriendlyByteBuf buf) {
+        Set<Identifier> disabledPlanets = new HashSet<>();
         String[] planets = buf.readUtf().split(",");
         for (var planet : planets) {
             if (!planet.isBlank()) {
-                disabledPlanets.add(ResourceLocation.parse(planet));
+                disabledPlanets.add(Identifier.fromNamespaceAndPath(planet));
             }
         }
         return Collections.unmodifiableSet(disabledPlanets);

@@ -11,7 +11,7 @@ import earth.terrarium.adastra.AdAstra;
 import earth.terrarium.adastra.common.blockentities.machines.GravityNormalizerBlockEntity;
 import earth.terrarium.adastra.common.utils.ModUtils;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 
@@ -28,12 +28,11 @@ public record ServerboundSetGravityNormalizerTargetPacket(
         return TYPE;
     }
 
-    private static class Type extends CodecPacketType<ServerboundSetGravityNormalizerTargetPacket> implements ServerboundPacketType<ServerboundSetGravityNormalizerTargetPacket> {
+    private static class Type extends CodecPacketType.Server<ServerboundSetGravityNormalizerTargetPacket> {
 
         public Type() {
             super(
-                ServerboundSetGravityNormalizerTargetPacket.class,
-                ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "set_gravity_normalizer_target"),
+                Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "set_gravity_normalizer_target"),
                 ObjectByteCodec.create(
                     ExtraByteCodecs.BLOCK_POS.fieldOf(ServerboundSetGravityNormalizerTargetPacket::machine),
                     ByteCodec.FLOAT.fieldOf(ServerboundSetGravityNormalizerTargetPacket::target),

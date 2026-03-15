@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class AbstractContainerScreenMixin implements AbstractContainerScreenExtension {
 
     @Inject(
-        method = "renderSlot",
+        method = "method_2385",
         at = @At(
             value = "INVOKE",
             target = "Lcom/mojang/blaze3d/vertex/PoseStack;translate(FFF)V",

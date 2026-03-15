@@ -21,7 +21,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -37,7 +37,7 @@ public class PlanetsMenu extends AbstractContainerMenu {
     protected final Inventory inventory;
     protected final Player player;
     protected final Level level;
-    protected final Set<ResourceLocation> disabledPlanets;
+    protected final Set<Identifier> disabledPlanets;
     protected final Map<ResourceKey<Level>, Map<UUID, Set<SpaceStation>>> spaceStations;
     protected final Map<ResourceKey<Level>, List<Pair<ItemStack, Integer>>> ingredients;
     protected final Object2BooleanMap<ResourceKey<Level>> claimedChunks = new Object2BooleanOpenHashMap<>();
@@ -45,7 +45,7 @@ public class PlanetsMenu extends AbstractContainerMenu {
 
     public PlanetsMenu(int containerId,
                        Inventory inventory,
-                       Set<ResourceLocation> disabledPlanets,
+                       Set<Identifier> disabledPlanets,
                        Map<ResourceKey<Level>, Map<UUID, Set<SpaceStation>>> spaceStations,
                        Set<GlobalPos> spawnLocations
     ) {
@@ -78,7 +78,7 @@ public class PlanetsMenu extends AbstractContainerMenu {
         return player;
     }
 
-    public Set<ResourceLocation> disabledPlanets() {
+    public Set<Identifier> disabledPlanets() {
         return disabledPlanets;
     }
 
@@ -189,12 +189,12 @@ public class PlanetsMenu extends AbstractContainerMenu {
     }
 
     public Component getPlanetName(ResourceKey<Level> dimension) {
-        return Component.translatableWithFallback("planet.%s.%s".formatted(dimension.location().getNamespace(), dimension.location().getPath()), PlanetsScreen.title(dimension.location().getPath()));
+        return Component.translatableWithFallback("planet.%s.%s".formatted(dimension.identifier().getNamespace(), dimension.identifier().getPath()), PlanetsScreen.title(dimension.identifier().getPath()));
     }
 
     public List<Planet> getSortedPlanets() {
         return AdAstraData.planets().values().stream()
-            .filter(planet -> !disabledPlanets().contains(planet.dimension().location()))
+            .filter(planet -> !disabledPlanets().contains(planet.dimension().identifier()))
             .filter(planet -> tier() >= planet.tier())
             .sorted(Comparator.comparingInt(Planet::tier).thenComparing(p -> getPlanetName(p.dimension()).getString()))
             .toList();

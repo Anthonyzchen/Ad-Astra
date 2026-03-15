@@ -6,11 +6,11 @@ import earth.terrarium.common_storage_lib.energy.impl.SimpleValueStorage;
 import earth.terrarium.common_storage_lib.storage.base.ValueStorage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -39,18 +39,18 @@ public abstract class EnergyContainerMachineBlockEntity extends ContainerMachine
     }
 
     @Override
-    public void loadAdditional(@NotNull CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
-        if (energyContainer != null && tag.contains("Energy")) {
-            energyContainer.set(tag.getLong("Energy"));
+    public void loadAdditional(@NotNull ValueInput input) {
+        super.loadAdditional(input);
+        if (energyContainer != null) {
+            energyContainer.set(input.getLongOr("Energy", 0L));
         }
     }
 
     @Override
-    protected void saveAdditional(@NotNull CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
+    protected void saveAdditional(@NotNull ValueOutput output) {
+        super.saveAdditional(output);
         if (energyContainer != null) {
-            tag.putLong("Energy", energyContainer.getStoredAmount());
+            output.putLong("Energy", energyContainer.getStoredAmount());
         }
     }
 

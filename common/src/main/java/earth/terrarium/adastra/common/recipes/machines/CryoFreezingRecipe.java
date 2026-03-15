@@ -11,12 +11,12 @@ import com.teamresourceful.resourcefullib.common.recipe.CodecRecipeSerializer;
 import earth.terrarium.adastra.common.registry.ModRecipeSerializers;
 import earth.terrarium.adastra.common.registry.ModRecipeTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import earth.terrarium.common_storage_lib.resources.ResourceStack;
 import earth.terrarium.common_storage_lib.resources.fluid.FluidResource;
-import net.minecraft.world.item.crafting.RecipeInput;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,6 +26,8 @@ public record CryoFreezingRecipe(
     FluidResource result,
     long resultAmount
 ) implements CodecRecipe<RecipeInput> {
+
+    private static final RecipeBookCategory BOOK_CATEGORY = new RecipeBookCategory();
 
     public static final MapCodec<CryoFreezingRecipe> CODEC = RecordCodecBuilder.mapCodec(
         instance -> instance.group(
@@ -37,7 +39,7 @@ public record CryoFreezingRecipe(
             new CryoFreezingRecipe(cookingTime, energy, input, resultStack.resource(), resultStack.amount())));
 
     private static final ByteCodec<FluidResource> FLUID_RESOURCE_BYTE_CODEC = ByteCodec.STRING.map(
-        str -> FluidResource.of(BuiltInRegistries.FLUID.get(ResourceLocation.parse(str))),
+        str -> FluidResource.of(BuiltInRegistries.FLUID.getValue(Identifier.parse(str))),
         res -> BuiltInRegistries.FLUID.getKey(res.getType()).toString()
     );
 
@@ -56,12 +58,30 @@ public record CryoFreezingRecipe(
     }
 
     @Override
-    public CodecRecipeSerializer<? extends CodecRecipe<RecipeInput>> serializer() {
+    public @NotNull ItemStack assemble(@NotNull RecipeInput input, HolderLookup.@NotNull Provider provider) {
+        return ItemStack.EMPTY;
+    }
+
+
+
+    @Override
+    public @NotNull CodecRecipeSerializer<? extends Recipe<RecipeInput>> getSerializer() {
         return ModRecipeSerializers.CRYO_FREEZING.get();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public @NotNull RecipeType<?> getType() {
-        return ModRecipeTypes.CRYO_FREEZING.get();
+    public @NotNull RecipeType<CryoFreezingRecipe> getType() {
+        return (RecipeType<CryoFreezingRecipe>) (RecipeType<?>) ModRecipeTypes.CRYO_FREEZING.get();
+    }
+
+    @Override
+    public @NotNull PlacementInfo placementInfo() {
+        return PlacementInfo.NOT_PLACEABLE;
+    }
+
+    @Override
+    public @NotNull RecipeBookCategory recipeBookCategory() {
+        return BOOK_CATEGORY;
     }
 }

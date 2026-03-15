@@ -21,11 +21,11 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.core.Holder;
-import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.equipment.ArmorMaterial;
+import net.minecraft.world.item.equipment.ArmorType;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
@@ -37,7 +37,7 @@ public class SpaceSuitItem extends CustomDyeableArmorItem {
 
     protected final long tankSize;
 
-    public SpaceSuitItem(Holder<ArmorMaterial> material, Type type, long tankSize, Properties properties) {
+    public SpaceSuitItem(ArmorMaterial material, ArmorType type, long tankSize, Properties properties) {
         super(material, type, properties);
         this.tankSize = tankSize;
     }

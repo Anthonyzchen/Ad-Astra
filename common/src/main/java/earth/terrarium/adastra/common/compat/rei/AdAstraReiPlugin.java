@@ -4,7 +4,6 @@ import earth.terrarium.adastra.client.screens.PlanetsScreen;
 import earth.terrarium.adastra.client.screens.machines.*;
 import earth.terrarium.adastra.common.compat.rei.categories.*;
 import earth.terrarium.adastra.common.compat.rei.displays.*;
-import earth.terrarium.adastra.common.recipes.machines.*;
 import earth.terrarium.adastra.common.registry.ModBlocks;
 import earth.terrarium.adastra.common.registry.ModRecipeTypes;
 import me.shedaniel.math.Rectangle;
@@ -14,8 +13,14 @@ import me.shedaniel.rei.api.client.registry.display.DisplayRegistry;
 import me.shedaniel.rei.api.client.registry.screen.OverlayDecider;
 import me.shedaniel.rei.api.client.registry.screen.ScreenRegistry;
 import me.shedaniel.rei.api.common.util.EntryStacks;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.item.crafting.RecipeHolder;
+
+import java.util.Objects;
 
 public class AdAstraReiPlugin implements REIClientPlugin {
 
@@ -37,14 +42,26 @@ public class AdAstraReiPlugin implements REIClientPlugin {
         registry.addWorkstations(NasaWorkbenchCategory.ID, EntryStacks.of(ModBlocks.NASA_WORKBENCH.get()));
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void registerDisplays(DisplayRegistry registry) {
-        registry.registerRecipeFiller(CompressingRecipe.class, ModRecipeTypes.COMPRESSING.get(), CompressingDisplay::new);
-        registry.registerRecipeFiller(AlloyingRecipe.class, ModRecipeTypes.ALLOYING.get(), AlloyingDisplay::new);
-        registry.registerRecipeFiller(OxygenLoadingRecipe.class, ModRecipeTypes.OXYGEN_LOADING.get(), OxygenLoadingDisplay::new);
-        registry.registerRecipeFiller(RefiningRecipe.class, ModRecipeTypes.REFINING.get(), RefiningDisplay::new);
-        registry.registerRecipeFiller(CryoFreezingRecipe.class, ModRecipeTypes.CRYO_FREEZING.get(), CryoFreezingDisplay::new);
-        registry.registerRecipeFiller(NasaWorkbenchRecipe.class, ModRecipeTypes.NASA_WORKBENCH.get(), NasaWorkbenchDisplay::new);
+        var mc = Minecraft.getInstance();
+        var server = mc.getSingleplayerServer();
+        if (server == null) return;
+        var allRecipes = server.getRecipeManager().getRecipes();
+
+        allRecipes.stream().filter(h -> h.value().getType() == ModRecipeTypes.COMPRESSING.get())
+            .forEach(h -> registry.add(new CompressingDisplay((RecipeHolder) h)));
+        allRecipes.stream().filter(h -> h.value().getType() == ModRecipeTypes.ALLOYING.get())
+            .forEach(h -> registry.add(new AlloyingDisplay((RecipeHolder) h)));
+        allRecipes.stream().filter(h -> h.value().getType() == ModRecipeTypes.OXYGEN_LOADING.get())
+            .forEach(h -> registry.add(new OxygenLoadingDisplay((RecipeHolder) h)));
+        allRecipes.stream().filter(h -> h.value().getType() == ModRecipeTypes.REFINING.get())
+            .forEach(h -> registry.add(new RefiningDisplay((RecipeHolder) h)));
+        allRecipes.stream().filter(h -> h.value().getType() == ModRecipeTypes.CRYO_FREEZING.get())
+            .forEach(h -> registry.add(new CryoFreezingDisplay((RecipeHolder) h)));
+        allRecipes.stream().filter(h -> h.value().getType() == ModRecipeTypes.NASA_WORKBENCH.get())
+            .forEach(h -> registry.add(new NasaWorkbenchDisplay((RecipeHolder) h)));
     }
 
     @Override

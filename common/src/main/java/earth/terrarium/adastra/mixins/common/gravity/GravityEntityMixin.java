@@ -5,7 +5,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.item.PrimedTnt;
-import net.minecraft.world.entity.vehicle.AbstractMinecart;
+import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
@@ -20,7 +20,7 @@ public abstract class GravityEntityMixin extends Entity {
         super(type, level);
     }
 
-    @Inject(method = "tick", at = @At("TAIL"))
+    @Inject(method = "tick()V", at = @At("TAIL"), remap = false)
     public void adastra$tick(CallbackInfo ci) {
         double gravity = 0.04 * GravityApi.API.getGravity(this);
         Vec3 velocity = this.getDeltaMovement();

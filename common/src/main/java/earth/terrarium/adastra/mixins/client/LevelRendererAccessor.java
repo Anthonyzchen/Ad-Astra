@@ -1,6 +1,5 @@
 package earth.terrarium.adastra.mixins.client;
 
-import com.mojang.blaze3d.vertex.VertexBuffer;
 import net.minecraft.client.Camera;
 import net.minecraft.client.renderer.LevelRenderer;
 import org.spongepowered.asm.mixin.Mixin;
@@ -15,7 +14,4 @@ public interface LevelRendererAccessor {
 
     @Accessor
     int getTicks();
-
-    @Accessor
-    VertexBuffer getSkyBuffer();
 }

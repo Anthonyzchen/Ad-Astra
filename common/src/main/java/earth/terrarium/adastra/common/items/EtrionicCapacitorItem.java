@@ -14,7 +14,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -47,7 +47,7 @@ public class EtrionicCapacitorItem extends Item implements EnergyProvider.Item {
     public static boolean active(ItemStack stack) {
         CompoundTag tag = getCustomData(stack);
         if (tag.contains(ACTIVE_TAG)) {
-            return tag.getBoolean(ACTIVE_TAG);
+            return tag.getBooleanOr(ACTIVE_TAG, false);
         }
         return false;
     }
@@ -63,7 +63,7 @@ public class EtrionicCapacitorItem extends Item implements EnergyProvider.Item {
     public static DistributionMode mode(ItemStack stack) {
         CompoundTag tag = getCustomData(stack);
         if (tag.contains(MODE_TAG)) {
-            return DistributionMode.values()[tag.getByte(MODE_TAG)];
+            return DistributionMode.values()[tag.getByteOr(MODE_TAG, (byte) 0)];
         }
         return DistributionMode.SEQUENTIAL;
     }

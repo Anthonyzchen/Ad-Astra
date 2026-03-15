@@ -13,6 +13,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ServerGamePacketListenerImpl.class)
 public abstract class ServerGamePacketListenerImplMixin {
 
+    // TODO: 1.21.11 - Verify these field names haven't changed in 1.21.11.
+    // Check ServerGamePacketListenerImpl for the correct field names for
+    // tracking flying/vehicle kick timers.
     @Shadow
     private int aboveGroundTickCount;
     @Shadow
@@ -21,7 +24,7 @@ public abstract class ServerGamePacketListenerImplMixin {
     @Shadow
     public ServerPlayer player;
 
-    @Inject(method = "tick", at = @At("HEAD"))
+    @Inject(method = "method_18784", at = @At("HEAD"))
     public void adastra$tick(CallbackInfo ci) {
         if (player.tickCount % 50 == 0) {
             // Prevent the player from being kicked for flying a jet suit.

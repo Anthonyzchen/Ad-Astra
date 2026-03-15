@@ -11,7 +11,7 @@ import earth.terrarium.adastra.api.planets.Planet;
 import earth.terrarium.adastra.common.planets.AdAstraData;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 
 import java.util.Map;
@@ -29,12 +29,11 @@ public record ClientboundSyncPlanetsPacket(
         return TYPE;
     }
 
-    private static class Type extends CodecPacketType<ClientboundSyncPlanetsPacket> implements ClientboundPacketType<ClientboundSyncPlanetsPacket> {
+    private static class Type extends CodecPacketType.Client<ClientboundSyncPlanetsPacket> {
 
         public Type() {
             super(
-                ClientboundSyncPlanetsPacket.class,
-                ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "sync_planets"),
+                Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "sync_planets"),
                 ObjectByteCodec.create(
                     ByteCodec.passthrough(
                             (buf, planet) -> AdAstraData.encodePlanets(new FriendlyByteBuf(buf)),

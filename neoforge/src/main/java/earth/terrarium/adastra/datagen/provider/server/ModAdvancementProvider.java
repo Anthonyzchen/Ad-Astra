@@ -9,7 +9,7 @@ import net.minecraft.advancements.critereon.*;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.neoforged.neoforge.common.data.AdvancementProvider;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
@@ -35,7 +35,7 @@ public class ModAdvancementProvider extends AdvancementProvider {
                     ModItems.EARTH_GLOBE.get(),
                     Component.translatable("advancements.ad_astra.ad_astra.title"),
                     Component.translatable("advancements.ad_astra.ad_astra.description"),
-                    new ResourceLocation(AdAstra.MOD_ID, "textures/block/steel_panel.png"),
+                    new Identifier(AdAstra.MOD_ID, "textures/block/steel_panel.png"),
                     AdvancementType.TASK,
                     false,
                     false,

@@ -28,6 +28,8 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -83,29 +85,28 @@ public class OxygenDistributorBlockEntity extends OxygenLoaderBlockEntity {
 
 
     @Override
-    public void loadAdditional(@NotNull CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
-        if (tag.contains("LastDistributedBlocks")) {
-            lastDistributedBlocks.clear();
-            for (var pos : tag.getLongArray("LastDistributedBlocks")) {
-                lastDistributedBlocks.add(BlockPos.of(pos));
-            }
-        }
-        energyPerTick = tag.getLong("EnergyPerTick");
-        fluidPerTick = tag.getFloat("FluidPerTick");
-        distributedBlocksCount = tag.getInt("DistributedBlocksCount");
-        accumulatedFluid = tag.getDouble("AccumulatedFluid");
-        limit = tag.getInt("Limit");
+    public void loadAdditional(@NotNull ValueInput input) {
+        super.loadAdditional(input);
+        input.read("LastDistributedBlocks", com.mojang.serialization.Codec.LONG_STREAM)
+            .ifPresent(longStream -> {
+                lastDistributedBlocks.clear();
+                longStream.forEach(pos -> lastDistributedBlocks.add(BlockPos.of(pos)));
+            });
+        energyPerTick = input.getLongOr("EnergyPerTick", 0L);
+        fluidPerTick = input.getFloatOr("FluidPerTick", 0f);
+        distributedBlocksCount = input.getIntOr("DistributedBlocksCount", 0);
+        accumulatedFluid = input.getDoubleOr("AccumulatedFluid", 0.0);
+        limit = input.getIntOr("Limit", MachineConfig.maxDistributionBlocks);
     }
 
     @Override
-    protected void saveAdditional(@NotNull CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
-        tag.putLong("EnergyPerTick", energyPerTick);
-        tag.putFloat("FluidPerTick", fluidPerTick);
-        tag.putInt("DistributedBlocksCount", distributedBlocksCount);
-        tag.putDouble("AccumulatedFluid", accumulatedFluid);
-        tag.putInt("Limit", limit);
+    protected void saveAdditional(@NotNull ValueOutput output) {
+        super.saveAdditional(output);
+        output.putLong("EnergyPerTick", energyPerTick);
+        output.putFloat("FluidPerTick", fluidPerTick);
+        output.putInt("DistributedBlocksCount", distributedBlocksCount);
+        output.putDouble("AccumulatedFluid", accumulatedFluid);
+        output.putInt("Limit", limit);
     }
 
     @Override

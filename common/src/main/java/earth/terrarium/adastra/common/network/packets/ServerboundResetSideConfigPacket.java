@@ -10,7 +10,7 @@ import com.teamresourceful.resourcefullib.common.network.defaults.CodecPacketTyp
 import earth.terrarium.adastra.AdAstra;
 import earth.terrarium.adastra.common.utils.ModUtils;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.function.Consumer;
@@ -26,12 +26,11 @@ public record ServerboundResetSideConfigPacket(
         return TYPE;
     }
 
-    private static class Type extends CodecPacketType<ServerboundResetSideConfigPacket> implements ServerboundPacketType<ServerboundResetSideConfigPacket> {
+    private static class Type extends CodecPacketType.Server<ServerboundResetSideConfigPacket> {
 
         public Type() {
             super(
-                ServerboundResetSideConfigPacket.class,
-                ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "reset_side_config"),
+                Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "reset_side_config"),
                 ObjectByteCodec.create(
                     ExtraByteCodecs.BLOCK_POS.fieldOf(ServerboundResetSideConfigPacket::machine),
                     ByteCodec.INT.fieldOf(ServerboundResetSideConfigPacket::configIndex),

@@ -26,14 +26,14 @@ public class MarsBlockBlobFeature extends Feature<BlockStateConfiguration> {
         RandomSource randomSource = context.random();
 
         BlockStateConfiguration blockStateConfiguration;
-        for (blockStateConfiguration = context.config(); blockPos.getY() > worldGenLevel.getMinBuildHeight() + 3; blockPos = blockPos.below()) {
+        for (blockStateConfiguration = context.config(); blockPos.getY() > worldGenLevel.getMinY() + 3; blockPos = blockPos.below()) {
             if (!worldGenLevel.isEmptyBlock(blockPos.below())) {
                 BlockState state = worldGenLevel.getBlockState(blockPos.below());
                 if (state.is(ModBlocks.MARS_SAND.get())) break;
             }
         }
 
-        if (blockPos.getY() <= worldGenLevel.getMinBuildHeight() + 3) {
+        if (blockPos.getY() <= worldGenLevel.getMinY() + 3) {
             return false;
         } else {
             for (int i = 0; i < 3; ++i) {

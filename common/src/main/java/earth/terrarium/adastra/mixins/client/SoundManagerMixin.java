@@ -26,14 +26,14 @@ public abstract class SoundManagerMixin {
     @Final
     private SoundEngine soundEngine;
 
-    @Inject(method = "play", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "method_4873", at = @At("HEAD"), cancellable = true)
     private void adastra$play(SoundInstance sound, CallbackInfo ci) {
         if (adastra$play(sound, 0)) {
             ci.cancel();
         }
     }
 
-    @Inject(method = "playDelayed", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "method_4872", at = @At("HEAD"), cancellable = true)
     private void adastra$playDelayed(SoundInstance sound, int delay, CallbackInfo ci) {
         if (adastra$play(sound, delay)) {
             ci.cancel();
@@ -55,7 +55,7 @@ public abstract class SoundManagerMixin {
 
         Minecraft.getInstance().execute(() -> {
             float volume = source == SoundSource.MUSIC || source == SoundSource.RECORDS ? 1 : 0.1f;
-            SoundInstance newSound = new SimpleSoundInstance(sound.getLocation(), source,
+            SoundInstance newSound = new SimpleSoundInstance(sound.getIdentifier(), source,
                 volume, 0.1f,
                 RandomSource.create(), sound.isLooping(), delay,
                 sound.getAttenuation(), sound.getX(),

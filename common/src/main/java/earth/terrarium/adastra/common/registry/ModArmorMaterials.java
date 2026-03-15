@@ -2,79 +2,67 @@ package earth.terrarium.adastra.common.registry;
 
 import earth.terrarium.adastra.AdAstra;
 import earth.terrarium.adastra.common.tags.ModItemTags;
-import net.minecraft.Util;
-import net.minecraft.core.Holder;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.sounds.SoundEvent;
+import net.minecraft.util.Util;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.ArmorMaterial;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.equipment.ArmorMaterial;
+import net.minecraft.world.item.equipment.ArmorType;
 
 import java.util.EnumMap;
-import java.util.List;
-import java.util.function.Supplier;
+import java.util.Map;
 
 public class ModArmorMaterials {
 
-    public static final Holder<ArmorMaterial> SPACE_SUIT = register("space_suit",
-        Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
-            map.put(ArmorItem.Type.BOOTS, 2);
-            map.put(ArmorItem.Type.LEGGINGS, 5);
-            map.put(ArmorItem.Type.CHESTPLATE, 6);
-            map.put(ArmorItem.Type.HELMET, 2);
+    public static final ArmorMaterial SPACE_SUIT = new ArmorMaterial(
+        15, // durability
+        Util.make(new EnumMap<>(ArmorType.class), map -> {
+            map.put(ArmorType.BOOTS, 2);
+            map.put(ArmorType.LEGGINGS, 5);
+            map.put(ArmorType.CHESTPLATE, 6);
+            map.put(ArmorType.HELMET, 2);
+            map.put(ArmorType.BODY, 5);
         }),
         14,
         SoundEvents.ARMOR_EQUIP_LEATHER,
         0.0f,
         0.0f,
-        () -> Ingredient.of(ModItemTags.STEEL_INGOTS)
+        ModItemTags.STEEL_INGOTS,
+        Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "space_suit")
     );
 
-    public static final Holder<ArmorMaterial> NETHERITE_SPACE_SUIT = register("netherite_space_suit",
-        Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
-            map.put(ArmorItem.Type.BOOTS, 3);
-            map.put(ArmorItem.Type.LEGGINGS, 6);
-            map.put(ArmorItem.Type.CHESTPLATE, 8);
-            map.put(ArmorItem.Type.HELMET, 3);
+    public static final ArmorMaterial NETHERITE_SPACE_SUIT = new ArmorMaterial(
+        37, // durability (netherite-tier)
+        Util.make(new EnumMap<>(ArmorType.class), map -> {
+            map.put(ArmorType.BOOTS, 3);
+            map.put(ArmorType.LEGGINGS, 6);
+            map.put(ArmorType.CHESTPLATE, 8);
+            map.put(ArmorType.HELMET, 3);
+            map.put(ArmorType.BODY, 5);
         }),
         15,
         SoundEvents.ARMOR_EQUIP_NETHERITE,
         3.0f,
         0.1f,
-        () -> Ingredient.of(Items.NETHERITE_INGOT)
+        net.minecraft.tags.ItemTags.REPAIRS_NETHERITE_ARMOR,
+        Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "netherite_space_suit")
     );
 
-    public static final Holder<ArmorMaterial> JET_SUIT = register("jet_suit",
-        Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
-            map.put(ArmorItem.Type.BOOTS, 4);
-            map.put(ArmorItem.Type.LEGGINGS, 7);
-            map.put(ArmorItem.Type.CHESTPLATE, 9);
-            map.put(ArmorItem.Type.HELMET, 4);
+    public static final ArmorMaterial JET_SUIT = new ArmorMaterial(
+        41, // durability (beyond netherite)
+        Util.make(new EnumMap<>(ArmorType.class), map -> {
+            map.put(ArmorType.BOOTS, 4);
+            map.put(ArmorType.LEGGINGS, 7);
+            map.put(ArmorType.CHESTPLATE, 9);
+            map.put(ArmorType.HELMET, 4);
+            map.put(ArmorType.BODY, 5);
         }),
         15,
         SoundEvents.ARMOR_EQUIP_NETHERITE,
         5.0f,
         0.1f,
-        () -> Ingredient.of(ModItemTags.CALORITE_INGOTS)
+        ModItemTags.CALORITE_INGOTS,
+        Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "jet_suit")
     );
-
-    private static Holder<ArmorMaterial> register(
-        String name,
-        EnumMap<ArmorItem.Type, Integer> defense,
-        int enchantmentValue,
-        Holder<SoundEvent> equipSound,
-        float toughness,
-        float knockbackResistance,
-        Supplier<Ingredient> repairIngredient
-    ) {
-        List<ArmorMaterial.Layer> layers = List.of(new ArmorMaterial.Layer(ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, name)));
-        ArmorMaterial material = new ArmorMaterial(defense, enchantmentValue, equipSound, repairIngredient, layers, toughness, knockbackResistance);
-        return Registry.registerForHolder(BuiltInRegistries.ARMOR_MATERIAL, ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, name), material);
-    }
 
     public static void init() {
         // Force static initialization

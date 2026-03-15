@@ -1,6 +1,6 @@
 package earth.terrarium.adastra.common.handlers;
 
-import com.teamresourceful.resourcefullib.common.utils.SaveHandler;
+import com.mojang.serialization.Codec;
 import earth.terrarium.adastra.api.systems.GravityApi;
 import earth.terrarium.adastra.api.systems.OxygenApi;
 import earth.terrarium.adastra.api.systems.PlanetData;
@@ -9,22 +9,26 @@ import it.unimi.dsi.fastutil.ints.IntArrayList;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.saveddata.SavedData;
+import net.minecraft.world.level.saveddata.SavedDataType;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PlanetHandler extends SaveHandler {
+public class PlanetHandler extends SavedData {
 
     private final Map<BlockPos, PlanetData> planetData = new HashMap<>();
-    private final ServerLevel level;
+    private ServerLevel level;
 
-    public PlanetHandler(ServerLevel level) {
+    public PlanetHandler() {
+    }
+
+    private PlanetHandler(ServerLevel level) {
         this.level = level;
     }
 
-    @Override
-    public void loadData(CompoundTag tag) {
+    private void loadData(CompoundTag tag) {
         var data = tag.getIntArray("");
         if (data.length % 3 != 0) {
             throw new RuntimeException("Invalid data length");
@@ -39,8 +43,8 @@ public class PlanetHandler extends SaveHandler {
         }
     }
 
-    @Override
-    public void saveData(CompoundTag tag) {
+    private void saveData(CompoundTag tag) {
+        if (level == null) return;
         boolean defaultOxygen = OxygenApi.API.hasOxygen(level);
         short defaultTemperature = TemperatureApi.API.getTemperature(level);
         float defaultGravity = GravityApi.API.getGravity(level);
@@ -60,8 +64,31 @@ public class PlanetHandler extends SaveHandler {
         tag.putIntArray("", dataArray.toIntArray());
     }
 
+    private static Codec<PlanetHandler> createCodec(ServerLevel level) {
+        return CompoundTag.CODEC.xmap(
+            tag -> {
+                PlanetHandler handler = new PlanetHandler(level);
+                handler.loadData(tag);
+                return handler;
+            },
+            handler -> {
+                CompoundTag tag = new CompoundTag();
+                handler.saveData(tag);
+                return tag;
+            }
+        );
+    }
+
     public static PlanetHandler read(ServerLevel level) {
-        return read(level.getDataStorage(), HandlerType.create(() -> new PlanetHandler(level)), "adastra_planet_data");
+        SavedDataType<PlanetHandler> type = new SavedDataType<>(
+            "adastra_planet_data",
+            () -> new PlanetHandler(level),
+            createCodec(level),
+            null
+        );
+        PlanetHandler handler = level.getDataStorage().computeIfAbsent(type);
+        handler.level = level;
+        return handler;
     }
 
     public static boolean hasOxygen(ServerLevel level, BlockPos pos) {

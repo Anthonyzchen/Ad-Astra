@@ -17,7 +17,7 @@ import earth.terrarium.adastra.common.utils.ModUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.TicketType;
@@ -41,12 +41,11 @@ public record ServerboundConstructSpaceStationPacket(
         return TYPE;
     }
 
-    private static class Type extends CodecPacketType<ServerboundConstructSpaceStationPacket> implements ServerboundPacketType<ServerboundConstructSpaceStationPacket> {
+    private static class Type extends CodecPacketType.Server<ServerboundConstructSpaceStationPacket> {
 
         public Type() {
             super(
-                ServerboundConstructSpaceStationPacket.class,
-                ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "construct_space_station"),
+                Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "construct_space_station"),
                 ObjectByteCodec.create(
                     ExtraByteCodecs.DIMENSION.fieldOf(ServerboundConstructSpaceStationPacket::dimension),
                     ExtraByteCodecs.COMPONENT.fieldOf(ServerboundConstructSpaceStationPacket::name),
@@ -85,7 +84,8 @@ public record ServerboundConstructSpaceStationPacket(
                 // Construct space station structure from structure nbt file
                 StructureTemplate structure = targetLevel.getStructureManager().getOrCreate(recipe.value().structure());
                 BlockPos stationPos = BlockPos.containing((pos.getMiddleBlockX() - (structure.getSize().getX() / 2.0f)), 100, (pos.getMiddleBlockZ() - (structure.getSize().getZ() / 2.0f)));
-                targetLevel.getChunkSource().addRegionTicket(TicketType.PORTAL, new ChunkPos(stationPos), 1, stationPos);
+                // Force load the chunks around the station for structure placement
+                targetLevel.getChunk(stationPos);
                 structure.placeInWorld(targetLevel, stationPos, stationPos, new StructurePlaceSettings(), targetLevel.random, 2);
 
                 SpaceStationHandler.constructSpaceStation(serverPlayer, targetLevel, packet.name);

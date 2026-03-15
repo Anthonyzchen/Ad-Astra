@@ -6,9 +6,7 @@ import com.teamresourceful.resourcefullib.common.menu.ContentMenuProvider;
 import earth.terrarium.adastra.common.menus.base.BlockPosContent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -19,6 +17,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -59,19 +59,19 @@ public abstract class ContainerMachineBlockEntity extends MachineBlockEntity imp
     }
 
     @Override
-    public void loadAdditional(@NotNull CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
-        ContainerHelper.loadAllItems(tag, this.items, registries);
-        ConfigurationEntry.load(tag, this.sideConfig, getDefaultConfig());
-        this.redstoneControl = RedstoneControl.values()[tag.getByte("RedstoneControl")];
+    public void loadAdditional(@NotNull ValueInput input) {
+        super.loadAdditional(input);
+        ContainerHelper.loadAllItems(input, this.items);
+        ConfigurationEntry.load(input, this.sideConfig, getDefaultConfig());
+        this.redstoneControl = RedstoneControl.values()[input.getByteOr("RedstoneControl", (byte) 0)];
     }
 
     @Override
-    protected void saveAdditional(@NotNull CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
-        ContainerHelper.saveAllItems(tag, this.items, registries);
-        ConfigurationEntry.save(tag, this.sideConfig);
-        tag.putByte("RedstoneControl", (byte) redstoneControl.ordinal());
+    protected void saveAdditional(@NotNull ValueOutput output) {
+        super.saveAdditional(output);
+        ContainerHelper.saveAllItems(output, this.items);
+        ConfigurationEntry.save(output, this.sideConfig);
+        output.putByte("RedstoneControl", (byte) redstoneControl.ordinal());
     }
 
     @Override

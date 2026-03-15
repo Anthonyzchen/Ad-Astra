@@ -9,7 +9,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.TagsProvider;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagEntry;
 import net.minecraft.tags.TagKey;
@@ -84,8 +84,8 @@ public class ModBlockTagProvider extends TagsProvider<Block> {
         ModBlocks.GLOBES.stream().map(RegistryEntry::get).forEach(b -> tag(ModBlockTags.GLOBES).add(element(b)));
         ModBlocks.FLAGS.stream().map(RegistryEntry::get).forEach(b -> tag(ModBlockTags.FLAGS).add(element(b)));
         ModBlocks.SLIDING_DOORS.stream().map(RegistryEntry::get).forEach(b -> tag(ModBlockTags.SLIDING_DOORS).add(element(b)));
-        tag(ModBlockTags.PASSES_FLOOD_FILL).add(TagEntry.tag(BlockTags.FENCES.location()));
-        tag(ModBlockTags.PASSES_FLOOD_FILL).add(TagEntry.tag(BlockTags.LEAVES.location()));
+        tag(ModBlockTags.PASSES_FLOOD_FILL).add(TagEntry.tag(BlockTags.FENCES.identifier()));
+        tag(ModBlockTags.PASSES_FLOOD_FILL).add(TagEntry.tag(BlockTags.LEAVES.identifier()));
         tag(ModBlockTags.PASSES_FLOOD_FILL).add(element(Blocks.LADDER));
 
         add(ModBlockTags.CABLE_DUCTS, ModBlocks.CABLE_DUCT.get());
@@ -300,27 +300,27 @@ public class ModBlockTagProvider extends TagsProvider<Block> {
     }
 
     private void addFabricTag(Block item, TagKey<Block> tag, String fabricCommonTag) {
-        tag(tag).add(TagEntry.optionalTag(new ResourceLocation("c", fabricCommonTag)));
+        tag(tag).add(TagEntry.optionalTag(new Identifier("c", fabricCommonTag)));
 
-        var commonTag = TagKey.create(Registries.BLOCK, new ResourceLocation("c", fabricCommonTag));
+        var commonTag = TagKey.create(Registries.BLOCK, new Identifier("c", fabricCommonTag));
         tag(commonTag).add(element(item));
     }
 
     private void addForgeTag(Block item, TagKey<Block> tag, String forgeCommonTag) {
-        tag(tag).add(TagEntry.optionalTag(new ResourceLocation("forge", forgeCommonTag)));
+        tag(tag).add(TagEntry.optionalTag(new Identifier("forge", forgeCommonTag)));
 
-        var commonTag = TagKey.create(Registries.BLOCK, new ResourceLocation("forge", forgeCommonTag));
+        var commonTag = TagKey.create(Registries.BLOCK, new Identifier("forge", forgeCommonTag));
         tag(commonTag).add(element(item));
 
-        var folderTag = TagKey.create(Registries.BLOCK, new ResourceLocation("forge", forgeCommonTag.split("/")[0]));
-        tag(folderTag).add(TagEntry.tag(commonTag.location()));
+        var folderTag = TagKey.create(Registries.BLOCK, new Identifier("forge", forgeCommonTag.split("/")[0]));
+        tag(folderTag).add(TagEntry.tag(commonTag.identifier()));
     }
 
     private static TagEntry element(Block block) {
         return TagEntry.element(loc(block));
     }
 
-    private static ResourceLocation loc(Block block) {
+    private static Identifier loc(Block block) {
         return BuiltInRegistries.BLOCK.getKey(block);
     }
 }

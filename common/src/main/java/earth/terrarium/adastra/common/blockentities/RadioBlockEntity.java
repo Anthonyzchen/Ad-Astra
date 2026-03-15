@@ -8,12 +8,12 @@ import earth.terrarium.adastra.common.utils.radio.RadioHolder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,16 +26,16 @@ public class RadioBlockEntity extends BlockEntity implements RadioHolder {
     }
 
     @Override
-    public void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
-        if (tag.contains("Station", Tag.TAG_STRING)) {
-            this.station = tag.getString("Station");
+    public void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        input.getString("Station").ifPresent(station -> {
+            this.station = station;
 
             if (this.level == null) return;
             if (!this.level.isClientSide()) return;
             if (this.station.isBlank()) return;
             RadioHandler.play(this.station, this.level.random, this.worldPosition);
-        }
+        });
     }
 
     @Override

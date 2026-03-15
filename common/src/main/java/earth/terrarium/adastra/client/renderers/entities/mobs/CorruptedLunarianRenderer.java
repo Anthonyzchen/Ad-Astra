@@ -5,21 +5,22 @@ import earth.terrarium.adastra.client.models.entities.mobs.CorruptedLunarianMode
 import earth.terrarium.adastra.common.entities.mob.CorruptedLunarian;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 
 // LEGACY ENTITY. WILL BE REPLACED IN THE FUTURE.
-public class CorruptedLunarianRenderer extends MobRenderer<CorruptedLunarian, CorruptedLunarianModel> {
+public class CorruptedLunarianRenderer extends MobRenderer<CorruptedLunarian, LivingEntityRenderState, CorruptedLunarianModel> {
 
-    public static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/entity/mob/lunarian/corrupted_lunarian.png");
+    public static final Identifier TEXTURE = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/entity/mob/lunarian/corrupted_lunarian.png");
 
     public CorruptedLunarianRenderer(EntityRendererProvider.Context context) {
         super(context, new CorruptedLunarianModel(context.bakeLayer(CorruptedLunarianModel.LAYER_LOCATION)), 0.5f);
     }
 
     @Override
-    public @NotNull ResourceLocation getTextureLocation(CorruptedLunarian entity) {
+    public @NotNull Identifier getTextureLocation(LivingEntityRenderState state) {
         return TEXTURE;
     }
 }

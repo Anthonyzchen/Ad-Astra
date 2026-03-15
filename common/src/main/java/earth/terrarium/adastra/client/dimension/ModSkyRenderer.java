@@ -1,7 +1,5 @@
 package earth.terrarium.adastra.client.dimension;
 
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Axis;
 import earth.terrarium.adastra.client.utils.DimensionRenderingUtils;
@@ -9,79 +7,59 @@ import earth.terrarium.adastra.mixins.client.LevelRendererAccessor;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.FogRenderer;
-import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.client.renderer.ShaderInstance;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.FastColor;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
-import net.minecraft.util.random.WeightedEntry;
+// WeightedList is used transitively via PlanetRenderer.starColors()
 import net.minecraft.world.level.material.FogType;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 
+/**
+ * Custom sky renderer for Ad Astra dimensions.
+ *
+ * In 1.21.11, the rendering pipeline was completely overhauled:
+ * - VertexBuffer was replaced by GpuBuffer
+ * - RenderSystem.enableBlend/disableBlend/setShader/setShaderTexture etc. are all removed
+ * - BufferUploader.drawWithShader() is removed
+ * - FogRenderer.levelFogColor()/setupNoFog() are removed
+ * - Rendering now uses a frame graph with RenderPipeline objects (RenderPipelines.STARS, .CELESTIAL, .SKY, etc.)
+ * - Draw calls go through RenderPass objects obtained from the frame graph
+ *
+ * TODO: 1.21.11 - Fully reimplement sky rendering using the new pipeline:
+ * - Stars: Build a GpuBuffer of star vertices, draw via RenderPipelines.STARS
+ * - Celestial bodies (sun, moon, planets): Draw via RenderPipelines.CELESTIAL
+ * - Sunrise: Draw via RenderPipelines.SUNRISE_SUNSET
+ * - Sky dome: Draw via RenderPipelines.SKY
+ * - All rendering must go through a RenderPass from the frame graph
+ *
+ * For now, this class retains the data model (renderer config, star generation)
+ * but the actual rendering methods are stubbed out.
+ */
 public class ModSkyRenderer {
 
     private final PlanetRenderer renderer;
-
-    @Nullable
-    private VertexBuffer starBuffer;
 
     public ModSkyRenderer(PlanetRenderer renderer) {
         this.renderer = renderer;
     }
 
+    /**
+     * Called to render the custom sky for this dimension.
+     * TODO: 1.21.11 - This method needs to be completely reimplemented using the new rendering pipeline.
+     * The old approach used RenderSystem state calls and VertexBuffer/BufferUploader which no longer exist.
+     * The new approach should use RenderPass with appropriate RenderPipelines.
+     */
     public void render(ClientLevel level, float partialTick, PoseStack poseStack, Camera camera, Matrix4f projectionMatrix, boolean isFoggy, Runnable setupFog) {
-        setupFog.run();
-        if (isFoggy || inFog(camera)) return;
-        if (!renderer.renderInRain() && level.isRaining()) return;
-        if (starBuffer == null) createStars();
-
-        // Apply camera rotation so sky elements rotate with the player's view
-        poseStack.pushPose();
-        poseStack.mulPose(Axis.XP.rotationDegrees(camera.getXRot()));
-        poseStack.mulPose(Axis.YP.rotationDegrees(camera.getYRot() + 180.0f));
-
-        setSkyColor(level, camera, partialTick);
-
-        RenderSystem.depthMask(false);
-        VertexBuffer.unbind();
-        RenderSystem.enableBlend();
-
-        renderSky(level, partialTick, poseStack, projectionMatrix);
-
-        RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
-        poseStack.pushPose();
-
-        renderStars(level, partialTick, poseStack, projectionMatrix, setupFog);
-
-        RenderSystem.disableBlend();
-
-        RenderSystem.setShaderColor(1, 1, 1, 1);
-        renderer.skyRenderables().forEach(renderable -> {
-            var globalRotation = switch (renderable.movementType()) {
-                case STATIC -> renderable.globalRotation();
-                case TIME_OF_DAY -> renderable.globalRotation().add(0, 0, level.getTimeOfDay(partialTick) * 360);
-                case TIME_OF_DAY_REVERSED ->
-                    renderable.globalRotation().add(0, 0, -level.getTimeOfDay(partialTick) * 360);
-            };
-
-            renderSkyRenderable(poseStack, renderable.localRotation(), globalRotation, renderable.scale(), renderable.texture(), renderable.blend());
-            if (renderable.backLightScale() > 0) {
-                setSkyRenderableColor(level, partialTick, renderable.backLightColor());
-                renderSkyRenderable(poseStack, renderable.localRotation(), globalRotation, renderable.backLightScale(), DimensionRenderingUtils.BACKLIGHT, true);
-                RenderSystem.setShaderColor(1, 1, 1, 1);
-            }
-        });
-
-        RenderSystem.setShaderColor(1, 1, 1, 1);
-        RenderSystem.disableBlend();
-        RenderSystem.defaultBlendFunc();
-        poseStack.popPose(); // pop from renderables
-        poseStack.popPose(); // pop camera rotation
-        RenderSystem.depthMask(true);
+        // Stubbed - rendering pipeline completely changed in 1.21.11
+        // The old implementation used:
+        // - RenderSystem.enableBlend/disableBlend (removed)
+        // - RenderSystem.setShader/setShaderTexture (removed)
+        // - VertexBuffer (removed, replaced by GpuBuffer)
+        // - BufferUploader.drawWithShader (removed)
+        // - FogRenderer.levelFogColor/setupNoFog (removed)
+        // - GlStateManager.SourceFactor/DestFactor for blend modes (moved to RenderPipeline config)
     }
 
     public boolean inFog(Camera camera) {
@@ -92,132 +70,11 @@ public class ModSkyRenderer {
             || levelRenderer.invokeDoesMobEffectBlockSky(camera);
     }
 
-    public void setSkyColor(ClientLevel level, Camera camera, float partialTick) {
-        Vec3 skyColor = level.getSkyColor(camera.getPosition(), partialTick);
-        float r = (float) skyColor.x;
-        float g = (float) skyColor.y;
-        float b = (float) skyColor.z;
-        RenderSystem.setShaderColor(r, g, b, 1);
-    }
-
-    public void renderSky(ClientLevel level, float partialTick, PoseStack poseStack, Matrix4f projectionMatrix) {
-        // Render the vanilla sky dome only for dimensions with atmosphere (fog).
-        // Space/orbit dimensions (no fog) skip this to avoid the dark bottom plate
-        // that hides stars below the horizon.
-        if (renderer.hasFog()) {
-            FogRenderer.levelFogColor();
-            ShaderInstance shader = RenderSystem.getShader();
-            if (shader != null) {
-                var skyBuffer = ((LevelRendererAccessor) Minecraft.getInstance().levelRenderer).getSkyBuffer();
-                skyBuffer.bind();
-                skyBuffer.drawWithShader(poseStack.last().pose(), projectionMatrix, shader);
-                VertexBuffer.unbind();
-            }
-        }
-        RenderSystem.enableBlend();
-
-        float[] color = ModDimensionSpecialEffects.getSunriseColor(level.getTimeOfDay(partialTick), partialTick, renderer.sunriseColor());
-        if (color != null) {
-            renderSunrise(level, partialTick, poseStack, color);
-        }
-    }
-
-    public void renderSunrise(ClientLevel level, float partialTick, PoseStack poseStack, float[] color) {
-        RenderSystem.setShaderColor(1, 1, 1, 1);
-
-        poseStack.pushPose();
-        poseStack.mulPose(Axis.XP.rotationDegrees(90));
-
-        poseStack.mulPose(Axis.ZP.rotationDegrees(renderer.sunriseAngle()));
-
-        float sunAngle = Mth.sin(level.getSunAngle(partialTick)) < 0 ? 180 : 0;
-        poseStack.mulPose(Axis.ZP.rotationDegrees(sunAngle));
-        poseStack.mulPose(Axis.ZP.rotationDegrees(90));
-
-        float r = color[0];
-        float g = color[1];
-        float b = color[2];
-
-        Matrix4f matrix = poseStack.last().pose();
-        BufferBuilder bufferBuilder = Tesselator.getInstance().begin(VertexFormat.Mode.TRIANGLE_FAN, DefaultVertexFormat.POSITION_COLOR);
-        bufferBuilder.addVertex(matrix, 0, 100, 0).setColor(r, g, b, color[3]);
-
-        for (int i = 0; i <= 16; i++) {
-            float angle = (float) i * (float) (Math.PI * 2) / 16;
-            float x = Mth.sin(angle);
-            float y = Mth.cos(angle);
-            bufferBuilder.addVertex(matrix, x * 120, y * 120, -y * 40 * color[3]).setColor(r, g, b, 0);
-        }
-
-        BufferUploader.drawWithShader(bufferBuilder.buildOrThrow());
-        poseStack.popPose();
-    }
-
-    public void renderSkyRenderable(PoseStack poseStack, Vec3 localRotation, Vec3 globalRotation, float scale, ResourceLocation texture, boolean blend) {
-        if (blend) RenderSystem.enableBlend();
-        poseStack.pushPose();
-
-        poseStack.mulPose(Axis.XP.rotationDegrees((float) globalRotation.x));
-        poseStack.mulPose(Axis.YP.rotationDegrees((float) globalRotation.y));
-        poseStack.mulPose(Axis.ZP.rotationDegrees((float) globalRotation.z));
-
-        poseStack.translate(0, 100, 0);
-        poseStack.mulPose(Axis.XP.rotationDegrees((float) localRotation.x));
-        poseStack.mulPose(Axis.YP.rotationDegrees((float) localRotation.y));
-        poseStack.mulPose(Axis.ZP.rotationDegrees((float) localRotation.z));
-        poseStack.translate(0, -100, 0);
-
-        var matrix = poseStack.last().pose();
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        RenderSystem.setShaderTexture(0, texture);
-        BufferBuilder bufferBuilder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-        bufferBuilder.addVertex(matrix, -scale, 100, -scale).setUv(1, 0);
-        bufferBuilder.addVertex(matrix, scale, 100, -scale).setUv(0, 0);
-        bufferBuilder.addVertex(matrix, scale, 100, scale).setUv(0, 1);
-        bufferBuilder.addVertex(matrix, -scale, 100, scale).setUv(1, 1);
-        BufferUploader.drawWithShader(bufferBuilder.buildOrThrow());
-        poseStack.popPose();
-        RenderSystem.disableBlend();
-    }
-
-    public void setSkyRenderableColor(ClientLevel level, float partialTick, int color) {
-        float r = FastColor.ARGB32.red(color) / 255f;
-        float g = FastColor.ARGB32.green(color) / 255f;
-        float b = FastColor.ARGB32.blue(color) / 255f;
-        float a = renderer.renderInRain() ? 1 : 1 - level.getRainLevel(partialTick);
-        RenderSystem.setShaderColor(r, g, b, a);
-    }
-
-    public void renderStars(ClientLevel level, float partialTick, PoseStack poseStack, Matrix4f projectionMatrix, Runnable setupFog) {
-        float starLight = renderer.starBrightness().orElseGet(() -> {
-            float rainLevel = 1 - level.getRainLevel(partialTick);
-            return level.getStarBrightness(partialTick) * rainLevel;
-        });
-        if (starLight <= 0) return;
-        if (starBuffer == null) return;
-        RenderSystem.setShaderColor(starLight, starLight, starLight, starLight);
-        FogRenderer.setupNoFog();
-        starBuffer.bind();
-        ShaderInstance shader = RenderSystem.getShader();
-        if (shader == null) return;
-        starBuffer.drawWithShader(poseStack.last().pose(), projectionMatrix, shader);
-        VertexBuffer.unbind();
-        setupFog.run();
-    }
-
-    public void createStars() {
-        if (starBuffer != null) {
-            starBuffer.close();
-        }
-
-        starBuffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
-        MeshData meshData = drawStars();
-        starBuffer.bind();
-        starBuffer.upload(meshData);
-        VertexBuffer.unbind();
-    }
-
-    public MeshData drawStars() {
+    /**
+     * Generates star vertex data for the custom sky.
+     * This can be used to populate a GpuBuffer for rendering through the new pipeline.
+     */
+    public MeshData generateStarMesh() {
         var random = RandomSource.create(10842);
         BufferBuilder builder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
 
@@ -229,7 +86,6 @@ public class ModSkyRenderer {
 
             double distance = x * x + y * y + z * z;
 
-            // ensure that the stars are within the sphere and not too close to the center
             if (distance >= 1 || distance <= 0.01) continue;
 
             distance = 1 / Math.sqrt(distance);
@@ -253,7 +109,7 @@ public class ModSkyRenderer {
             double sinRot = Math.sin(rot);
             double cosRot = Math.cos(rot);
 
-            int color = renderer.starColors().getRandom(random).map(WeightedEntry.Wrapper::data).orElse(0xffffffff);
+            int color = renderer.starColors().getRandom(random).orElse(0xffffffff);
 
             for (int j = 0; j < 4; j++) {
                 double xOffset = ((j & 2) - 1) * scale;
@@ -274,5 +130,15 @@ public class ModSkyRenderer {
         }
 
         return builder.buildOrThrow();
+    }
+
+    public void setSkyRenderableColor(ClientLevel level, float partialTick, int color) {
+        // In 1.21.11, RenderSystem.setShaderColor() is removed.
+        // Color tinting is now handled through the rendering pipeline or vertex colors.
+        // TODO: 1.21.11 - Implement color application through the new rendering pipeline
+    }
+
+    public PlanetRenderer getRenderer() {
+        return renderer;
     }
 }

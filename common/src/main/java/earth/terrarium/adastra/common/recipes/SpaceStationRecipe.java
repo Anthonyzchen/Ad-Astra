@@ -1,6 +1,5 @@
 package earth.terrarium.adastra.common.recipes;
 
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.teamresourceful.bytecodecs.base.ByteCodec;
@@ -11,13 +10,14 @@ import com.teamresourceful.resourcefullib.common.recipe.CodecRecipeSerializer;
 import earth.terrarium.adastra.common.recipes.base.IngredientHolder;
 import earth.terrarium.adastra.common.registry.ModRecipeSerializers;
 import earth.terrarium.adastra.common.registry.ModRecipeTypes;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.crafting.RecipeHolder;
-import net.minecraft.world.item.crafting.RecipeInput;
-import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,20 +27,22 @@ import java.util.Optional;
 public record SpaceStationRecipe(
     List<IngredientHolder> ingredients,
     ResourceKey<Level> dimension,
-    ResourceLocation structure
+    Identifier structure
 ) implements CodecRecipe<RecipeInput> {
+
+    private static final RecipeBookCategory BOOK_CATEGORY = new RecipeBookCategory();
 
     public static final MapCodec<SpaceStationRecipe> CODEC = RecordCodecBuilder.mapCodec(
         instance -> instance.group(
             IngredientHolder.CODEC.listOf().fieldOf("ingredients").forGetter(SpaceStationRecipe::ingredients),
             ResourceKey.codec(Registries.DIMENSION).fieldOf("dimension").forGetter(SpaceStationRecipe::dimension),
-            ResourceLocation.CODEC.fieldOf("structure").forGetter(SpaceStationRecipe::structure)
+            Identifier.CODEC.fieldOf("structure").forGetter(SpaceStationRecipe::structure)
         ).apply(instance, SpaceStationRecipe::new));
 
     public static final ByteCodec<SpaceStationRecipe> NETWORK_CODEC = ObjectByteCodec.create(
         IngredientHolder.NETWORK_CODEC.listOf().fieldOf(SpaceStationRecipe::ingredients),
         ExtraByteCodecs.DIMENSION.fieldOf(SpaceStationRecipe::dimension),
-        ExtraByteCodecs.RESOURCE_LOCATION.fieldOf(SpaceStationRecipe::structure),
+        ExtraByteCodecs.IDENTIFIER.fieldOf(SpaceStationRecipe::structure),
         SpaceStationRecipe::new
     );
 
@@ -50,18 +52,38 @@ public record SpaceStationRecipe(
     }
 
     @Override
-    public CodecRecipeSerializer<? extends CodecRecipe<RecipeInput>> serializer() {
-        return ModRecipeSerializers.SPACE_STATION_SERIALIZER.get();
+    public @NotNull ItemStack assemble(@NotNull RecipeInput input, HolderLookup.@NotNull Provider provider) {
+        return ItemStack.EMPTY;
     }
 
     @Override
-    public @NotNull RecipeType<?> getType() {
-        return ModRecipeTypes.SPACE_STATION_RECIPE.get();
+    public @NotNull CodecRecipeSerializer<? extends Recipe<RecipeInput>> getSerializer() {
+        return ModRecipeSerializers.SPACE_STATION_SERIALIZER.get();
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public @NotNull RecipeType<SpaceStationRecipe> getType() {
+        return (RecipeType<SpaceStationRecipe>) (RecipeType<?>) ModRecipeTypes.SPACE_STATION_RECIPE.get();
+    }
+
+    @Override
+    public @NotNull PlacementInfo placementInfo() {
+        return PlacementInfo.NOT_PLACEABLE;
+    }
+
+    @Override
+    public @NotNull RecipeBookCategory recipeBookCategory() {
+        return BOOK_CATEGORY;
+    }
+
+    @SuppressWarnings("unchecked")
     public static Optional<RecipeHolder<SpaceStationRecipe>> getSpaceStation(Level level, ResourceKey<Level> dimension) {
-        return level.getRecipeManager().getAllRecipesFor(ModRecipeTypes.SPACE_STATION_RECIPE.get())
-            .stream()
+        var server = level.getServer();
+        if (server == null) return Optional.empty();
+        return server.getRecipeManager().getRecipes().stream()
+            .filter(holder -> holder.value().getType() == ModRecipeTypes.SPACE_STATION_RECIPE.get())
+            .map(holder -> (RecipeHolder<SpaceStationRecipe>) (RecipeHolder<?>) holder)
             .filter(recipe -> recipe.value().dimension().equals(dimension))
             .findFirst();
     }

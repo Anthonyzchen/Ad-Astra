@@ -7,13 +7,13 @@ import earth.terrarium.adastra.common.blockentities.machines.CoalGeneratorBlockE
 import earth.terrarium.adastra.common.menus.machines.CoalGeneratorMenu;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import org.jetbrains.annotations.NotNull;
 
 public class CoalGeneratorScreen extends MachineScreen<CoalGeneratorMenu, CoalGeneratorBlockEntity> {
 
-    public static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/gui/container/coal_generator.png");
+    public static final Identifier TEXTURE = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/gui/container/coal_generator.png");
 
     public CoalGeneratorScreen(CoalGeneratorMenu menu, Inventory inventory, Component component) {
         super(menu, inventory, component, TEXTURE, IRON_SLOT, 176, 189);

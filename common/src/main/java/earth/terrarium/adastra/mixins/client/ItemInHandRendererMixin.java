@@ -21,7 +21,7 @@ public abstract class ItemInHandRendererMixin {
     @Shadow
     protected abstract void renderPlayerArm(PoseStack poseStack, MultiBufferSource buffer, int combinedLight, float equippedProgress, float swingProgress, HumanoidArm side);
 
-    @Inject(method = "renderArmWithItem", at = @At(value = "HEAD", target = "Lnet/minecraft/client/renderer/ItemInHandRenderer;renderArmWithItem(Lnet/minecraft/client/player/AbstractClientPlayer;FFLnet/minecraft/world/InteractionHand;FLnet/minecraft/world/item/ItemStack;FLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V"), cancellable = true)
+    @Inject(method = "method_3228", at = @At(value = "HEAD"), cancellable = true)
     private void adastra$renderArmWithItem(AbstractClientPlayer player, float partialTicks, float pitch, InteractionHand hand, float swingProgress, ItemStack stack, float equippedProgress, PoseStack poseStack, MultiBufferSource buffer, int combinedLight, CallbackInfo ci) {
         if (stack.is(ModItems.TI_69.get())) {
             boolean mainHand = hand == InteractionHand.MAIN_HAND;

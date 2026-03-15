@@ -1,70 +1,21 @@
 package earth.terrarium.adastra.mixins.client;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import earth.terrarium.adastra.client.models.armor.SpaceSuitModel;
-import earth.terrarium.adastra.common.items.armor.SpaceSuitItem;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.model.PlayerModel;
-import net.minecraft.client.model.geom.ModelPart;
-import net.minecraft.client.player.AbstractClientPlayer;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.entity.LivingEntityRenderer;
-import net.minecraft.client.renderer.entity.player.PlayerRenderer;
-import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.util.FastColor;
-import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.client.renderer.entity.player.AvatarRenderer;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(PlayerRenderer.class)
-public abstract class PlayerRendererMixin extends LivingEntityRenderer<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> {
-
-    @Shadow
-    protected abstract void setupRotations(AbstractClientPlayer entityLiving, PoseStack matrixStack, float ageInTicks, float rotationYaw, float partialTicks, float scale);
-
-    @Shadow
-    protected abstract void setModelProperties(AbstractClientPlayer clientPlayer);
-
-    public PlayerRendererMixin(EntityRendererProvider.Context context, PlayerModel<AbstractClientPlayer> model, float shadowRadius) {
-        super(context, model, shadowRadius);
-    }
-
-    @Inject(method = "renderHand", at = @At("HEAD"), cancellable = true)
-    private void adastra$renderHand(PoseStack poseStack, MultiBufferSource buffer, int packedLight, AbstractClientPlayer player, ModelPart rendererArm, ModelPart rendererArmwear, CallbackInfo ci) {
-        var stack = player.getItemBySlot(EquipmentSlot.CHEST);
-        if (!(stack.getItem() instanceof SpaceSuitItem spaceSuit)) return;
-        ci.cancel();
-
-        var playerModel = getModel();
-        setModelProperties(player);
-        playerModel.attackTime = 0.0F;
-        playerModel.crouching = false;
-        playerModel.swimAmount = 0.0F;
-        playerModel.setupAnim(player, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F);
-        rendererArm.xRot = 0.0F;
-
-        var layer = SpaceSuitModel.getLayerLocation(stack);
-        var texture = SpaceSuitModel.getTextureLocation(stack);
-        if (layer == null || texture == null) return;
-        var root = Minecraft.getInstance().getEntityModels().bakeLayer(layer);
-
-        var spaceSuitModel = new SpaceSuitModel(root, EquipmentSlot.CHEST, stack, null);
-        boolean isRightHand = rendererArm == spaceSuitModel.rightArm;
-
-        int color = spaceSuit.getColor(stack);
-        int packedColor = FastColor.ARGB32.color(255, FastColor.ARGB32.red(color), FastColor.ARGB32.green(color), FastColor.ARGB32.blue(color));
-
-        if (isRightHand) {
-            spaceSuitModel.rightArm.copyFrom(rendererArm);
-            spaceSuitModel.rightArm.render(poseStack, buffer.getBuffer(RenderType.entityTranslucent(texture)), packedLight, OverlayTexture.NO_OVERLAY, packedColor);
-        } else {
-            spaceSuitModel.leftArm.copyFrom(rendererArm);
-            spaceSuitModel.leftArm.render(poseStack, buffer.getBuffer(RenderType.entityTranslucent(texture)), packedLight, OverlayTexture.NO_OVERLAY, packedColor);
-        }
-    }
+/**
+ * In 1.21.11, PlayerRenderer was renamed to AvatarRenderer, and the rendering API changed significantly:
+ * - LivingEntityRenderer now takes 3 type parameters (Entity, RenderState, Model)
+ * - renderHand signature changed to (PoseStack, SubmitNodeCollector, int, Identifier, ModelPart, boolean)
+ * - The player entity is no longer available in renderHand (only render state is used)
+ * - MultiBufferSource is replaced by SubmitNodeCollector in many rendering methods
+ * - RenderType moved to net.minecraft.client.renderer.rendertype.RenderType
+ * - FastColor.ARGB32 is now net.minecraft.util.ARGB
+ *
+ * TODO: 1.21.11 - Reimplement space suit hand rendering using the new AvatarRenderer API.
+ * The old approach of extending LivingEntityRenderer and shadowing setupRotations/setModelProperties
+ * no longer works. Space suit hand rendering should use render layers or a different hook point.
+ */
+@Mixin(AvatarRenderer.class)
+public abstract class PlayerRendererMixin {
 }

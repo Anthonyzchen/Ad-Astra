@@ -1,19 +1,18 @@
 package earth.terrarium.adastra.client.models.entities.mobs;
 
 import earth.terrarium.adastra.AdAstra;
-import net.minecraft.client.model.VillagerModel;
+import net.minecraft.client.model.npc.VillagerModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartNames;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.npc.AbstractVillager;
+import net.minecraft.resources.Identifier;
 
 // LEGACY ENTITY. WILL BE REPLACED IN THE FUTURE.
-public class LunarianModel<T extends AbstractVillager> extends VillagerModel<T> {
+public class LunarianModel extends VillagerModel {
 
-    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "lunarian"), "main");
+    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "lunarian"), "main");
 
     public LunarianModel(ModelPart root) {
         super(root);

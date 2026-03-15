@@ -13,7 +13,7 @@ import earth.terrarium.adastra.common.utils.ModUtils;
 // import earth.terrarium.common_storage_lib.storage.base.CommonStorage;
 // import earth.terrarium.common_storage_lib.resources.fluid.FluidResource;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 
@@ -30,12 +30,11 @@ public record ServerboundClearFluidTankPacket(
         return TYPE;
     }
 
-    private static class Type extends CodecPacketType<ServerboundClearFluidTankPacket> implements ServerboundPacketType<ServerboundClearFluidTankPacket> {
+    private static class Type extends CodecPacketType.Server<ServerboundClearFluidTankPacket> {
 
         public Type() {
             super(
-                ServerboundClearFluidTankPacket.class,
-                ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "clear_fluid_tank"),
+                Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "clear_fluid_tank"),
                 ObjectByteCodec.create(
                     ExtraByteCodecs.BLOCK_POS.fieldOf(ServerboundClearFluidTankPacket::machine),
                     ByteCodec.INT.fieldOf(ServerboundClearFluidTankPacket::tank),

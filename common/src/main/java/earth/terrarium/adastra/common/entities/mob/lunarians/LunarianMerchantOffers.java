@@ -7,7 +7,7 @@ import earth.terrarium.adastra.common.registry.ModItems;
 import earth.terrarium.adastra.common.utils.FluidUtils;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -16,8 +16,8 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.npc.VillagerProfession;
-import net.minecraft.world.entity.npc.VillagerTrades.ItemListing;
+import net.minecraft.world.entity.npc.villager.VillagerProfession;
+import net.minecraft.world.entity.npc.villager.VillagerTrades.ItemListing;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.component.DyedItemColor;
 import net.minecraft.world.item.alchemy.Potion;
@@ -325,7 +325,8 @@ public class LunarianMerchantOffers {
         @Override
         public MerchantOffer getOffer(Entity entity, RandomSource random) {
             ItemStack itemStack2 = new ItemStack(this.sell);
-            if (this.sell instanceof ArmorItem) {
+            // In 1.21.11, ArmorItem no longer exists. Check if the item supports dyeing via DYEABLE repair tag
+            {
                 ArrayList<DyeItem> list = Lists.newArrayList();
                 list.add(SellDyedArmorFactory.getRandomDye(random));
                 if (random.nextFloat() > 0.7f) {

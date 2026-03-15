@@ -5,7 +5,7 @@ import earth.terrarium.adastra.common.utils.TooltipUtils;
 import mezz.jei.api.gui.drawable.IDrawable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
@@ -15,11 +15,11 @@ public class EtaDrawable implements IDrawable {
     private final int mouseX;
     private final int mouseY;
     private final int cookTime;
-    private final ResourceLocation texture;
+    private final Identifier texture;
     private final int textureWidth;
     private final int textureHeight;
 
-    public EtaDrawable(double mouseX, double mouseY, int cookTime, ResourceLocation texture, int textureWidth, int textureHeight) {
+    public EtaDrawable(double mouseX, double mouseY, int cookTime, Identifier texture, int textureWidth, int textureHeight) {
         this.mouseX = (int) mouseX;
         this.mouseY = (int) mouseY;
         this.cookTime = cookTime;

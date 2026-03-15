@@ -20,9 +20,10 @@ import earth.terrarium.adastra.common.utils.PlatformUtils;
 import com.teamresourceful.resourcefullib.common.fluid.ResourcefulBucketItem;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.*;
+import net.minecraft.world.item.equipment.ArmorType;
 
 @SuppressWarnings("unused")
 public class ModItems {
@@ -96,27 +97,27 @@ public class ModItems {
 
     public static final RegistryEntry<Item> RADIO = ITEMS.register("radio", () -> new TooltipBlockItem(ModBlocks.RADIO.get(), ConstantComponents.RADIO_INFO, new Item.Properties()));
 
-    public static final RegistryEntry<Item> SPACE_HELMET = BASIC_ITEMS.register("space_helmet", () -> new CustomDyeableArmorItem(ModArmorMaterials.SPACE_SUIT, ArmorItem.Type.HELMET, new Item.Properties()));
-    public static final RegistryEntry<Item> SPACE_SUIT = BASIC_ITEMS.register("space_suit", () -> new SpaceSuitItem(ModArmorMaterials.SPACE_SUIT, ArmorItem.Type.CHESTPLATE, 1000, new Item.Properties()));
-    public static final RegistryEntry<Item> SPACE_PANTS = BASIC_ITEMS.register("space_pants", () -> new CustomDyeableArmorItem(ModArmorMaterials.SPACE_SUIT, ArmorItem.Type.LEGGINGS, new Item.Properties()));
-    public static final RegistryEntry<Item> SPACE_BOOTS = BASIC_ITEMS.register("space_boots", () -> new CustomDyeableArmorItem(ModArmorMaterials.SPACE_SUIT, ArmorItem.Type.BOOTS, new Item.Properties()));
+    public static final RegistryEntry<Item> SPACE_HELMET = BASIC_ITEMS.register("space_helmet", () -> new CustomDyeableArmorItem(ModArmorMaterials.SPACE_SUIT, ArmorType.HELMET, new Item.Properties()));
+    public static final RegistryEntry<Item> SPACE_SUIT = BASIC_ITEMS.register("space_suit", () -> new SpaceSuitItem(ModArmorMaterials.SPACE_SUIT, ArmorType.CHESTPLATE, 1000, new Item.Properties()));
+    public static final RegistryEntry<Item> SPACE_PANTS = BASIC_ITEMS.register("space_pants", () -> new CustomDyeableArmorItem(ModArmorMaterials.SPACE_SUIT, ArmorType.LEGGINGS, new Item.Properties()));
+    public static final RegistryEntry<Item> SPACE_BOOTS = BASIC_ITEMS.register("space_boots", () -> new CustomDyeableArmorItem(ModArmorMaterials.SPACE_SUIT, ArmorType.BOOTS, new Item.Properties()));
 
-    public static final RegistryEntry<Item> NETHERITE_SPACE_HELMET = ITEMS.register("netherite_space_helmet", () -> new CustomDyeableArmorItem(ModArmorMaterials.NETHERITE_SPACE_SUIT, ArmorItem.Type.HELMET, new Item.Properties().fireResistant()));
-    public static final RegistryEntry<Item> NETHERITE_SPACE_SUIT = BASIC_ITEMS.register("netherite_space_suit", () -> new NetheriteSpaceSuitItem(ModArmorMaterials.NETHERITE_SPACE_SUIT, ArmorItem.Type.CHESTPLATE, 2000, new Item.Properties().fireResistant()));
-    public static final RegistryEntry<Item> NETHERITE_SPACE_PANTS = BASIC_ITEMS.register("netherite_space_pants", () -> new CustomDyeableArmorItem(ModArmorMaterials.NETHERITE_SPACE_SUIT, ArmorItem.Type.LEGGINGS, new Item.Properties().fireResistant()));
-    public static final RegistryEntry<Item> NETHERITE_SPACE_BOOTS = BASIC_ITEMS.register("netherite_space_boots", () -> new CustomDyeableArmorItem(ModArmorMaterials.NETHERITE_SPACE_SUIT, ArmorItem.Type.BOOTS, new Item.Properties().fireResistant()));
+    public static final RegistryEntry<Item> NETHERITE_SPACE_HELMET = ITEMS.register("netherite_space_helmet", () -> new CustomDyeableArmorItem(ModArmorMaterials.NETHERITE_SPACE_SUIT, ArmorType.HELMET, new Item.Properties().fireResistant()));
+    public static final RegistryEntry<Item> NETHERITE_SPACE_SUIT = BASIC_ITEMS.register("netherite_space_suit", () -> new NetheriteSpaceSuitItem(ModArmorMaterials.NETHERITE_SPACE_SUIT, ArmorType.CHESTPLATE, 2000, new Item.Properties().fireResistant()));
+    public static final RegistryEntry<Item> NETHERITE_SPACE_PANTS = BASIC_ITEMS.register("netherite_space_pants", () -> new CustomDyeableArmorItem(ModArmorMaterials.NETHERITE_SPACE_SUIT, ArmorType.LEGGINGS, new Item.Properties().fireResistant()));
+    public static final RegistryEntry<Item> NETHERITE_SPACE_BOOTS = BASIC_ITEMS.register("netherite_space_boots", () -> new CustomDyeableArmorItem(ModArmorMaterials.NETHERITE_SPACE_SUIT, ArmorType.BOOTS, new Item.Properties().fireResistant()));
 
-    public static final RegistryEntry<Item> JET_SUIT_HELMET = ITEMS.register("jet_suit_helmet", () -> new CustomDyeableArmorItem(ModArmorMaterials.JET_SUIT, ArmorItem.Type.HELMET, new Item.Properties().fireResistant()));
-    public static final RegistryEntry<Item> JET_SUIT = BASIC_ITEMS.register("jet_suit", () -> new JetSuitItem(ModArmorMaterials.JET_SUIT, ArmorItem.Type.CHESTPLATE, 4000, 1_000_000, new Item.Properties().fireResistant()));
-    public static final RegistryEntry<Item> JET_SUIT_PANTS = BASIC_ITEMS.register("jet_suit_pants", () -> new CustomDyeableArmorItem(ModArmorMaterials.JET_SUIT, ArmorItem.Type.LEGGINGS, new Item.Properties().fireResistant()));
-    public static final RegistryEntry<Item> JET_SUIT_BOOTS = BASIC_ITEMS.register("jet_suit_boots", () -> new CustomDyeableArmorItem(ModArmorMaterials.JET_SUIT, ArmorItem.Type.BOOTS, new Item.Properties().fireResistant()));
+    public static final RegistryEntry<Item> JET_SUIT_HELMET = ITEMS.register("jet_suit_helmet", () -> new CustomDyeableArmorItem(ModArmorMaterials.JET_SUIT, ArmorType.HELMET, new Item.Properties().fireResistant()));
+    public static final RegistryEntry<Item> JET_SUIT = BASIC_ITEMS.register("jet_suit", () -> new JetSuitItem(ModArmorMaterials.JET_SUIT, ArmorType.CHESTPLATE, 4000, 1_000_000, new Item.Properties().fireResistant()));
+    public static final RegistryEntry<Item> JET_SUIT_PANTS = BASIC_ITEMS.register("jet_suit_pants", () -> new CustomDyeableArmorItem(ModArmorMaterials.JET_SUIT, ArmorType.LEGGINGS, new Item.Properties().fireResistant()));
+    public static final RegistryEntry<Item> JET_SUIT_BOOTS = BASIC_ITEMS.register("jet_suit_boots", () -> new CustomDyeableArmorItem(ModArmorMaterials.JET_SUIT, ArmorType.BOOTS, new Item.Properties().fireResistant()));
 
     public static final RegistryEntry<Item> TI_69 = ITEMS.register("ti_69", () -> new Ti69Item(new Item.Properties().stacksTo(1)));
     public static final RegistryEntry<Item> WRENCH = ITEMS.register("wrench", () -> new WrenchItem(new Item.Properties().stacksTo(1)));
     public static final RegistryEntry<Item> ZIP_GUN = ITEMS.register("zip_gun", () -> new ZipGunItem(new Item.Properties().stacksTo(1)));
 
     public static final RegistryEntry<Item> SPACE_PAINTING = BASIC_ITEMS.register("space_painting", () -> new SpacePaintingItem(new Item.Properties(),
-        ResourceKey.create(net.minecraft.core.registries.Registries.PAINTING_VARIANT, ResourceLocation.fromNamespaceAndPath(earth.terrarium.adastra.AdAstra.MOD_ID, "earth")),
+        ResourceKey.create(net.minecraft.core.registries.Registries.PAINTING_VARIANT, Identifier.fromNamespaceAndPath(earth.terrarium.adastra.AdAstra.MOD_ID, "earth")),
         ModPaintingVariantTags.SPACE_PAINTINGS));
 
     public static final RegistryEntry<Item> CHEESE = BASIC_ITEMS.register("cheese", () -> new Item(new Item.Properties()

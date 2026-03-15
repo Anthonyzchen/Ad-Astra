@@ -6,7 +6,7 @@ import earth.terrarium.adastra.AdAstra;
 import earth.terrarium.adastra.common.registry.ModItems;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.neoforged.neoforge.client.model.generators.ItemModelProvider;
 import net.neoforged.neoforge.client.model.generators.ModelFile;
@@ -16,7 +16,7 @@ import java.util.Objects;
 
 public class ModItemModelProvider extends ItemModelProvider {
 
-    public static final ResourceLocation RENDERED_ITEM = new ResourceLocation(AdAstra.MOD_ID, "item/rendered_item");
+    public static final Identifier RENDERED_ITEM = new Identifier(AdAstra.MOD_ID, "item/rendered_item");
 
     public ModItemModelProvider(PackOutput output, ExistingFileHelper existingFileHelper) {
         super(output, AdAstra.MOD_ID, existingFileHelper);

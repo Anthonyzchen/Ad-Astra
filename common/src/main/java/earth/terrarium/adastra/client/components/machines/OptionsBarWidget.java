@@ -3,12 +3,12 @@ package earth.terrarium.adastra.client.components.machines;
 import earth.terrarium.adastra.AdAstra;
 import earth.terrarium.adastra.client.components.base.ContainerWidget;
 import earth.terrarium.adastra.common.blockentities.base.ContainerMachineBlockEntity;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.layouts.GridLayout;
 import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.layouts.SpacerElement;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ import java.util.List;
 
 public class OptionsBarWidget extends ContainerWidget {
 
-    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "options_bar");
+    private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "options_bar");
     public static final int PADDING = 6;
     public static final int SPACING = 3;
 

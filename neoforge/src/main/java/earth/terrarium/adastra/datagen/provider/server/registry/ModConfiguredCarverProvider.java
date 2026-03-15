@@ -7,7 +7,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.valueproviders.ConstantFloat;
 import net.minecraft.world.level.levelgen.VerticalAnchor;
 import net.minecraft.world.level.levelgen.carver.CarverConfiguration;
@@ -20,7 +20,7 @@ public class ModConfiguredCarverProvider {
     public static final ResourceKey<ConfiguredWorldCarver<?>> MOON_CRATER = register("moon_crater");
 
     private static ResourceKey<ConfiguredWorldCarver<?>> register(String name) {
-        return ResourceKey.create(Registries.CONFIGURED_CARVER, new ResourceLocation(AdAstra.MOD_ID, name));
+        return ResourceKey.create(Registries.CONFIGURED_CARVER, new Identifier(AdAstra.MOD_ID, name));
     }
 
     public static void bootstrap(BootstapContext<ConfiguredWorldCarver<?>> context) {

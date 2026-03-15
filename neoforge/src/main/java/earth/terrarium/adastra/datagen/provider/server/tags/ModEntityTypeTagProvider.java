@@ -34,11 +34,11 @@ public class ModEntityTypeTagProvider extends TagsProvider<EntityType<?>> {
 
         tag(ModEntityTypeTags.LIVES_WITHOUT_OXYGEN).add(TagEntry.element(BuiltInRegistries.ENTITY_TYPE.getKey(EntityType.ZOMBIE)));
         tag(ModEntityTypeTags.LIVES_WITHOUT_OXYGEN).add(TagEntry.element(BuiltInRegistries.ENTITY_TYPE.getKey(EntityType.HUSK)));
-        tag(ModEntityTypeTags.LIVES_WITHOUT_OXYGEN).add(TagEntry.tag(EntityTypeTags.SKELETONS.location()));
+        tag(ModEntityTypeTags.LIVES_WITHOUT_OXYGEN).add(TagEntry.tag(EntityTypeTags.SKELETONS.identifier()));
 
-        tag(ModEntityTypeTags.CAN_SURVIVE_EXTREME_COLD).add(TagEntry.tag(EntityTypeTags.FREEZE_IMMUNE_ENTITY_TYPES.location()));
+        tag(ModEntityTypeTags.CAN_SURVIVE_EXTREME_COLD).add(TagEntry.tag(EntityTypeTags.FREEZE_IMMUNE_ENTITY_TYPES.identifier()));
 
-        tag(ModEntityTypeTags.CAN_SURVIVE_ACID_RAIN).add(TagEntry.tag(ModEntityTypeTags.CAN_SURVIVE_EXTREME_HEAT.location()));
+        tag(ModEntityTypeTags.CAN_SURVIVE_ACID_RAIN).add(TagEntry.tag(ModEntityTypeTags.CAN_SURVIVE_EXTREME_HEAT.identifier()));
 
         tag(ModEntityTypeTags.IGNORES_AIR_VORTEX).add(TagEntry.element(BuiltInRegistries.ENTITY_TYPE.getKey(EntityType.LEASH_KNOT)));
 

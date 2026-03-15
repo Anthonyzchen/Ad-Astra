@@ -8,6 +8,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.material.Fluid;
 
 import java.text.DecimalFormat;
@@ -20,7 +21,7 @@ public class TooltipUtils {
     private static final long BUCKET = 81000L;
 
     public static String getFormattedAmount(long number) {
-        if (Screen.hasShiftDown()) {
+        if (com.mojang.blaze3d.platform.InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), com.mojang.blaze3d.platform.InputConstants.KEY_LSHIFT)) {
             return DecimalFormat.getNumberInstance().format(number);
         }
         NumberFormat compactFormat = NumberFormat.getCompactNumberInstance(Locale.ROOT, NumberFormat.Style.SHORT);
@@ -73,7 +74,7 @@ public class TooltipUtils {
     public static Component getFluidComponent(FluidResource resource, long amount, long capacity) {
         Component fluidName;
         if (!resource.isBlank()) {
-            fluidName = resource.getType().getBucket().getDescription();
+            fluidName = resource.getType().getBucket().getName(ItemStack.EMPTY);
         } else {
             fluidName = Component.literal("Empty");
         }
@@ -85,7 +86,7 @@ public class TooltipUtils {
     }
 
     public static Component getFluidComponent(long amount, long capacity, Fluid fluid) {
-        Component fluidName = fluid != null ? fluid.getBucket().getDescription() : Component.literal("Empty");
+        Component fluidName = fluid != null ? fluid.getBucket().getName(ItemStack.EMPTY) : Component.literal("Empty");
         return Component.translatable("tooltip.ad_astra.fluid",
             getFormattedAmount(amount / 81L),
             getFormattedAmount(capacity / 81L),
@@ -96,7 +97,7 @@ public class TooltipUtils {
     public static Component getFluidComponent(Object fluid, long capacity, Fluid fallback) {
         Component fluidName;
         if (fallback != null) {
-            fluidName = fallback.getBucket().getDescription();
+            fluidName = fallback.getBucket().getName(ItemStack.EMPTY);
         } else {
             fluidName = Component.literal("Empty");
         }
@@ -154,7 +155,7 @@ public class TooltipUtils {
     }
 
     public static void addDescriptionComponent(List<Component> tooltipComponents, Component description) {
-        if (!Screen.hasShiftDown()) {
+        if (!com.mojang.blaze3d.platform.InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), com.mojang.blaze3d.platform.InputConstants.KEY_LSHIFT)) {
             tooltipComponents.add(ConstantComponents.SHIFT_DESCRIPTION);
             return;
         }

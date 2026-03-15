@@ -1,18 +1,11 @@
 package earth.terrarium.adastra.mixins.common;
 
-import com.mojang.authlib.GameProfile;
 import net.minecraft.world.level.block.entity.SkullBlockEntity;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.gen.Invoker;
 
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-
+// In 1.21.11, SkullBlockEntity.fetchGameProfile was removed.
+// Profile resolution is now handled through ResolvableProfile.resolveProfile().
+// This invoker is kept as a placeholder but no longer exposes any methods.
 @Mixin(SkullBlockEntity.class)
 public interface SkullBlockEntityInvoker {
-
-    @Invoker("fetchGameProfile")
-    static CompletableFuture<Optional<GameProfile>> invokeFetchGameProfile(String profileName) {
-        throw new AssertionError();
-    }
 }

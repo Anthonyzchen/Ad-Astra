@@ -4,7 +4,6 @@ import earth.terrarium.adastra.api.systems.OxygenApi;
 import earth.terrarium.adastra.client.utils.SoundUtils;
 import earth.terrarium.adastra.common.menus.vehicles.LanderMenu;
 import earth.terrarium.adastra.common.registry.ModParticleTypes;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -16,6 +15,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
 
@@ -30,17 +31,17 @@ public class Lander extends Vehicle {
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag compound) {
-        super.readAdditionalSaveData(compound);
-        speed = compound.getFloat("Speed");
-        angle = compound.getFloat("Angle");
+    protected void readAdditionalSaveData(ValueInput input) {
+        super.readAdditionalSaveData(input);
+        speed = input.getFloatOr("Speed", 0f);
+        angle = input.getFloatOr("Angle", 0f);
     }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag compound) {
-        super.addAdditionalSaveData(compound);
-        compound.putFloat("Speed", speed);
-        compound.putFloat("Angle", angle);
+    protected void addAdditionalSaveData(ValueOutput output) {
+        super.addAdditionalSaveData(output);
+        output.putFloat("Speed", speed);
+        output.putFloat("Angle", angle);
     }
 
     @Override
@@ -144,7 +145,7 @@ public class Lander extends Vehicle {
     }
 
     @Override
-    public boolean causeFallDamage(float fallDistance, float damageMultiplier, DamageSource damageSource) {
+    public boolean causeFallDamage(double fallDistance, float damageMultiplier, DamageSource damageSource) {
         if (level().isClientSide()) return false;
         if (fallDistance > 40 && onGround()) {
             explode();

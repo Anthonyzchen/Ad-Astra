@@ -1,7 +1,7 @@
 package earth.terrarium.adastra.api.client.events;
 
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,14 +15,14 @@ public final class AdAstraClientEvents {
     @FunctionalInterface
     public interface RenderSolarSystemEvent {
 
-        void render(GuiGraphics graphics, @Nullable ResourceLocation solarSystem, int width, int height);
+        void render(GuiGraphics graphics, @Nullable Identifier solarSystem, int width, int height);
 
         static void register(RenderSolarSystemEvent listener) {
             RENDER_SOLAR_SYSTEM_LISTENERS.add(listener);
         }
 
         @ApiStatus.Internal
-        static void fire(GuiGraphics graphics, @Nullable ResourceLocation solarSystem, int width, int height) {
+        static void fire(GuiGraphics graphics, @Nullable Identifier solarSystem, int width, int height) {
             for (var listener : RENDER_SOLAR_SYSTEM_LISTENERS) {
                 listener.render(graphics, solarSystem, width, height);
             }

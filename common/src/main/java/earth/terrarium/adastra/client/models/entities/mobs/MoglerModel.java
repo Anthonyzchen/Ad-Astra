@@ -8,16 +8,14 @@ import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.monster.Zoglin;
-import net.minecraft.world.entity.monster.hoglin.Hoglin;
 
 // LEGACY ENTITY. WILL BE REPLACED IN THE FUTURE.
-public class MoglerModel<T extends Entity> extends EntityModel<T> {
+public class MoglerModel<T extends LivingEntityRenderState> extends EntityModel<T> {
 
-    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "mogler"), "main");
+    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "mogler"), "main");
 
     private final ModelPart body;
     private final ModelPart head;
@@ -73,28 +71,19 @@ public class MoglerModel<T extends Entity> extends EntityModel<T> {
     }
 
     @Override
-    public void setupAnim(T entity, float limbAngle, float limbDistance, float animationProgress, float headYaw, float headPitch) {
+    public void setupAnim(T state) {
+        float limbAngle = state.walkAnimationPos;
+        float limbDistance = state.walkAnimationSpeed;
+        float headYaw = state.yRot;
 
-        Hoglin hoglin = null;
+        // TODO: restore attack animation from render state when Mogler is properly ported
+        this.head.yRot = headYaw * ((float) Math.PI / 180.0f);
+        this.head.xRot = 0.0f;
 
-        if (entity instanceof Hoglin hog) {
-            hoglin = hog;
-        }
-
-        if (entity instanceof Hoglin || entity instanceof Zoglin) {
-            this.head.yRot = headYaw * ((float) Math.PI / 180.0f);
-            int i = 0;
-            if (hoglin != null) {
-                i = hoglin.getAttackAnimationRemainingTicks();
-            }
-            float f = 1.0f - (float) Mth.abs(10 - 2 * i) / 10.0f;
-            this.head.xRot = Mth.lerp(f, 0.0f, -1.14906584f);
-
-            this.right_front_leg.xRot = Mth.cos(limbAngle) * 1.2f * limbDistance;
-            this.left_front_leg.xRot = Mth.cos(limbAngle + (float) Math.PI) * 1.2f * limbDistance;
-            this.leg3.xRot = this.right_front_leg.xRot;
-            this.left_back_leg.xRot = this.left_front_leg.xRot;
-        }
+        this.right_front_leg.xRot = Mth.cos(limbAngle) * 1.2f * limbDistance;
+        this.left_front_leg.xRot = Mth.cos(limbAngle + (float) Math.PI) * 1.2f * limbDistance;
+        this.leg3.xRot = this.right_front_leg.xRot;
+        this.left_back_leg.xRot = this.left_front_leg.xRot;
     }
 
     @Override

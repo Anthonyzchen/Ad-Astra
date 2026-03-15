@@ -1,14 +1,7 @@
 package earth.terrarium.adastra.client.utils;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.BufferUploader;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.Tesselator;
-import com.mojang.blaze3d.vertex.VertexFormat;
-import net.minecraft.client.renderer.GameRenderer;
-import com.teamresourceful.resourcefullib.client.utils.RenderUtils;
-import com.teamresourceful.resourcefullib.client.utils.ScreenUtils;
+import com.teamresourceful.resourcefullib.client.closables.CloseableScissor;
+import net.minecraft.client.renderer.RenderPipelines;
 import earth.terrarium.adastra.AdAstra;
 import earth.terrarium.adastra.common.registry.ModFluids;
 import earth.terrarium.adastra.common.utils.TooltipUtils;
@@ -20,11 +13,10 @@ import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
-import org.joml.Matrix4f;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,20 +25,20 @@ import java.util.function.Function;
 
 public class GuiUtils {
 
-    public static final ResourceLocation ENERGY_BAR = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "energy_bar");
+    public static final Identifier ENERGY_BAR = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "energy_bar");
     public static final int ENERGY_BAR_WIDTH = 13;
     public static final int ENERGY_BAR_HEIGHT = 46;
 
-    public static final ResourceLocation FLUID_BAR = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "fluid_bar");
+    public static final Identifier FLUID_BAR = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "fluid_bar");
     public static final int FLUID_BAR_WIDTH = 12;
     public static final int FLUID_BAR_HEIGHT = 46;
 
-    public static final ResourceLocation HAMMER = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/gui/sprites/hammer.png");
-    public static final ResourceLocation SNOWFLAKE = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/gui/sprites/snowflake.png");
-    public static final ResourceLocation FIRE = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/gui/sprites/fire.png");
-    public static final ResourceLocation ARROW = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/gui/sprites/arrow.png");
-    public static final ResourceLocation SUN = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "sun");
-    public static final ResourceLocation SLIDER = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "slider");
+    public static final Identifier HAMMER = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/gui/sprites/hammer.png");
+    public static final Identifier SNOWFLAKE = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/gui/sprites/snowflake.png");
+    public static final Identifier FIRE = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/gui/sprites/fire.png");
+    public static final Identifier ARROW = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/gui/sprites/arrow.png");
+    public static final Identifier SUN = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "sun");
+    public static final Identifier SLIDER = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "slider");
 
     public static final WidgetSprites SETTINGS_BUTTON_SPRITES = createPressableButtonSprites("settings_button");
     public static final WidgetSprites RESET_BUTTON_SPRITES = createPressableButtonSprites("reset_button");
@@ -68,16 +60,16 @@ public class GuiUtils {
 
     public static WidgetSprites createPressableButtonSprites(String name) {
         return new WidgetSprites(
-            ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "buttons/" + name),
-            ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "buttons/" + name + "_pressed"),
-            ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "buttons/" + name + "_highlighted")
+            Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "buttons/" + name),
+            Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "buttons/" + name + "_pressed"),
+            Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "buttons/" + name + "_highlighted")
         );
     }
 
     public static void drawEnergyBar(GuiGraphics graphics, int mouseX, int mouseY, int x, int y, long energy, long capacity, Component... tooltips) {
         float ratio = energy / (float) capacity;
-        try (var ignored = RenderUtils.createScissorBox(Minecraft.getInstance(), graphics.pose(), x + 6, y - 31 + ENERGY_BAR_HEIGHT - (int) (ENERGY_BAR_HEIGHT * ratio), ENERGY_BAR_WIDTH, ENERGY_BAR_HEIGHT)) {
-            graphics.blitSprite(ENERGY_BAR, x + 6, y - 31, ENERGY_BAR_WIDTH, ENERGY_BAR_HEIGHT);
+        try (var ignored = new CloseableScissor(graphics, x + 6, y - 31 + ENERGY_BAR_HEIGHT - (int) (ENERGY_BAR_HEIGHT * ratio), ENERGY_BAR_WIDTH, ENERGY_BAR_HEIGHT)) {
+            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, ENERGY_BAR, x + 6, y - 31, ENERGY_BAR_WIDTH, ENERGY_BAR_HEIGHT);
         }
 
         drawTooltips(mouseX, mouseY, x + 6, x + 19, y - 31, y + 15, list -> {
@@ -99,7 +91,7 @@ public class GuiUtils {
         }
 
         // Draw the bar frame overlay on top
-        graphics.blitSprite(FLUID_BAR, barX, barY, FLUID_BAR_WIDTH, FLUID_BAR_HEIGHT);
+        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, FLUID_BAR, barX, barY, FLUID_BAR_WIDTH, FLUID_BAR_HEIGHT);
 
         drawTooltips(mouseX, mouseY, x + 6, x + 18, y - 31, y + 15, list -> {
             list.add(TooltipUtils.getFluidComponent(fluid, amount, capacity));
@@ -108,10 +100,10 @@ public class GuiUtils {
         });
     }
 
-    public static void drawHorizontalProgressBar(GuiGraphics graphics, ResourceLocation texture, int mouseX, int mouseY, int x, int y, int width, int height, int progress, int maxProgress, boolean reverse, Component... tooltips) {
+    public static void drawHorizontalProgressBar(GuiGraphics graphics, Identifier texture, int mouseX, int mouseY, int x, int y, int width, int height, int progress, int maxProgress, boolean reverse, Component... tooltips) {
         int widthProgress = (int) (width * (progress / (float) maxProgress));
         if (reverse) widthProgress = width - widthProgress;
-        graphics.blit(texture, x, y, 0, 0, widthProgress, height, width, height);
+        graphics.blit(RenderPipelines.GUI_TEXTURED, texture, x, y, 0, 0, widthProgress, height, width, height);
 
         drawTooltips(mouseX, mouseY, x, x + width, y, y + height, list -> {
             Collections.addAll(list, tooltips);
@@ -119,10 +111,10 @@ public class GuiUtils {
         });
     }
 
-    public static void drawVerticalProgressBar(GuiGraphics graphics, ResourceLocation texture, int mouseX, int mouseY, int x, int y, int width, int height, int progress, int maxProgress, Component... tooltips) {
+    public static void drawVerticalProgressBar(GuiGraphics graphics, Identifier texture, int mouseX, int mouseY, int x, int y, int width, int height, int progress, int maxProgress, Component... tooltips) {
         int heightProgress = (int) (height * (progress / (float) maxProgress));
         heightProgress = height - heightProgress;
-        graphics.blit(texture, x, y + heightProgress, 0, heightProgress, width, height - heightProgress, width, height);
+        graphics.blit(RenderPipelines.GUI_TEXTURED, texture, x, y + heightProgress, 0, heightProgress, width, height - heightProgress, width, height);
 
         drawTooltips(mouseX, mouseY, x, x + width, y, y + height, list -> {
             Collections.addAll(list, tooltips);
@@ -132,62 +124,54 @@ public class GuiUtils {
 
     /**
      * Renders the fluid's still texture tiled and tinted within the given area.
+     *
+     * In 1.21.11, the old RenderSystem.setShader/setShaderTexture/enableBlend approach is removed.
+     * This now uses GuiGraphics.blit() which handles the rendering pipeline internally.
+     *
+     * TODO: 1.21.11 - Verify fluid rendering works correctly with the new GuiGraphics.blit API.
+     * The tiling and tinting approach may need adjustment for the new pipeline.
      */
     public static void renderFluidFill(GuiGraphics graphics, Fluid fluid, int x, int y, int width, int height) {
         if (height <= 0) return;
 
-        ResourceLocation stillTexture = getFluidStillTexture(fluid);
+        Identifier stillTexture = getFluidStillTexture(fluid);
         int color = getFluidColor(fluid);
 
         @SuppressWarnings("deprecation")
         TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(stillTexture);
 
-        float r = ((color >> 16) & 0xFF) / 255f;
-        float g = ((color >> 8) & 0xFF) / 255f;
-        float b = (color & 0xFF) / 255f;
-        float a = ((color >> 24) & 0xFF) / 255f;
-
-        RenderSystem.setShaderTexture(0, TextureAtlas.LOCATION_BLOCKS);
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        RenderSystem.setShaderColor(r, g, b, a);
-        RenderSystem.enableBlend();
-
-        Matrix4f matrix = graphics.pose().last().pose();
-        BufferBuilder builder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-
-        // Tile the 16x16 fluid sprite to fill the area from top to bottom
+        // Use GuiGraphics to render the fluid sprite tiled
+        // TODO: 1.21.11 - The tiling approach needs to be updated for the new rendering pipeline.
+        // For now, render the sprite scaled to fill the area. Proper tiling may require
+        // using blitSprite with the appropriate RenderPipeline.
         int drawY = y;
         int remaining = height;
         while (remaining > 0) {
             int drawHeight = Math.min(remaining, 16);
+            // Render using the sprite's atlas texture coordinates
             float minU = sprite.getU0();
             float maxU = sprite.getU(width / 16f);
             float minV = sprite.getV0();
             float maxV = sprite.getV(drawHeight / 16f);
 
-            builder.addVertex(matrix, x, drawY + drawHeight, 0).setUv(minU, maxV);
-            builder.addVertex(matrix, x + width, drawY + drawHeight, 0).setUv(maxU, maxV);
-            builder.addVertex(matrix, x + width, drawY, 0).setUv(maxU, minV);
-            builder.addVertex(matrix, x, drawY, 0).setUv(minU, minV);
+            // Use blit with atlas texture coordinates
+            graphics.blit(TextureAtlas.LOCATION_BLOCKS, x, drawY, x + width, drawY + drawHeight,
+                minU, minV, maxU, maxV);
 
             drawY += drawHeight;
             remaining -= drawHeight;
         }
-
-        BufferUploader.drawWithShader(builder.buildOrThrow());
-        RenderSystem.setShaderColor(1, 1, 1, 1);
-        RenderSystem.disableBlend();
     }
 
     /**
      * Returns the still texture location for a given fluid.
      */
-    public static ResourceLocation getFluidStillTexture(Fluid fluid) {
+    public static Identifier getFluidStillTexture(Fluid fluid) {
         if (fluid == Fluids.LAVA || fluid == Fluids.FLOWING_LAVA) {
-            return ResourceLocation.withDefaultNamespace("block/lava_still");
+            return Identifier.withDefaultNamespace("block/lava_still");
         }
         // All Ad Astra fluids and water use the water_still texture
-        return ResourceLocation.withDefaultNamespace("block/water_still");
+        return Identifier.withDefaultNamespace("block/water_still");
     }
 
     /**
@@ -223,7 +207,10 @@ public class GuiUtils {
         if (mouseX >= minX && mouseX <= maxX && mouseY >= minY && mouseY <= maxY) {
             List<Component> lines = tooltips.apply(new ArrayList<>());
             lines.removeIf(c -> c.getString().isEmpty());
-            ScreenUtils.setTooltip(lines);
+            var screen = Minecraft.getInstance().screen;
+            if (screen != null) {
+                screen.setTooltipForNextRenderPass(lines.stream().map(Component::getVisualOrderText).toList());
+            }
         }
     }
 

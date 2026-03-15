@@ -25,7 +25,7 @@ public class RadioBlock extends BasicEntityBlock {
 
     public static final MapCodec<RadioBlock> CODEC = simpleCodec(RadioBlock::new);
 
-    public static final EightDirectionProperty FACING = EightDirectionProperty.FACING;
+    public static final net.minecraft.world.level.block.state.properties.EnumProperty<EightDirectionProperty.Direction> FACING = EightDirectionProperty.FACING;
 
     private static final VoxelShape SHAPE = Block.box(1, 0, 1, 15, 8, 15);
 

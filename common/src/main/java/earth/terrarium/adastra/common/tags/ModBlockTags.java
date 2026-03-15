@@ -2,7 +2,7 @@ package earth.terrarium.adastra.common.tags;
 
 import earth.terrarium.adastra.AdAstra;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
 
@@ -46,6 +46,6 @@ public final class ModBlockTags {
     public static final TagKey<Block> DESTROYED_IN_SPACE = tag("destroyed_in_space");
 
     private static TagKey<Block> tag(String name) {
-        return TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, name));
+        return TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, name));
     }
 }

@@ -112,7 +112,7 @@ public abstract class BaseContainerMenu<T extends BlockEntity> extends AbstractC
 
     public static <T extends BlockEntity> T getBlockEntityFromBuf(Level level, BlockPos pos, Class<T> type) {
         if (pos == null) return null;
-        if (!level.isClientSide) return null;
+        if (!level.isClientSide()) return null;
         return WorldUtils.getTileEntity(type, level, pos);
     }
 }

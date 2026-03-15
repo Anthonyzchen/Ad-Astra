@@ -3,19 +3,19 @@ package earth.terrarium.adastra.client.models.entities.mobs;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import earth.terrarium.adastra.AdAstra;
-import earth.terrarium.adastra.common.entities.mob.StarCrawler;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 
 // LEGACY ENTITY. WILL BE REPLACED IN THE FUTURE.
-public class StarCrawlerModel extends EntityModel<StarCrawler> {
+public class StarCrawlerModel extends EntityModel<LivingEntityRenderState> {
 
-    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "star_crawler"), "main");
+    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "star_crawler"), "main");
 
     private final ModelPart body;
     private final ModelPart leg1;
@@ -106,7 +106,10 @@ public class StarCrawlerModel extends EntityModel<StarCrawler> {
     }
 
     @Override
-    public void setupAnim(StarCrawler entity, float limbAngle, float limbDistance, float animationProgress, float headYaw, float headPitch) {
+    public void setupAnim(LivingEntityRenderState state) {
+        float limbAngle = state.walkAnimationPos;
+        float limbDistance = state.walkAnimationSpeed;
+
         this.leg1.yRot = Mth.cos(limbAngle * 0.6662f) * limbDistance;
         this.leg2.yRot = Mth.cos(limbAngle * 0.6662f) * limbDistance;
         this.leg3.yRot = Mth.cos(limbAngle * 0.6662f) * limbDistance;

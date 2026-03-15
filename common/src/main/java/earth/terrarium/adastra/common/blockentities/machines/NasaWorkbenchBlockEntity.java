@@ -84,7 +84,7 @@ public class NasaWorkbenchBlockEntity extends ContainerMachineBlockEntity {
     @Override
     public void update() {
         if (level().isClientSide()) return;
-        RecipeHolder<NasaWorkbenchRecipe> holder = quickCheck.getRecipeFor(toRecipeInput(), level()).orElse(null);
+        RecipeHolder<NasaWorkbenchRecipe> holder = quickCheck.getRecipeFor(toRecipeInput(), (ServerLevel) level()).orElse(null);
         recipe = holder != null ? holder.value() : null;
     }
 

@@ -15,12 +15,12 @@ import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.Ingredient;
 
 public record NasaWorkbenchCategory(IGuiHelper guiHelper) implements IRecipeCategory<NasaWorkbenchRecipe> {
 
-    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "nasa_workbench");
+    public static final Identifier ID = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "nasa_workbench");
     public static final RecipeType<NasaWorkbenchRecipe> RECIPE = new RecipeType<>(ID, NasaWorkbenchRecipe.class);
 
     @Override
@@ -34,8 +34,13 @@ public record NasaWorkbenchCategory(IGuiHelper guiHelper) implements IRecipeCate
     }
 
     @Override
-    public IDrawable getBackground() {
-        return guiHelper.createBlankDrawable(180, 145);
+    public int getWidth() {
+        return 180;
+    }
+
+    @Override
+    public int getHeight() {
+        return 145;
     }
 
     @Override
@@ -45,7 +50,7 @@ public record NasaWorkbenchCategory(IGuiHelper guiHelper) implements IRecipeCate
 
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, NasaWorkbenchRecipe recipe, IFocusGroup focuses) {
-        builder.addInvisibleIngredients(RecipeIngredientRole.CATALYST).addIngredients(Ingredient.of(ModItems.NASA_WORKBENCH.get()));
+        // Catalyst role removed in JEI for 1.21.1; catalyst registration handled in registerRecipeCatalysts
         slot(builder, recipe, 57, 16, 0);
         slot(builder, recipe, 48, 34, 1);
         slot(builder, recipe, 66, 34, 2);

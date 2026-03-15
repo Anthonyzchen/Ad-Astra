@@ -9,13 +9,13 @@ import earth.terrarium.adastra.common.menus.machines.OxygenDistributorMenu;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import org.jetbrains.annotations.NotNull;
 
 public class OxygenDistributorScreen extends MachineScreen<OxygenDistributorMenu, OxygenDistributorBlockEntity> {
 
-    public static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/gui/container/oxygen_distributor.png");
+    public static final Identifier TEXTURE = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/gui/container/oxygen_distributor.png");
     public static final Rect2i CLICK_AREA = new Rect2i(76, 95, 26, 25);
 
     public OxygenDistributorScreen(OxygenDistributorMenu menu, Inventory inventory, Component component) {

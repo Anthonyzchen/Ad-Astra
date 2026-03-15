@@ -7,12 +7,13 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.BiomeTags;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.SpawnPlacementTypes;
 import net.minecraft.world.entity.ai.village.poi.PoiManager;
 import net.minecraft.world.entity.ai.village.poi.PoiTypes;
-import net.minecraft.world.entity.npc.WanderingTrader;
+import net.minecraft.world.entity.npc.wanderingtrader.WanderingTrader;
 import net.minecraft.world.level.*;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.storage.ServerLevelData;
 import org.jetbrains.annotations.Nullable;
@@ -46,7 +47,7 @@ public class LunarianWanderingTraderSpawner implements CustomSpawner {
 
     @Override
     public int tick(ServerLevel level, boolean spawnMonsters, boolean spawnAnimals) {
-        if (!level.getGameRules().getBoolean(GameRules.RULE_DO_TRADER_SPAWNING)) return 0;
+        if (!(Boolean) level.getGameRules().get(GameRules.SPAWN_WANDERING_TRADERS)) return 0;
         if (--this.spawnTimer > 0) return 0;
 
         this.spawnTimer = DEFAULT_SPAWN_TIMER;
@@ -54,7 +55,7 @@ public class LunarianWanderingTraderSpawner implements CustomSpawner {
         this.properties.setWanderingTraderSpawnDelay(this.spawnDelay);
         if (this.spawnDelay > 0) return 0;
         this.spawnDelay = DEFAULT_SPAWN_DELAY;
-        if (!level.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING)) return 0;
+        if (!(Boolean) level.getGameRules().get(GameRules.SPAWN_MOBS)) return 0;
         int i = this.spawnChance;
         this.spawnChance = Mth.clamp(this.spawnChance + 25, 25, 75);
         this.properties.setWanderingTraderSpawnChance(this.spawnChance);
@@ -83,7 +84,7 @@ public class LunarianWanderingTraderSpawner implements CustomSpawner {
                 return false;
             }
 
-            WanderingTrader wanderingTraderEntity = ModEntityTypes.LUNARIAN_WANDERING_TRADER.get().spawn(level, blockPos3, MobSpawnType.EVENT);
+            WanderingTrader wanderingTraderEntity = ModEntityTypes.LUNARIAN_WANDERING_TRADER.get().spawn(level, blockPos3, EntitySpawnReason.EVENT);
             if (wanderingTraderEntity != null) {
 
                 this.properties.setWanderingTraderId(wanderingTraderEntity.getUUID());

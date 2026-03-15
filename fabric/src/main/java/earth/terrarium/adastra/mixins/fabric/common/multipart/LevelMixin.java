@@ -30,7 +30,9 @@ public class LevelMixin implements MultipartPartsHolder {
         return adastra$multipartEntityParts;
     }
 
-    // TODO: Verify intermediary name method_31593 is still correct for 1.21.1 - this is a lambda in Level.getEntities
+    // TODO: 1.21.11 - Verify intermediary name method_31593 is still correct for 1.21.11.
+    // Lambda names frequently change between MC versions. Check Level.getEntities in the
+    // 1.21.11 intermediary mappings. If it fails at runtime, use a refmap or check yarn/intermediary.
     @Inject(
         method = {"method_31593"},
         at = @At("TAIL")
@@ -46,7 +48,9 @@ public class LevelMixin implements MultipartPartsHolder {
         }
     }
 
-    // TODO: Verify intermediary name method_47576 is still correct for 1.21.1 - this is a lambda in Level.getEntities
+    // TODO: 1.21.11 - Verify intermediary name method_47576 is still correct for 1.21.11.
+    // Lambda names frequently change between MC versions. Check Level.getEntities in the
+    // 1.21.11 intermediary mappings.
     @Inject(
         method = {"method_47576"},
         at = @At(value = "RETURN", ordinal = 2),

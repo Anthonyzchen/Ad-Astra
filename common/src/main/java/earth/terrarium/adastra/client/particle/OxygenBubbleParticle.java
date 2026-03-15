@@ -2,12 +2,14 @@ package earth.terrarium.adastra.client.particle;
 
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.util.RandomSource;
 
-public class OxygenBubbleParticle extends TextureSheetParticle {
+public class OxygenBubbleParticle extends SingleQuadParticle {
 
-    protected OxygenBubbleParticle(ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
-        super(level, x, y, z, xSpeed, ySpeed, zSpeed);
+    protected OxygenBubbleParticle(ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, TextureAtlasSprite sprite) {
+        super(level, x, y, z, xSpeed, ySpeed, zSpeed, sprite);
         this.setSize(0.02f, 0.02f);
         this.quadSize *= this.random.nextFloat() * 0.6f + 0.2f;
         this.xd = xSpeed * 0.2f + (Math.random() * 2.0 - 1.0) * 0.02f;
@@ -39,8 +41,8 @@ public class OxygenBubbleParticle extends TextureSheetParticle {
     }
 
     @Override
-    public ParticleRenderType getRenderType() {
-        return ParticleRenderType.PARTICLE_SHEET_OPAQUE;
+    protected SingleQuadParticle.Layer getLayer() {
+        return SingleQuadParticle.Layer.OPAQUE;
     }
 
     public static class Provider implements ParticleProvider<SimpleParticleType> {
@@ -52,10 +54,9 @@ public class OxygenBubbleParticle extends TextureSheetParticle {
         }
 
         @Override
-        public Particle createParticle(SimpleParticleType type, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
-            OxygenBubbleParticle oxygenBubbleParticle = new OxygenBubbleParticle(level, x, y, z, xSpeed, ySpeed, zSpeed);
-            oxygenBubbleParticle.pickSprite(sprites);
-            return oxygenBubbleParticle;
+        public Particle createParticle(SimpleParticleType type, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, RandomSource random) {
+            TextureAtlasSprite sprite = sprites.get(random);
+            return new OxygenBubbleParticle(level, x, y, z, xSpeed, ySpeed, zSpeed, sprite);
         }
     }
 }

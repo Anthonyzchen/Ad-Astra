@@ -1,11 +1,12 @@
 package earth.terrarium.adastra.client.components;
 
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class PressableImageButton extends ImageButton {
 
@@ -28,7 +29,7 @@ public class PressableImageButton extends ImageButton {
 
     @Override
     public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        ResourceLocation texture = sprites.get(!isFocused(), isHovered());
-        graphics.blitSprite(texture, getX(), getY(), width, height);
+        Identifier texture = sprites.get(!isFocused(), isHovered());
+        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, texture, getX(), getY(), width, height);
     }
 }

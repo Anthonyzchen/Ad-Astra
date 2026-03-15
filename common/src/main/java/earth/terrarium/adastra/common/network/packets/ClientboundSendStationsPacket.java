@@ -8,7 +8,7 @@ import com.teamresourceful.resourcefullib.common.network.defaults.CodecPacketTyp
 import earth.terrarium.adastra.AdAstra;
 import earth.terrarium.adastra.client.radio.screen.RadioScreen;
 import earth.terrarium.adastra.common.utils.radio.StationInfo;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.List;
 
@@ -22,12 +22,11 @@ public record ClientboundSendStationsPacket(
         return TYPE;
     }
 
-    private static class Type extends CodecPacketType<ClientboundSendStationsPacket> implements ClientboundPacketType<ClientboundSendStationsPacket> {
+    private static class Type extends CodecPacketType.Client<ClientboundSendStationsPacket> {
 
         public Type() {
             super(
-                ClientboundSendStationsPacket.class,
-                ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "send_stations"),
+                Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "send_stations"),
                 ObjectByteCodec.create(
                     StationInfo.BYTE_CODEC.listOf().fieldOf(ClientboundSendStationsPacket::stations),
                     ClientboundSendStationsPacket::new

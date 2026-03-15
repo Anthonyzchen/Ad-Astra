@@ -3,7 +3,7 @@ package earth.terrarium.adastra.mixins.common.gravity;
 import earth.terrarium.adastra.api.systems.GravityApi;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.projectile.ThrownExperienceBottle;
+import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrownExperienceBottle;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -18,7 +18,7 @@ public abstract class ThrownExperienceBottleMixin extends Entity {
     }
 
     // 1.21.1: getGravity now returns double instead of float
-    @Inject(method = "getDefaultGravity", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "method_7490", at = @At("HEAD"), cancellable = true)
     public void adastra$getGravity(CallbackInfoReturnable<Double> cir) {
         cir.setReturnValue((double) (0.07f * GravityApi.API.getGravity(this)));
     }

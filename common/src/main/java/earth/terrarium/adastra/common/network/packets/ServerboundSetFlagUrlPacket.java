@@ -11,7 +11,7 @@ import earth.terrarium.adastra.AdAstra;
 import earth.terrarium.adastra.common.blockentities.flag.FlagBlockEntity;
 import earth.terrarium.adastra.common.blockentities.flag.content.UrlContent;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.Block;
 
@@ -29,12 +29,11 @@ public record ServerboundSetFlagUrlPacket(BlockPos pos, String url) implements P
         return TYPE;
     }
 
-    private static class Type extends CodecPacketType<ServerboundSetFlagUrlPacket> implements ServerboundPacketType<ServerboundSetFlagUrlPacket> {
+    private static class Type extends CodecPacketType.Server<ServerboundSetFlagUrlPacket> {
 
         public Type() {
             super(
-                ServerboundSetFlagUrlPacket.class,
-                ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "set_flag_url"),
+                Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "set_flag_url"),
                 ObjectByteCodec.create(
                     ExtraByteCodecs.BLOCK_POS.fieldOf(ServerboundSetFlagUrlPacket::pos),
                     ByteCodec.STRING.fieldOf(ServerboundSetFlagUrlPacket::url),
@@ -50,7 +49,7 @@ public record ServerboundSetFlagUrlPacket(BlockPos pos, String url) implements P
                     && player.distanceToSqr(packet.pos().getCenter()) <= 64
                     && player.level().getBlockEntity(packet.pos()) instanceof FlagBlockEntity flag
                     && flag.getOwner() != null
-                    && player.getUUID().equals(flag.getOwner().getId())
+                    && player.getUUID().equals(flag.getOwner().id())
                 ) {
                     flag.setContent(UrlContent.of(packet.url()));
                     var blockState = player.level().getBlockState(packet.pos());

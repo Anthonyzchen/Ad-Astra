@@ -8,7 +8,7 @@ import com.teamresourceful.resourcefullib.common.network.defaults.CodecPacketTyp
 import earth.terrarium.adastra.AdAstra;
 import earth.terrarium.adastra.common.network.NetworkHandler;
 import earth.terrarium.adastra.common.utils.radio.StationLoader;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
@@ -23,12 +23,11 @@ public record ServerboundRequestStationsPacket() implements Packet<ServerboundRe
         return TYPE;
     }
 
-    private static class Type extends CodecPacketType<ServerboundRequestStationsPacket> implements ServerboundPacketType<ServerboundRequestStationsPacket> {
+    private static class Type extends CodecPacketType.Server<ServerboundRequestStationsPacket> {
 
         public Type() {
             super(
-                ServerboundRequestStationsPacket.class,
-                ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "request_stations"),
+                Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "request_stations"),
                 ByteCodec.unit(ServerboundRequestStationsPacket::new)
             );
         }

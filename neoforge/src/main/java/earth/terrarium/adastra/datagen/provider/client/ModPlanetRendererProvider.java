@@ -10,8 +10,8 @@ import earth.terrarium.adastra.datagen.provider.base.ModCodecProvider;
 import net.minecraft.core.Registry;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.random.SimpleWeightedRandomList;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.random.WeightedList;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
@@ -24,11 +24,11 @@ import java.util.function.BiConsumer;
 
 public class ModPlanetRendererProvider extends ModCodecProvider<PlanetRenderer> {
 
-    public static final ResourceKey<Registry<PlanetRenderer>> PLANET_REGISTRY = ResourceKey.createRegistryKey(new ResourceLocation(AdAstra.MOD_ID, "planet_renderers"));
+    public static final ResourceKey<Registry<PlanetRenderer>> PLANET_REGISTRY = ResourceKey.createRegistryKey(new Identifier(AdAstra.MOD_ID, "planet_renderers"));
 
     public static final int DEFAULT_SUNRISE_COLOR = 0xd85f33;
 
-    public static final SimpleWeightedRandomList<Integer> COLORED_STARS = SimpleWeightedRandomList.<Integer>builder()
+    public static final WeightedList<Integer> COLORED_STARS = WeightedList.<Integer>builder()
         .add(0xA9BCDFFF, 3)   // Blue
         .add(0xBBD7FFFF, 5)   // Blue-White,
         .add(0xFFF4E8FF, 100) // Yellow-White
@@ -41,7 +41,7 @@ public class ModPlanetRendererProvider extends ModCodecProvider<PlanetRenderer> 
         .add(0xFFFF0000, 1)   // Bright Red
         .build();
 
-    public static final SimpleWeightedRandomList<Integer> DEFAULT_STARS = SimpleWeightedRandomList.<Integer>builder()
+    public static final WeightedList<Integer> DEFAULT_STARS = WeightedList.<Integer>builder()
         .add(0xffffffff, 1)
         .build();
 
@@ -50,7 +50,7 @@ public class ModPlanetRendererProvider extends ModCodecProvider<PlanetRenderer> 
     }
 
     @Override
-    protected void build(BiConsumer<ResourceLocation, PlanetRenderer> consumer) {
+    protected void build(BiConsumer<Identifier, PlanetRenderer> consumer) {
         orbit(consumer, Planet.EARTH_ORBIT, DimensionRenderingUtils.EARTH, 0xff3c7cda, 10,
             new SkyRenderable(DimensionRenderingUtils.MOON, 8, new Vec3(80, 0, 30), new Vec3(0, -5, 0), MovementType.STATIC, 0xffafb8cc));
 
@@ -66,7 +66,7 @@ public class ModPlanetRendererProvider extends ModCodecProvider<PlanetRenderer> 
         orbit(consumer, Planet.GLACIO_ORBIT, DimensionRenderingUtils.GLACIO, 0xffced7ec, 9,
             new SkyRenderable(DimensionRenderingUtils.VICINUS, 50, new Vec3(60, 0, 5), new Vec3(0, 0, -5), MovementType.STATIC, false, 0xff974cb8));
 
-        consumer.accept(Planet.MOON.location(), new PlanetRenderer(
+        consumer.accept(Planet.MOON.identifier(), new PlanetRenderer(
             Planet.MOON,
             true,
             true,
@@ -84,7 +84,7 @@ public class ModPlanetRendererProvider extends ModCodecProvider<PlanetRenderer> 
                 new SkyRenderable(DimensionRenderingUtils.EARTH, 14, new Vec3(80, 0, 30), new Vec3(0, -5, 0), MovementType.STATIC, 0xff3c7cda)
             )));
 
-        consumer.accept(Planet.MARS.location(), new PlanetRenderer(
+        consumer.accept(Planet.MARS.identifier(), new PlanetRenderer(
             Planet.MARS,
             true,
             true,
@@ -104,7 +104,7 @@ public class ModPlanetRendererProvider extends ModCodecProvider<PlanetRenderer> 
                 new SkyRenderable(DimensionRenderingUtils.EARTH, 0.4f, new Vec3(-40, 0, 160), new Vec3(0, 100, 0), MovementType.TIME_OF_DAY, true, 0xff3c7cda)
             )));
 
-        consumer.accept(Planet.VENUS.location(), new PlanetRenderer(
+        consumer.accept(Planet.VENUS.identifier(), new PlanetRenderer(
             Planet.VENUS,
             false,
             true,
@@ -123,7 +123,7 @@ public class ModPlanetRendererProvider extends ModCodecProvider<PlanetRenderer> 
                 new SkyRenderable(DimensionRenderingUtils.MERCURY, 0.3f, new Vec3(10, 0, -10), new Vec3(0, 100, 0), MovementType.TIME_OF_DAY_REVERSED, true, 0xffab6989)
             )));
 
-        consumer.accept(Planet.MERCURY.location(), new PlanetRenderer(
+        consumer.accept(Planet.MERCURY.identifier(), new PlanetRenderer(
             Planet.MERCURY,
             true,
             true,
@@ -141,7 +141,7 @@ public class ModPlanetRendererProvider extends ModCodecProvider<PlanetRenderer> 
                 new SkyRenderable(DimensionRenderingUtils.VENUS, 0.4f, new Vec3(-15, 0, 140), new Vec3(0, 100, 0), MovementType.TIME_OF_DAY, true, 0xfff3c476)
             )));
 
-        consumer.accept(Planet.GLACIO.location(), new PlanetRenderer(
+        consumer.accept(Planet.GLACIO.identifier(), new PlanetRenderer(
             Planet.GLACIO,
             false,
             true,
@@ -160,13 +160,13 @@ public class ModPlanetRendererProvider extends ModCodecProvider<PlanetRenderer> 
             )));
     }
 
-    private static void orbit(BiConsumer<ResourceLocation, PlanetRenderer> consumer, ResourceKey<Level> planet, ResourceLocation planetTexture, int backlightColor, int sunScale, SkyRenderable... additionalRenderables) {
+    private static void orbit(BiConsumer<Identifier, PlanetRenderer> consumer, ResourceKey<Level> planet, Identifier planetTexture, int backlightColor, int sunScale, SkyRenderable... additionalRenderables) {
         List<SkyRenderable> renderables = new ArrayList<>();
         renderables.add(new SkyRenderable(DimensionRenderingUtils.SUN, sunScale, Vec3.ZERO, Vec3.ZERO, MovementType.TIME_OF_DAY, 0xffffffd9));
         renderables.add(new SkyRenderable(planetTexture, 80, new Vec3(180, 0, 0), Vec3.ZERO, MovementType.STATIC, backlightColor));
         renderables.addAll(List.of(additionalRenderables));
         consumer.accept(
-            planet.location(),
+            planet.identifier(),
             new PlanetRenderer(
                 planet,
                 true,

@@ -18,7 +18,7 @@ public abstract class FishingHookMixin extends Entity {
         super(entityType, level);
     }
 
-    @Inject(method = "tick", at = @At("TAIL"))
+    @Inject(method = "method_5773", at = @At("TAIL"))
     public void adastra$tick(CallbackInfo ci) {
         double gravity = -0.03 * GravityApi.API.getGravity(this);
         Vec3 velocity = this.getDeltaMovement();

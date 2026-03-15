@@ -11,11 +11,12 @@ import earth.terrarium.adastra.common.blockentities.flag.FlagBlockEntity;
 import earth.terrarium.adastra.common.blockentities.machines.*;
 import earth.terrarium.adastra.common.blockentities.pipes.CableBlockEntity;
 import earth.terrarium.adastra.common.blockentities.pipes.FluidPipeBlockEntity;
-// RegistryHelpers removed - using BlockEntityType.Builder directly
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+
+import java.util.Set;
 
 @SuppressWarnings("unused")
 public class ModBlockEntityTypes {
@@ -24,81 +25,81 @@ public class ModBlockEntityTypes {
 
     public static final RegistryEntry<BlockEntityType<CoalGeneratorBlockEntity>> COAL_GENERATOR = BLOCK_ENTITY_TYPES.register(
         "coal_generator",
-        () -> BlockEntityType.Builder.of(
+        () -> new BlockEntityType<>(
             CoalGeneratorBlockEntity::new,
-            ModBlocks.COAL_GENERATOR.get()).build(null));
+            Set.of(ModBlocks.COAL_GENERATOR.get())));
 
     public static final RegistryEntry<BlockEntityType<CompressorBlockEntity>> COMPRESSOR = BLOCK_ENTITY_TYPES.register(
         "compressor",
-        () -> BlockEntityType.Builder.of(
+        () -> new BlockEntityType<>(
             CompressorBlockEntity::new,
-            ModBlocks.COMPRESSOR.get()).build(null));
+            Set.of(ModBlocks.COMPRESSOR.get())));
 
     public static final RegistryEntry<BlockEntityType<EtrionicBlastFurnaceBlockEntity>> ETRIONIC_BLAST_FURNACE = BLOCK_ENTITY_TYPES.register(
         "etreonic_blast_furnace",
-        () -> BlockEntityType.Builder.of(
+        () -> new BlockEntityType<>(
             EtrionicBlastFurnaceBlockEntity::new,
-            ModBlocks.ETRIONIC_BLAST_FURNACE.get()).build(null));
+            Set.of(ModBlocks.ETRIONIC_BLAST_FURNACE.get())));
 
     public static final RegistryEntry<BlockEntityType<OxygenLoaderBlockEntity>> OXYGEN_LOADER = BLOCK_ENTITY_TYPES.register(
         "oxygen_loader",
-        () -> BlockEntityType.Builder.of(
+        () -> new BlockEntityType<>(
             OxygenLoaderBlockEntity::new,
-            ModBlocks.OXYGEN_LOADER.get()).build(null));
+            Set.of(ModBlocks.OXYGEN_LOADER.get())));
 
     public static final RegistryEntry<BlockEntityType<FuelRefineryBlockEntity>> FUEL_REFINERY = BLOCK_ENTITY_TYPES.register(
         "fuel_refinery",
-        () -> BlockEntityType.Builder.of(
+        () -> new BlockEntityType<>(
             FuelRefineryBlockEntity::new,
-            ModBlocks.FUEL_REFINERY.get()).build(null));
+            Set.of(ModBlocks.FUEL_REFINERY.get())));
 
     public static final RegistryEntry<BlockEntityType<WaterPumpBlockEntity>> WATER_PUMP = BLOCK_ENTITY_TYPES.register(
         "water_pump",
-        () -> BlockEntityType.Builder.of(
+        () -> new BlockEntityType<>(
             WaterPumpBlockEntity::new,
-            ModBlocks.WATER_PUMP.get()).build(null));
+            Set.of(ModBlocks.WATER_PUMP.get())));
 
     public static final RegistryEntry<BlockEntityType<SolarPanelBlockEntity>> SOLAR_PANEL = BLOCK_ENTITY_TYPES.register(
         "solar_panel",
-        () -> BlockEntityType.Builder.of(
+        () -> new BlockEntityType<>(
             SolarPanelBlockEntity::new,
-            ModBlocks.SOLAR_PANEL.get()).build(null));
+            Set.of(ModBlocks.SOLAR_PANEL.get())));
 
     public static final RegistryEntry<BlockEntityType<OxygenDistributorBlockEntity>> OXYGEN_DISTRIBUTOR = BLOCK_ENTITY_TYPES.register(
         "oxygen_distributor",
-        () -> BlockEntityType.Builder.of(
+        () -> new BlockEntityType<>(
             OxygenDistributorBlockEntity::new,
-            ModBlocks.OXYGEN_DISTRIBUTOR.get()).build(null));
+            Set.of(ModBlocks.OXYGEN_DISTRIBUTOR.get())));
 
     public static final RegistryEntry<BlockEntityType<GravityNormalizerBlockEntity>> GRAVITY_NORMALIZER = BLOCK_ENTITY_TYPES.register(
         "gravity_normalizer",
-        () -> BlockEntityType.Builder.of(
+        () -> new BlockEntityType<>(
             GravityNormalizerBlockEntity::new,
-            ModBlocks.GRAVITY_NORMALIZER.get()).build(null));
+            Set.of(ModBlocks.GRAVITY_NORMALIZER.get())));
 
     public static final RegistryEntry<BlockEntityType<EnergizerBlockEntity>> ENERGIZER = BLOCK_ENTITY_TYPES.register(
         "energizer",
-        () -> BlockEntityType.Builder.of(
+        () -> new BlockEntityType<>(
             EnergizerBlockEntity::new,
-            ModBlocks.ENERGIZER.get()).build(null));
+            Set.of(ModBlocks.ENERGIZER.get())));
 
     public static final RegistryEntry<BlockEntityType<CryoFreezerBlockEntity>> CRYO_FREEZER = BLOCK_ENTITY_TYPES.register(
         "cryo_freezer",
-        () -> BlockEntityType.Builder.of(
+        () -> new BlockEntityType<>(
             CryoFreezerBlockEntity::new,
-            ModBlocks.CRYO_FREEZER.get()).build(null));
+            Set.of(ModBlocks.CRYO_FREEZER.get())));
 
     public static final RegistryEntry<BlockEntityType<DetectorBlockEntity>> Detector = BLOCK_ENTITY_TYPES.register(
         "detector",
-        () -> BlockEntityType.Builder.of(
+        () -> new BlockEntityType<>(
             DetectorBlockEntity::new,
-            ModBlocks.OXYGEN_SENSOR.get()).build(null));
+            Set.of(ModBlocks.OXYGEN_SENSOR.get())));
 
     public static final RegistryEntry<BlockEntityType<NasaWorkbenchBlockEntity>> NASA_WORKBENCH = BLOCK_ENTITY_TYPES.register(
         "nasa_workbench",
-        () -> BlockEntityType.Builder.of(
+        () -> new BlockEntityType<>(
             NasaWorkbenchBlockEntity::new,
-            ModBlocks.NASA_WORKBENCH.get()).build(null));
+            Set.of(ModBlocks.NASA_WORKBENCH.get())));
 
     public static final RegistryEntry<BlockEntityType<GlobeBlockEntity>> GLOBE = BLOCK_ENTITY_TYPES.register(
         "globe",
@@ -132,15 +133,14 @@ public class ModBlockEntityTypes {
 
     public static final RegistryEntry<BlockEntityType<RadioBlockEntity>> RADIO = BLOCK_ENTITY_TYPES.register(
         "radio",
-        () -> BlockEntityType.Builder.of(
+        () -> new BlockEntityType<>(
             RadioBlockEntity::new,
-            ModBlocks.RADIO.get()).build(null));
+            Set.of(ModBlocks.RADIO.get())));
 
     public static <E extends BlockEntity> BlockEntityType<E> createBlockEntityType(BlockEntityType.BlockEntitySupplier<E> factory, ResourcefulRegistry<Block> registry) {
-        return BlockEntityType.Builder.of(factory,
-                registry.stream()
+        return new BlockEntityType<>(factory,
+                Set.copyOf(registry.stream()
                     .map(RegistryEntry::get)
-                    .toArray(Block[]::new))
-            .build(null);
+                    .toList()));
     }
 }

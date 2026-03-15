@@ -17,7 +17,7 @@ import java.util.List;
 @Mixin({Entity.class, LivingEntity.class})
 public abstract class EntityBelowWorldMixin {
 
-    @Inject(method = "onBelowWorld", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "onBelowWorld()V", at = @At("HEAD"), cancellable = true, remap = false)
     private void adastra$onBelowWorld(CallbackInfo ci) {
         var entity = ((Entity) (Object) this);
         if (!(entity.level() instanceof ServerLevel serverLevel)) return;

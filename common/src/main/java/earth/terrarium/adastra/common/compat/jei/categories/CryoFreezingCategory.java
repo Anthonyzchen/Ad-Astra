@@ -20,12 +20,12 @@ import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.Ingredient;
 
 public record CryoFreezingCategory(IGuiHelper guiHelper) implements IRecipeCategory<CryoFreezingRecipe> {
 
-    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "cryo_freezing");
+    public static final Identifier ID = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "cryo_freezing");
     public static final RecipeType<CryoFreezingRecipe> RECIPE = new RecipeType<>(ID, CryoFreezingRecipe.class);
 
     @Override
@@ -39,8 +39,13 @@ public record CryoFreezingCategory(IGuiHelper guiHelper) implements IRecipeCateg
     }
 
     @Override
-    public IDrawable getBackground() {
-        return guiHelper.createBlankDrawable(180, 100);
+    public int getWidth() {
+        return 180;
+    }
+
+    @Override
+    public int getHeight() {
+        return 100;
     }
 
     @Override
@@ -50,7 +55,7 @@ public record CryoFreezingCategory(IGuiHelper guiHelper) implements IRecipeCateg
 
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, CryoFreezingRecipe recipe, IFocusGroup focuses) {
-        builder.addInvisibleIngredients(RecipeIngredientRole.CATALYST).addIngredients(Ingredient.of(ModItems.CRYO_FREEZER.get()));
+        // Catalyst role removed in JEI for 1.21.1; catalyst registration handled in registerRecipeCatalysts
         builder.addSlot(RecipeIngredientRole.INPUT, 27, 66).addIngredients(recipe.input());
         builder.addSlot(RecipeIngredientRole.RENDER_ONLY, 114, 38);
         builder.addSlot(RecipeIngredientRole.RENDER_ONLY, 114, 66);

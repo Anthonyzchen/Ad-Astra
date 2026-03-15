@@ -8,7 +8,7 @@ import com.teamresourceful.resourcefullib.common.network.base.ServerboundPacketT
 import com.teamresourceful.resourcefullib.common.network.defaults.CodecPacketType;
 import earth.terrarium.adastra.AdAstra;
 import earth.terrarium.adastra.common.utils.KeybindManager;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.function.Consumer;
@@ -23,12 +23,11 @@ public record ServerboundSyncKeybindPacket(boolean jumping, boolean sprinting,
         return TYPE;
     }
 
-    private static class Type extends CodecPacketType<ServerboundSyncKeybindPacket> implements ServerboundPacketType<ServerboundSyncKeybindPacket> {
+    private static class Type extends CodecPacketType.Server<ServerboundSyncKeybindPacket> {
 
         public Type() {
             super(
-                ServerboundSyncKeybindPacket.class,
-                ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "sync_keybinds"),
+                Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "sync_keybinds"),
                 ObjectByteCodec.create(
                     ByteCodec.BOOLEAN.fieldOf(ServerboundSyncKeybindPacket::jumping),
                     ByteCodec.BOOLEAN.fieldOf(ServerboundSyncKeybindPacket::sprinting),

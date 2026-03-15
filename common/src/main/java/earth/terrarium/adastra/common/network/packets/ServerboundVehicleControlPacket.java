@@ -8,7 +8,7 @@ import com.teamresourceful.resourcefullib.common.network.base.ServerboundPacketT
 import com.teamresourceful.resourcefullib.common.network.defaults.CodecPacketType;
 import earth.terrarium.adastra.AdAstra;
 import earth.terrarium.adastra.common.entities.vehicles.Vehicle;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 
@@ -23,12 +23,11 @@ public record ServerboundVehicleControlPacket(float xxa, float zza) implements P
         return TYPE;
     }
 
-    private static class Type extends CodecPacketType<ServerboundVehicleControlPacket> implements ServerboundPacketType<ServerboundVehicleControlPacket> {
+    private static class Type extends CodecPacketType.Server<ServerboundVehicleControlPacket> {
 
         public Type() {
             super(
-                ServerboundVehicleControlPacket.class,
-                ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "vehicle_control"),
+                Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "vehicle_control"),
                 ObjectByteCodec.create(
                     ByteCodec.FLOAT.fieldOf(ServerboundVehicleControlPacket::xxa),
                     ByteCodec.FLOAT.fieldOf(ServerboundVehicleControlPacket::zza),

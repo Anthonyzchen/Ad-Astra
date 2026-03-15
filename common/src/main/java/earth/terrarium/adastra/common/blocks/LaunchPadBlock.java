@@ -13,6 +13,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
@@ -20,6 +21,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
@@ -55,7 +57,6 @@ public class LaunchPadBlock extends Block implements SimpleWaterloggedBlock {
         builder.add(WATERLOGGED, POWERED, PART);
     }
 
-    @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
         TooltipUtils.addDescriptionComponent(tooltip, ConstantComponents.LAUNCH_PAD_INFO);
     }
@@ -84,7 +85,7 @@ public class LaunchPadBlock extends Block implements SimpleWaterloggedBlock {
     }
 
     @Override
-    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos neighborPos, boolean movedByPiston) {
+    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, @Nullable Orientation orientation, boolean movedByPiston) {
         if (!level.isClientSide()) {
             BlockPos controllerPos = getController(state, pos);
             BlockState controllerState = level.getBlockState(controllerPos);
@@ -119,15 +120,13 @@ public class LaunchPadBlock extends Block implements SimpleWaterloggedBlock {
     }
 
     @Override
-    public void wasExploded(Level level, BlockPos pos, Explosion explosion) {
-        if (!level.isClientSide()) {
-            for (Direction direction : Direction.Plane.HORIZONTAL) {
-                BlockPos offset = pos.relative(direction);
-                BlockState state = level.getBlockState(offset);
-                if (state.getBlock().equals(this)) {
-                    destroy(level, offset, state);
-                    break;
-                }
+    public void wasExploded(ServerLevel level, BlockPos pos, Explosion explosion) {
+        for (Direction direction : Direction.Plane.HORIZONTAL) {
+            BlockPos offset = pos.relative(direction);
+            BlockState state = level.getBlockState(offset);
+            if (state.getBlock().equals(this)) {
+                destroy(level, offset, state);
+                break;
             }
         }
         super.wasExploded(level, pos, explosion);

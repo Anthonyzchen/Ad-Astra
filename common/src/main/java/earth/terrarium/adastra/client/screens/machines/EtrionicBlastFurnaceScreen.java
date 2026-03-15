@@ -10,15 +10,15 @@ import earth.terrarium.adastra.common.menus.machines.EtrionicBlastFurnaceMenu;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import org.jetbrains.annotations.NotNull;
 
 public class EtrionicBlastFurnaceScreen extends MachineScreen<EtrionicBlastFurnaceMenu, EtrionicBlastFurnaceBlockEntity> {
 
-    public static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/gui/container/etrionic_blast_furnace.png");
-    public static final ResourceLocation FURNACE_OVERLAY = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "etrionic_blast_furnace_overlay");
-    public static final ResourceLocation FURNACE_OVERLAY_FULL_TEXTURE = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/gui/sprites/etrionic_blast_furnace_overlay.png");
+    public static final Identifier TEXTURE = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/gui/container/etrionic_blast_furnace.png");
+    public static final Identifier FURNACE_OVERLAY = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "etrionic_blast_furnace_overlay");
+    public static final Identifier FURNACE_OVERLAY_FULL_TEXTURE = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/gui/sprites/etrionic_blast_furnace_overlay.png");
     public static final Rect2i CLICK_AREA = new Rect2i(23, 79, 45, 19);
 
     public EtrionicBlastFurnaceScreen(EtrionicBlastFurnaceMenu menu, Inventory inventory, Component component) {

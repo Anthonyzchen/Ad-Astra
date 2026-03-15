@@ -13,7 +13,7 @@ import earth.terrarium.common_storage_lib.storage.base.StorageSlot;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.Item;
@@ -92,9 +92,9 @@ public class FluidUtils {
         CompoundTag tag = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
         SimpleFluidStorage storage = new SimpleFluidStorage(slots, capacity);
         if (tag.contains("FluidType") && tag.contains("FluidAmount")) {
-            String fluidId = tag.getString("FluidType");
-            long amount = tag.getLong("FluidAmount");
-            Fluid fluid = BuiltInRegistries.FLUID.get(ResourceLocation.parse(fluidId));
+            String fluidId = tag.getStringOr("FluidType", "");
+            long amount = tag.getLongOr("FluidAmount", 0L);
+            Fluid fluid = BuiltInRegistries.FLUID.getValue(Identifier.parse(fluidId));
             if (fluid != null && fluid != Fluids.EMPTY && amount > 0) {
                 storage.get(0).insert(FluidResource.of(fluid), Math.min(amount, capacity), false);
             }

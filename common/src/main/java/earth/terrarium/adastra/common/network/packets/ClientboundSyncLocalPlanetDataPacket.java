@@ -9,7 +9,7 @@ import com.teamresourceful.resourcefullib.common.network.defaults.CodecPacketTyp
 import earth.terrarium.adastra.AdAstra;
 import earth.terrarium.adastra.api.systems.PlanetData;
 import earth.terrarium.adastra.client.utils.ClientData;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public record ClientboundSyncLocalPlanetDataPacket(
     PlanetData localData
@@ -22,12 +22,11 @@ public record ClientboundSyncLocalPlanetDataPacket(
         return TYPE;
     }
 
-    private static class Type extends CodecPacketType<ClientboundSyncLocalPlanetDataPacket> implements ClientboundPacketType<ClientboundSyncLocalPlanetDataPacket> {
+    private static class Type extends CodecPacketType.Client<ClientboundSyncLocalPlanetDataPacket> {
 
         public Type() {
             super(
-                ClientboundSyncLocalPlanetDataPacket.class,
-                ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "sync_local_planet_data"),
+                Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "sync_local_planet_data"),
                 ObjectByteCodec.create(
                     ByteCodec.INT.map(PlanetData::unpack, PlanetData::pack).fieldOf(ClientboundSyncLocalPlanetDataPacket::localData),
                     ClientboundSyncLocalPlanetDataPacket::new

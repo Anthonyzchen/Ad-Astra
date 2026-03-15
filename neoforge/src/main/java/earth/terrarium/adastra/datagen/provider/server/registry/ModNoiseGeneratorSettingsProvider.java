@@ -5,7 +5,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.data.worldgen.SurfaceRuleData;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -25,7 +25,7 @@ public class ModNoiseGeneratorSettingsProvider {
     protected static final NoiseSettings SIMPLE_NOISE_SETTINGS = NoiseSettings.create(0, 256, 2, 1);
 
     private static ResourceKey<NoiseGeneratorSettings> register(String name) {
-        return ResourceKey.create(Registries.NOISE_SETTINGS, new ResourceLocation(AdAstra.MOD_ID, name));
+        return ResourceKey.create(Registries.NOISE_SETTINGS, new Identifier(AdAstra.MOD_ID, name));
     }
 
     public static void bootstrap(BootstapContext<NoiseGeneratorSettings> context) {

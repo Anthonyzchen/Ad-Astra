@@ -31,7 +31,7 @@ public class SulfurCreeper extends Creeper {
     }
 
     public void explodeCreeper() {
-        if (this.level().isClientSide) return;
+        if (this.level().isClientSide()) return;
         float power = isPowered() ? 2 : 1;
         this.dead = true;
         Explosion explosion = this.level().explode(this, this.getX(), this.getY(), this.getZ(), 3 * power, Level.ExplosionInteraction.MOB);

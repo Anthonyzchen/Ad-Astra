@@ -11,13 +11,15 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.Locale;
 
-public class EightDirectionProperty extends EnumProperty<EightDirectionProperty.Direction> {
+/**
+ * In 1.21.2+ EnumProperty is final and cannot be extended.
+ * This class is now a utility holder for the FACING property and Direction enum.
+ */
+public class EightDirectionProperty {
 
-    public static final EightDirectionProperty FACING = new EightDirectionProperty();
+    public static final EnumProperty<Direction> FACING = EnumProperty.create("facing", Direction.class);
 
-    public EightDirectionProperty() {
-        super("facing", Direction.class, List.of(Direction.VALUES));
-    }
+    private EightDirectionProperty() {}
 
     public enum Direction implements StringRepresentable {
         NORTH(new Vec3i(0, 0, -1)),

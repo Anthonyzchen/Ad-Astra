@@ -32,7 +32,7 @@ public class EnergyUtils {
      */
     public static SimpleValueStorage getItemEnergyStorage(ItemStack stack, long capacity) {
         CompoundTag tag = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
-        long stored = tag.contains(ENERGY_TAG) ? tag.getLong(ENERGY_TAG) : 0;
+        long stored = tag.getLongOr(ENERGY_TAG, 0L);
         SimpleValueStorage storage = new SimpleValueStorage(capacity);
         storage.set(Math.min(stored, capacity));
         return storage;

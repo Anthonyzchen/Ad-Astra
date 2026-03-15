@@ -1,20 +1,20 @@
 package earth.terrarium.adastra.client.renderers.entities.mobs.features;
 
 import earth.terrarium.adastra.client.models.entities.mobs.SulfurCreeperModel;
-import earth.terrarium.adastra.common.entities.mob.SulfurCreeper;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.EnergySwirlLayer;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
+import net.minecraft.resources.Identifier;
 
 // LEGACY ENTITY. WILL BE REPLACED IN THE FUTURE.
-public class SulfurCreeperChargeFeatureRenderer extends EnergySwirlLayer<SulfurCreeper, SulfurCreeperModel<SulfurCreeper>> {
+public class SulfurCreeperChargeFeatureRenderer extends EnergySwirlLayer<LivingEntityRenderState, SulfurCreeperModel<LivingEntityRenderState>> {
 
-    private static final ResourceLocation SKIN = ResourceLocation.withDefaultNamespace("textures/entity/creeper/creeper_armor.png");
-    private final SulfurCreeperModel<SulfurCreeper> model;
+    private static final Identifier SKIN = Identifier.withDefaultNamespace("textures/entity/creeper/creeper_armor.png");
+    private final SulfurCreeperModel<LivingEntityRenderState> model;
 
-    public SulfurCreeperChargeFeatureRenderer(RenderLayerParent<SulfurCreeper, SulfurCreeperModel<SulfurCreeper>> context, EntityModelSet loader) {
+    public SulfurCreeperChargeFeatureRenderer(RenderLayerParent<LivingEntityRenderState, SulfurCreeperModel<LivingEntityRenderState>> context, EntityModelSet loader) {
         super(context);
         this.model = new SulfurCreeperModel<>(loader.bakeLayer(SulfurCreeperModel.LAYER_LOCATION));
     }
@@ -25,12 +25,12 @@ public class SulfurCreeperChargeFeatureRenderer extends EnergySwirlLayer<SulfurC
     }
 
     @Override
-    protected ResourceLocation getTextureLocation() {
+    protected Identifier getTextureLocation() {
         return SKIN;
     }
 
     @Override
-    protected EntityModel<SulfurCreeper> model() {
+    protected EntityModel<LivingEntityRenderState> model() {
         return this.model;
     }
 }

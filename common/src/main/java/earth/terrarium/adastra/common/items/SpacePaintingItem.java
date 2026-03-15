@@ -1,20 +1,20 @@
 package earth.terrarium.adastra.common.items;
 
 import earth.terrarium.adastra.common.registry.ModItems;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.decoration.Painting;
-import net.minecraft.world.entity.decoration.PaintingVariant;
+import net.minecraft.world.entity.decoration.painting.Painting;
+import net.minecraft.world.entity.decoration.painting.PaintingVariant;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.HangingEntityItem;
@@ -63,13 +63,13 @@ public class SpacePaintingItem extends HangingEntityItem {
             customData.loadInto(painting);
         }
         if (painting.survives()) {
-            if (!level.isClientSide) {
+            if (!level.isClientSide()) {
                 painting.playPlacementSound();
                 level.gameEvent(player, GameEvent.ENTITY_PLACE, painting.blockPosition());
                 level.addFreshEntity(painting);
             }
             stack.shrink(1);
-            return InteractionResult.sidedSuccess(level.isClientSide);
+            return InteractionResult.SUCCESS;
         }
         return InteractionResult.CONSUME;
     }

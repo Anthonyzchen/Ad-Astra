@@ -70,7 +70,7 @@ public final class FloodFill3D {
     };
 
     public static Set<BlockPos> run(Level level, BlockPos start, int limit, SolidBlockPredicate predicate, boolean retainOrder) {
-        level.getProfiler().push("adastra-floodfill");
+        net.minecraft.util.profiling.Profiler.get().push("adastra-floodfill");
 
         LongSet positions = retainOrder ? new LongLinkedOpenHashSet(limit) : new LongOpenHashSet(limit);
         LongArrayFIFOQueue queue = new LongArrayFIFOQueue(limit);
@@ -96,7 +96,7 @@ public final class FloodFill3D {
             result.add(BlockPos.of(pos));
         }
 
-        level.getProfiler().pop();
+        net.minecraft.util.profiling.Profiler.get().pop();
         return result;
     }
 

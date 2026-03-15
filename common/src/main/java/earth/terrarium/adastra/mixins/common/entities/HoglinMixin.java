@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(Hoglin.class)
 public abstract class HoglinMixin {
 
-    @Inject(method = "finishConversion", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "method_26942", at = @At("HEAD"), cancellable = true)
     private void adastra$finishConversion(ServerLevel level, CallbackInfo ci) {
         if (((Hoglin) (Object) this) instanceof Mogler mogler) {
             ci.cancel();

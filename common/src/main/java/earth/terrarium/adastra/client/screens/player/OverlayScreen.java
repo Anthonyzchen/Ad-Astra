@@ -1,7 +1,7 @@
 package earth.terrarium.adastra.client.screens.player;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.renderer.RenderPipelines;
 import earth.terrarium.adastra.AdAstra;
 import earth.terrarium.adastra.api.systems.PlanetData;
 import earth.terrarium.adastra.client.config.AdAstraConfigClient;
@@ -14,7 +14,7 @@ import earth.terrarium.adastra.common.items.armor.SpaceSuitItem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.levelgen.Heightmap;
 
@@ -22,12 +22,12 @@ import java.util.Locale;
 
 public class OverlayScreen {
 
-    public static final ResourceLocation BATTERY_EMPTY = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "overlay/battery_empty");
-    public static final ResourceLocation BATTERY = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/gui/sprites/overlay/battery.png");
-    public static final ResourceLocation OXYGEN_TANK_EMPTY = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "overlay/oxygen_tank_empty");
-    public static final ResourceLocation OXYGEN_TANK = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/gui/sprites/overlay/oxygen_tank.png");
-    public static final ResourceLocation ROCKET_BAR = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "overlay/rocket_bar");
-    public static final ResourceLocation ROCKET = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "overlay/rocket");
+    public static final Identifier BATTERY_EMPTY = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "overlay/battery_empty");
+    public static final Identifier BATTERY = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/gui/sprites/overlay/battery.png");
+    public static final Identifier OXYGEN_TANK_EMPTY = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "overlay/oxygen_tank_empty");
+    public static final Identifier OXYGEN_TANK = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/gui/sprites/overlay/oxygen_tank.png");
+    public static final Identifier ROCKET_BAR = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "overlay/rocket_bar");
+    public static final Identifier ROCKET = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "overlay/rocket");
 
     public static void render(GuiGraphics graphics, float partialTick) {
         var player = Minecraft.getInstance().player;
@@ -52,12 +52,12 @@ public class OverlayScreen {
                 poseStack.popPose();
             }
 
-            graphics.blitSprite(ROCKET_BAR, 0, height / 2, 16, 128);
+            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, ROCKET_BAR, 0, height / 2, 16, 128);
 
             poseStack.pushPose();
             double y = Mth.clamp(rocket.getY(), 100, AdAstraConfig.atmosphereLeave);
             poseStack.translate(0.3f, (AdAstraConfig.atmosphereLeave - y - 500) / 4.5, 0);
-            graphics.blitSprite(ROCKET, 3, height / 2 + 113, 8, 11);
+            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, ROCKET, 3, height / 2 + 113, 8, 11);
             poseStack.popPose();
         }
 
@@ -76,8 +76,8 @@ public class OverlayScreen {
 
             poseStack.pushPose();
             poseStack.scale(scale, scale, scale);
-            graphics.blitSprite(OXYGEN_TANK_EMPTY, x, y, 62, 52);
-            graphics.blit(OXYGEN_TANK, x, y + 52 - barHeight, 0, 52 - barHeight, 62, barHeight, 62, 52);
+            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, OXYGEN_TANK_EMPTY, x, y, 62, 52);
+            graphics.blit(RenderPipelines.GUI_TEXTURED, OXYGEN_TANK, x, y + 52 - barHeight, 0, 52 - barHeight, 62, barHeight, 62, 52);
 
             var text = String.format("%.1f%%", ratio * 100);
             int textWidth = font.width(text);
@@ -103,8 +103,8 @@ public class OverlayScreen {
 
             poseStack.pushPose();
             poseStack.scale(scale, scale, scale);
-            graphics.blitSprite(BATTERY_EMPTY, x, y, 49, 27);
-            graphics.blit(BATTERY, x, y, 0, 27, barWidth, 27, 49, 27);
+            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, BATTERY_EMPTY, x, y, 49, 27);
+            graphics.blit(RenderPipelines.GUI_TEXTURED, BATTERY, x, y, 0, 27, barWidth, 27, 49, 27);
 
             var text = String.format("%.1f%%", ratio * 100);
             int textWidth = font.width(text);
@@ -122,13 +122,13 @@ public class OverlayScreen {
             poseStack.scale(1.4f, 1.4f, 1.4f);
 
             float alpha = Mth.clamp(0.1f - (float) (lander.getDeltaMovement().y() + 0.5), 0, 1);
-            RenderSystem.enableBlend();
-            RenderSystem.setShaderColor(1, 1, 1, alpha);
+            // TODO: 1.21.11 - RenderSystem.enableBlend/setShaderColor removed. Alpha blending
+            // for text should be handled through GuiGraphics color parameter or a custom RenderType.
+            int textAlpha = (int) (alpha * 255) << 24;
+            int textColor = 0xe53253 | textAlpha;
             graphics.drawCenteredString(font,
                 Component.translatable("message.ad_astra.lander.onboard", minecraft.options.keyJump.getTranslatedKeyMessage().getString().toUpperCase(Locale.ROOT)),
-                0, 60, 0xe53253);
-            RenderSystem.disableBlend();
-            RenderSystem.setShaderColor(1, 1, 1, 1);
+                0, 60, textColor);
 
             int distanceColor = 0x55ff55;
             if (distance < 100) {

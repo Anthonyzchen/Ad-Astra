@@ -2,7 +2,7 @@ package earth.terrarium.adastra.common.tags;
 
 import earth.terrarium.adastra.AdAstra;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 
@@ -17,6 +17,6 @@ public final class ModEntityTypeTags {
     public static final TagKey<EntityType<?>> IGNORES_AIR_VORTEX = tag("ignores_air_vortex");
 
     private static TagKey<EntityType<?>> tag(String name) {
-        return TagKey.create(Registries.ENTITY_TYPE, ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, name));
+        return TagKey.create(Registries.ENTITY_TYPE, Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, name));
     }
 }

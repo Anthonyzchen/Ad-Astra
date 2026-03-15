@@ -11,7 +11,7 @@ import earth.terrarium.adastra.AdAstra;
 import earth.terrarium.adastra.common.utils.radio.RadioHolder;
 import earth.terrarium.adastra.common.utils.radio.StationLoader;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.Optional;
@@ -31,12 +31,11 @@ public record ServerboundSetStationPacket(String url,
         return TYPE;
     }
 
-    private static class Type extends CodecPacketType<ServerboundSetStationPacket> implements ServerboundPacketType<ServerboundSetStationPacket> {
+    private static class Type extends CodecPacketType.Server<ServerboundSetStationPacket> {
 
         public Type() {
             super(
-                ServerboundSetStationPacket.class,
-                ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "set_station"),
+                Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "set_station"),
                 ObjectByteCodec.create(
                     ByteCodec.STRING.fieldOf(ServerboundSetStationPacket::url),
                     ExtraByteCodecs.BLOCK_POS.optionalFieldOf(ServerboundSetStationPacket::pos),

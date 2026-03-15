@@ -4,9 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.util.random.SimpleWeightedRandomList;
-import net.minecraft.util.random.WeightedEntry;
-import net.minecraft.util.random.WeightedRandomList;
+import net.minecraft.util.random.WeightedList;
 import net.minecraft.world.level.Level;
 
 import java.util.List;
@@ -24,7 +22,7 @@ public record PlanetRenderer(
     Optional<Float> starBrightness,
     int sunriseAngle,
     boolean renderInRain,
-    WeightedRandomList<WeightedEntry.Wrapper<Integer>> starColors,
+    WeightedList<Integer> starColors,
     List<SkyRenderable> skyRenderables
 ) {
 
@@ -40,7 +38,7 @@ public record PlanetRenderer(
         Codec.FLOAT.optionalFieldOf("star_brightness").forGetter(PlanetRenderer::starBrightness),
         Codec.INT.fieldOf("sunrise_angle").forGetter(PlanetRenderer::sunriseAngle),
         Codec.BOOL.fieldOf("render_in_rain").forGetter(PlanetRenderer::renderInRain),
-        SimpleWeightedRandomList.codec(WeightedEntry.Wrapper.codec(Codec.INT)).fieldOf("star_colors").forGetter(PlanetRenderer::starColors),
+        WeightedList.codec(Codec.INT).fieldOf("star_colors").forGetter(PlanetRenderer::starColors),
         SkyRenderable.CODEC.listOf().fieldOf("sky_renderables").forGetter(PlanetRenderer::skyRenderables)
     ).apply(inst, PlanetRenderer::new));
 }

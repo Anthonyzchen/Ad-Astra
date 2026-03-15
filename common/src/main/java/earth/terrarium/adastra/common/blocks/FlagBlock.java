@@ -21,8 +21,9 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -45,7 +46,7 @@ public class FlagBlock extends BasicEntityBlock implements SimpleWaterloggedBloc
 
     public static final MapCodec<FlagBlock> CODEC = simpleCodec(FlagBlock::new);
 
-    public static final EightDirectionProperty FACING = EightDirectionProperty.FACING;
+    public static final net.minecraft.world.level.block.state.properties.EnumProperty<EightDirectionProperty.Direction> FACING = EightDirectionProperty.FACING;
     public static final EnumProperty<DoubleBlockHalf> HALF = BlockStateProperties.DOUBLE_BLOCK_HALF;
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
@@ -74,7 +75,6 @@ public class FlagBlock extends BasicEntityBlock implements SimpleWaterloggedBloc
         builder.add(FACING, WATERLOGGED, HALF);
     }
 
-    @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
         TooltipUtils.addDescriptionComponent(tooltip, ConstantComponents.FLAG_INFO);
     }
@@ -91,7 +91,7 @@ public class FlagBlock extends BasicEntityBlock implements SimpleWaterloggedBloc
 
     private InteractionResult action(Level level, BlockPos pos, Player player) {
         if (level.getBlockEntity(pos) instanceof FlagBlockEntity entity) {
-            if (entity.getOwner() != null && player.getUUID().equals(entity.getOwner().getId())) {
+            if (entity.getOwner() != null && player.getUUID().equals(entity.getOwner().id())) {
                 FlagUrlScreen.open(pos);
             } else {
                 player.displayClientMessage(ConstantComponents.NOT_THE_OWNER, true);
@@ -125,12 +125,13 @@ public class FlagBlock extends BasicEntityBlock implements SimpleWaterloggedBloc
         return RenderShape.INVISIBLE; // Rendering is done in the BER
     }
 
-    public @NotNull BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+    @Override
+    public @NotNull BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess scheduledTickAccess, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, RandomSource random) {
         DoubleBlockHalf half = state.getValue(HALF);
         if (direction.getAxis() == Direction.Axis.Y && half == DoubleBlockHalf.LOWER == (direction == Direction.UP)) {
             return neighborState.is(this) && neighborState.getValue(HALF) != half ? state.setValue(FACING, neighborState.getValue(FACING)) : Blocks.AIR.defaultBlockState();
         } else {
-            return half == DoubleBlockHalf.LOWER && direction == Direction.DOWN && !state.canSurvive(level, pos) ? Blocks.AIR.defaultBlockState() : super.updateShape(state, direction, neighborState, level, pos, neighborPos);
+            return half == DoubleBlockHalf.LOWER && direction == Direction.DOWN && !state.canSurvive(level, pos) ? Blocks.AIR.defaultBlockState() : super.updateShape(state, level, scheduledTickAccess, pos, direction, neighborPos, neighborState, random);
         }
     }
 
@@ -138,7 +139,7 @@ public class FlagBlock extends BasicEntityBlock implements SimpleWaterloggedBloc
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         BlockPos pos = context.getClickedPos();
         Level level = context.getLevel();
-        if (pos.getY() < level.getMaxBuildHeight() - 1 && level.getBlockState(pos.above()).canBeReplaced(context)) {
+        if (pos.getY() < level.getMaxY() - 1 && level.getBlockState(pos.above()).canBeReplaced(context)) {
             var direction = EightDirectionProperty.Direction.VALUES[Mth.floor((double) (context.getRotation() * 8.0F / 360.0F) + 0.5D) & 7];
             return this.defaultBlockState().setValue(FACING, direction);
         }

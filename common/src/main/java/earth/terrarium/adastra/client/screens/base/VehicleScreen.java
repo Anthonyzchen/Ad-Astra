@@ -6,18 +6,18 @@ import earth.terrarium.adastra.common.menus.base.BaseEntityContainerMenu;
 import earth.terrarium.common_storage_lib.resources.fluid.FluidResource;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Inventory;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class VehicleScreen<T extends BaseEntityContainerMenu<U>, U extends Entity> extends AbstractContainerCursorScreen<T> {
 
-    private final ResourceLocation texture;
+    private final Identifier texture;
 
     protected final U entity;
 
-    public VehicleScreen(T menu, Inventory inventory, Component component, ResourceLocation texture, int width, int height) {
+    public VehicleScreen(T menu, Inventory inventory, Component component, Identifier texture, int width, int height) {
         super(menu, inventory, component);
         this.texture = texture;
         this.imageWidth = width;

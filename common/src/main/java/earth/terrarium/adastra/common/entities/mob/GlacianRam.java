@@ -100,7 +100,7 @@ public class GlacianRam extends Animal implements Shearable {
             player.playSound(this.getMilkingSound(), 1.0f, 1.0f);
             ItemStack itemStack2 = ItemUtils.createFilledResult(itemStack, player, Items.MILK_BUCKET.getDefaultInstance());
             player.setItemInHand(hand, itemStack2);
-            return InteractionResult.sidedSuccess(this.level().isClientSide);
+            return InteractionResult.SUCCESS;
         } else {
             InteractionResult actionResult = super.mobInteract(player, hand);
             if (actionResult.consumesAction() && this.isFood(itemStack)) {
@@ -119,7 +119,7 @@ public class GlacianRam extends Animal implements Shearable {
 
     @Override
     public void aiStep() {
-        if (this.level().isClientSide) {
+        if (this.level().isClientSide()) {
             this.eatPermafrostTimer = Math.max(0, this.eatPermafrostTimer - 1);
         }
 
@@ -129,7 +129,7 @@ public class GlacianRam extends Animal implements Shearable {
     public InteractionResult shear(Player player, InteractionHand hand) {
         ItemStack itemStack = player.getItemInHand(hand);
         if (itemStack.is(Items.SHEARS)) {
-            if (!this.level().isClientSide && this.readyForShearing()) {
+            if (!this.level().isClientSide() && this.readyForShearing()) {
                 this.shear(player, SoundSource.PLAYERS);
                 itemStack.hurtAndBreak(1, player, hand == InteractionHand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND);
                 return InteractionResult.SUCCESS;

@@ -1,11 +1,10 @@
 package earth.terrarium.adastra.client.renderers.world;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Block;
 import org.joml.Matrix4f;
@@ -61,24 +60,17 @@ public class OverlayRenderer {
 
         poseStack.pushPose();
         var bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
+        // TODO: 1.21.11 - RenderType.debugSectionQuads() may have been removed or renamed.
+        // The debug overlay rendering needs to use a RenderType that supports translucent quads.
+        // In the new pipeline, GL state (polygon offset, cull, depth, blend) is configured
+        // in the RenderPipeline/RenderType rather than through RenderSystem calls.
         var consumer = bufferSource.getBuffer(RenderType.debugSectionQuads());
-
-        RenderSystem.polygonOffset(-3, -3);
-        RenderSystem.enablePolygonOffset();
-        RenderSystem.disableCull();
-        RenderSystem.depthMask(false);
-        RenderSystem.enableBlend();
 
         poseStack.translate(-camera.getPosition().x(), -camera.getPosition().y(), -camera.getPosition().z());
         positions.values().forEach(positions -> positions.forEach(pos ->
             renderCube(poseStack, consumer, pos, positions)));
 
         bufferSource.endBatch();
-        RenderSystem.enableCull();
-        RenderSystem.polygonOffset(0, 0);
-        RenderSystem.disablePolygonOffset();
-        RenderSystem.depthMask(true);
-        RenderSystem.disableBlend();
         poseStack.popPose();
     }
 

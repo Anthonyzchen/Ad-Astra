@@ -14,8 +14,7 @@ import earth.terrarium.adastra.common.planets.AdAstraData;
 import earth.terrarium.adastra.common.registry.*;
 import earth.terrarium.adastra.common.utils.radio.StationLoader;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.core.cauldron.CauldronInteraction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
@@ -61,15 +60,13 @@ public class AdAstra {
     }
 
     public static void postInit() {
-        CauldronInteraction.WATER.map().put(ModItems.SPACE_HELMET.get(), CauldronInteraction.DYED_ITEM);
-        CauldronInteraction.WATER.map().put(ModItems.SPACE_SUIT.get(), CauldronInteraction.DYED_ITEM);
-        CauldronInteraction.WATER.map().put(ModItems.SPACE_PANTS.get(), CauldronInteraction.DYED_ITEM);
-        CauldronInteraction.WATER.map().put(ModItems.SPACE_BOOTS.get(), CauldronInteraction.DYED_ITEM);
+        // In 1.21.11, CauldronInteraction.DYED_ITEM was removed (dyedItemIteration is private).
+        // Dyed item cauldron interactions are now handled automatically via the DyedItemColor component.
         ModEntityTypes.registerSpawnPlacements();
     }
 
-    public static void onAddReloadListener(BiConsumer<ResourceLocation, PreparableReloadListener> registry) {
-        registry.accept(ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "planets"), new AdAstraData());
+    public static void onAddReloadListener(BiConsumer<Identifier, PreparableReloadListener> registry) {
+        registry.accept(Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "planets"), new AdAstraData());
     }
 
     public static void onDatapackSync(ServerPlayer player) {

@@ -1,6 +1,6 @@
 package earth.terrarium.adastra.common.handlers;
 
-import com.teamresourceful.resourcefullib.common.utils.SaveHandler;
+import com.mojang.serialization.Codec;
 import earth.terrarium.adastra.api.planets.Planet;
 import earth.terrarium.adastra.common.planets.AdAstraData;
 import net.minecraft.core.GlobalPos;
@@ -8,29 +8,50 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.saveddata.SavedData;
+import net.minecraft.world.level.saveddata.SavedDataType;
 
 import java.util.*;
 
-public class LaunchingDimensionHandler extends SaveHandler {
+public class LaunchingDimensionHandler extends SavedData {
+
+    private static final Codec<LaunchingDimensionHandler> CODEC = CompoundTag.CODEC.xmap(
+        tag -> {
+            LaunchingDimensionHandler handler = new LaunchingDimensionHandler();
+            handler.loadData(tag);
+            return handler;
+        },
+        handler -> {
+            CompoundTag tag = new CompoundTag();
+            handler.saveData(tag);
+            return tag;
+        }
+    );
+
+    private static final SavedDataType<LaunchingDimensionHandler> TYPE = new SavedDataType<>(
+        "adastra_launching_dimensions",
+        LaunchingDimensionHandler::new,
+        CODEC,
+        null
+    );
 
     private final Map<UUID, LaunchedDimensions> data = new HashMap<>();
 
-    @Override
-    public void loadData(CompoundTag tag) {
-        tag.getAllKeys().forEach(key -> {
+    private void loadData(CompoundTag tag) {
+        tag.keySet().forEach(key -> {
             UUID uuid = UUID.fromString(key);
-            CompoundTag planetsTag = tag.getCompound(key);
+            CompoundTag planetsTag = tag.getCompoundOrEmpty(key);
             Map<ResourceKey<Level>, GlobalPos> planets = new HashMap<>();
-            for (String allKey : planetsTag.getAllKeys()) {
-                GlobalPos.CODEC.parse(NbtOps.INSTANCE, planetsTag.getCompound(allKey))
+            for (String allKey : planetsTag.keySet()) {
+                GlobalPos.CODEC.parse(NbtOps.INSTANCE, planetsTag.getCompoundOrEmpty(allKey))
                     .result()
                     .ifPresent(pos -> {
-                        ResourceLocation planet = ResourceLocation.tryParse(allKey);
+                        Identifier planet = Identifier.tryParse(allKey);
                         planets.put(ResourceKey.create(Registries.DIMENSION, Objects.requireNonNull(planet)), pos);
                     });
             }
@@ -38,21 +59,20 @@ public class LaunchingDimensionHandler extends SaveHandler {
         });
     }
 
-    @Override
-    public void saveData(CompoundTag tag) {
+    private void saveData(CompoundTag tag) {
         this.data.forEach((uuid, data) -> {
             CompoundTag planetsTag = new CompoundTag();
             for (var entry : data.dimensions.entrySet()) {
                 GlobalPos.CODEC.encodeStart(NbtOps.INSTANCE, entry.getValue())
                     .result()
-                    .ifPresent(pos -> planetsTag.put(entry.getKey().location().toString(), pos));
+                    .ifPresent(pos -> planetsTag.put(entry.getKey().identifier().toString(), pos));
             }
             tag.put(uuid.toString(), planetsTag);
         });
     }
 
     public static LaunchingDimensionHandler read(ServerLevel level) {
-        return read(level, HandlerType.create(LaunchingDimensionHandler::new), "adastra_launching_dimensions");
+        return level.getDataStorage().computeIfAbsent(TYPE);
     }
 
     private static LaunchedDimensions get(Player player, ServerLevel level, boolean create) {

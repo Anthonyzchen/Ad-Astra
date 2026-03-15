@@ -1,19 +1,18 @@
 package earth.terrarium.adastra.client.utils;
 
 import com.teamresourceful.resourcefullib.common.registry.RegistryEntry;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.item.ClampedItemPropertyFunction;
-import net.minecraft.resources.ResourceLocation;
+// TODO: 1.21.11 - ClampedItemPropertyFunction no longer exists. Item properties are now
+// data-driven via item model definitions. Item property registration needs reworking.
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 
 /**
@@ -28,7 +27,7 @@ public final class ClientRegistrationHooks {
     private ClientRegistrationHooks() {}
 
     @SuppressWarnings("unchecked")
-    public static <T extends BlockEntity> void registerBlockEntityRenderers(BlockEntityType<T> type, BlockEntityRendererProvider<T> provider) {
+    public static <T extends BlockEntity, S extends BlockEntityRenderState> void registerBlockEntityRenderers(BlockEntityType<T> type, BlockEntityRendererProvider<T, S> provider) {
         BlockEntityRenderers.register(type, provider);
     }
 
@@ -40,12 +39,20 @@ public final class ClientRegistrationHooks {
         // On NeoForge: handled via EntityRenderersEvent.RegisterRenderers event
     }
 
-    public static void registerItemProperty(Item item, ResourceLocation id, ClampedItemPropertyFunction function) {
-        // TODO: Platform-specific registration - ItemProperties.register() is not accessible in common module.
-        // This must be called from Fabric/NeoForge platform code instead.
+    // TODO: 1.21.11 - ClampedItemPropertyFunction no longer exists.
+    // Item properties are now data-driven via item model definitions.
+    // This interface provides a temporary replacement for the function signature.
+    @FunctionalInterface
+    public interface ItemPropertyFunction {
+        float call(net.minecraft.world.item.ItemStack stack, @org.jetbrains.annotations.Nullable net.minecraft.client.multiplayer.ClientLevel level, @org.jetbrains.annotations.Nullable net.minecraft.world.entity.LivingEntity entity, int seed);
     }
 
-    public static void setRenderLayer(Block block, RenderType renderType) {
+    public static void registerItemProperty(Item item, Identifier id, ItemPropertyFunction function) {
+        // TODO: 1.21.11 - Item properties are now data-driven. This is a no-op.
+        // Define item property overrides in item model JSON files instead.
+    }
+
+    public static void setRenderLayer(Block block, Object renderType) {
         // TODO: In 1.21.1, render layers are determined by the block model JSON, not set programmatically.
         // No-op - ensure block models specify the correct render type in their JSON definitions.
     }

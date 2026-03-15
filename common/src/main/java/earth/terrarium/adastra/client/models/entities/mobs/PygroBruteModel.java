@@ -1,19 +1,19 @@
 package earth.terrarium.adastra.client.models.entities.mobs;
 
 import earth.terrarium.adastra.AdAstra;
-import earth.terrarium.adastra.common.entities.mob.PygroBrute;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartNames;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
+import net.minecraft.resources.Identifier;
 
 // LEGACY ENTITY. WILL BE REPLACED IN THE FUTURE.
-public class PygroBruteModel extends HumanoidModel<PygroBrute> {
+public class PygroBruteModel extends HumanoidModel<HumanoidRenderState> {
 
-    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "pygro_brute"), "main");
+    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "pygro_brute"), "main");
 
     public PygroBruteModel(ModelPart modelPart) {
         super(modelPart);

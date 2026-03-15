@@ -7,14 +7,14 @@ import earth.terrarium.adastra.client.radio.audio.RadioHandler;
 import earth.terrarium.adastra.common.network.NetworkHandler;
 import earth.terrarium.adastra.common.network.packets.ServerboundRequestStationsPacket;
 import earth.terrarium.adastra.common.utils.radio.StationInfo;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -23,8 +23,8 @@ import java.util.*;
 
 public class RadioScreen extends BaseCursorScreen {
 
-    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/radio/ui.png");
-    private static final ResourceLocation CLOCK = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/radio/clock.png");
+    private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/radio/ui.png");
+    private static final Identifier CLOCK = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/radio/clock.png");
     private static final int WIDTH = 253;
     private static final int HEIGHT = 138;
 

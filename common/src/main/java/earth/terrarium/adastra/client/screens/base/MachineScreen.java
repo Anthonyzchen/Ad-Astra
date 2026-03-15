@@ -26,18 +26,18 @@ import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class MachineScreen<M extends BaseContainerMenu<E>, E extends ContainerMachineBlockEntity> extends AbstractContainerCursorScreen<M> implements ConfigurationScreen, AbstractContainerScreenExtension {
 
-    public static final ResourceLocation IRON_SLOT = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/gui/container/slots/iron.png");
-    public static final ResourceLocation STEEL_SLOT = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/gui/container/slots/steel.png");
+    public static final Identifier IRON_SLOT = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/gui/container/slots/iron.png");
+    public static final Identifier STEEL_SLOT = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/gui/container/slots/steel.png");
 
-    private final ResourceLocation texture;
-    private final ResourceLocation slotTexture;
+    private final Identifier texture;
+    private final Identifier slotTexture;
 
     private final Rect2i inventoryRect;
     protected final E entity;
@@ -49,7 +49,7 @@ public abstract class MachineScreen<M extends BaseContainerMenu<E>, E extends Co
 
     public MachineScreen(
         M menu, Inventory inventory, Component component,
-        ResourceLocation texture, ResourceLocation slotTexture,
+        Identifier texture, Identifier slotTexture,
         int width, int height
     ) {
         super(menu, inventory, component);
@@ -150,7 +150,7 @@ public abstract class MachineScreen<M extends BaseContainerMenu<E>, E extends Co
 
     @Override
     public void adastra$renderPreSlot(GuiGraphics graphics, Slot slot) {
-        ResourceLocation texture = null;
+        Identifier texture = null;
         if (slot.isActive() && slot instanceof InventorySlot) {
             texture = this.slotTexture;
         } else if (slot instanceof ImageSlot imageSlot) {
@@ -169,7 +169,7 @@ public abstract class MachineScreen<M extends BaseContainerMenu<E>, E extends Co
         graphics.drawString(font, label, this.inventoryLabelX, this.inventoryLabelY, 0x2a262b, false);
     }
 
-    public void drawHorizontalProgressBar(GuiGraphics graphics, ResourceLocation texture, int mouseX, int mouseY, int xOffset, int yOffset, int width, int height, int progress, int maxProgress, boolean reverse) {
+    public void drawHorizontalProgressBar(GuiGraphics graphics, Identifier texture, int mouseX, int mouseY, int xOffset, int yOffset, int width, int height, int progress, int maxProgress, boolean reverse) {
         GuiUtils.drawHorizontalProgressBar(
             graphics, texture,
             mouseX, mouseY,
@@ -181,7 +181,7 @@ public abstract class MachineScreen<M extends BaseContainerMenu<E>, E extends Co
             TooltipUtils.getEtaComponent(progress, maxProgress, reverse));
     }
 
-    public void drawVerticalProgressBar(GuiGraphics graphics, ResourceLocation texture, int mouseX, int mouseY, int xOffset, int yOffset, int width, int height, int progress, int maxProgress, boolean reverse) {
+    public void drawVerticalProgressBar(GuiGraphics graphics, Identifier texture, int mouseX, int mouseY, int xOffset, int yOffset, int width, int height, int progress, int maxProgress, boolean reverse) {
         GuiUtils.drawVerticalProgressBar(
             graphics, texture,
             mouseX, mouseY,

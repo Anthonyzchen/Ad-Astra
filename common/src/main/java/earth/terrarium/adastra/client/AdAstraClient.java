@@ -41,22 +41,24 @@ import net.minecraft.client.Camera;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
-import net.minecraft.client.color.item.ItemColor;
+// TODO: 1.21.11 - ItemColor no longer exists. Item tinting is now data-driven via ItemTintSource.
+// The onAddItemColors method signature needs to be reworked for the new system.
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.particle.SplashParticle;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.entity.NoopRenderer;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.SimpleParticleType;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.component.DyedItemColor;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 
 import java.util.function.BiConsumer;
@@ -155,7 +157,7 @@ public class AdAstraClient {
     }
 
     private static void registerItemProperties() {
-        ClientRegistrationHooks.registerItemProperty(ModItems.ETRIONIC_CAPACITOR.get(), ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "toggled"), (stack, level, entity, i) -> EtrionicCapacitorItem.active(stack) ? 0 : 1);
+        ClientRegistrationHooks.registerItemProperty(ModItems.ETRIONIC_CAPACITOR.get(), Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "toggled"), (stack, level, entity, i) -> EtrionicCapacitorItem.active(stack) ? 0 : 1);
     }
 
     public static void registerRenderLayers() {
@@ -174,16 +176,24 @@ public class AdAstraClient {
         consumer.accept(ModParticleTypes.OXYGEN_BUBBLE.get(), OxygenBubbleParticle.Provider::new);
     }
 
-    public static void onRegisterModels(Consumer<ResourceLocation> consumer) {
-        ModBlocks.GLOBES.stream().forEach(b -> consumer.accept(ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "block/%s_cube".formatted(b.getId().getPath()))));
-        consumer.accept(ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "block/%s_flipped".formatted(ModBlocks.AIRLOCK.getId().getPath())));
-        consumer.accept(ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "block/%s_flipped".formatted(ModBlocks.REINFORCED_DOOR.getId().getPath())));
+    public static void onRegisterModels(Consumer<Identifier> consumer) {
+        ModBlocks.GLOBES.stream().forEach(b -> consumer.accept(Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "block/%s_cube".formatted(b.getId().getPath()))));
+        consumer.accept(Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "block/%s_flipped".formatted(ModBlocks.AIRLOCK.getId().getPath())));
+        consumer.accept(Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "block/%s_flipped".formatted(ModBlocks.REINFORCED_DOOR.getId().getPath())));
         consumer.accept(OxygenDistributorBlockEntityRenderer.TOP);
         consumer.accept(GravityNormalizerBlockEntityRenderer.TOP);
         consumer.accept(GravityNormalizerBlockEntityRenderer.TOE);
     }
 
-    public static void onRegisterItemRenderers(BiConsumer<Item, BlockEntityWithoutLevelRenderer> consumer) {
+    /**
+     * Functional interface for custom item renderers, replacing the removed BlockEntityWithoutLevelRenderer.
+     */
+    @FunctionalInterface
+    public interface CustomItemRenderer {
+        void renderByItem(ItemStack stack, ItemDisplayContext displayContext, com.mojang.blaze3d.vertex.PoseStack poseStack, net.minecraft.client.renderer.MultiBufferSource buffer, int packedLight, int packedOverlay);
+    }
+
+    public static void onRegisterItemRenderers(BiConsumer<Item, CustomItemRenderer> consumer) {
         ModItems.GLOBES.stream().forEach(item -> consumer.accept(item.get(), new GlobeBlockEntityRenderer.ItemRenderer()));
         consumer.accept(ModItems.OXYGEN_DISTRIBUTOR.get(), new OxygenDistributorBlockEntityRenderer.ItemRenderer());
         consumer.accept(ModItems.GRAVITY_NORMALIZER.get(), new GravityNormalizerBlockEntityRenderer.ItemRenderer());
@@ -198,7 +208,15 @@ public class AdAstraClient {
         consumer.accept(OverlayScreen::render);
     }
 
-    public static void onAddItemColors(BiConsumer<ItemColor, ItemLike[]> consumer) {
+    // TODO: 1.21.11 - ItemColor no longer exists. Item tinting is now data-driven via ItemTintSource.
+    // This method needs to be reworked to use the new data-driven tinting system.
+    // For now, using a local functional interface to maintain the same signature.
+    @FunctionalInterface
+    public interface ItemColorFunction {
+        int getColor(ItemStack stack, int tintIndex);
+    }
+
+    public static void onAddItemColors(BiConsumer<ItemColorFunction, ItemLike[]> consumer) {
         // Default color must include full alpha (0xFF000000) or items will be invisible.
         // DyedItemColor.getOrDefault() only calls ARGB32.opaque() when the dye component exists,
         // but passes through the raw default value when it doesn't, so alpha=0 (0x00FFFFFF) causes
@@ -213,8 +231,8 @@ public class AdAstraClient {
         GRAVITY_OVERLAY_RENDERER.render(stack, camera);
     }
 
-    public static void onAddReloadListener(BiConsumer<ResourceLocation, PreparableReloadListener> consumer) {
-        consumer.accept(ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "planet_renderers"), new AdAstraPlanetRenderers());
+    public static void onAddReloadListener(BiConsumer<Identifier, PreparableReloadListener> consumer) {
+        consumer.accept(Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "planet_renderers"), new AdAstraPlanetRenderers());
     }
 
     public static void clientTick(Minecraft minecraft) {

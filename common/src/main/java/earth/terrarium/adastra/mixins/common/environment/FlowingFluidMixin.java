@@ -20,7 +20,7 @@ public abstract class FlowingFluidMixin {
 
 
     @WrapOperation(
-        method = "getNewLiquid",
+        method = "method_15727",
         at = @At(
             value = "INVOKE",
             target = "Lnet/minecraft/world/level/block/state/BlockState;isSolid()Z"
@@ -33,7 +33,7 @@ public abstract class FlowingFluidMixin {
         return original.call(instance);
     }
 
-    @Inject(method = "spread", at = @At(value = "HEAD"), cancellable = true)
+    @Inject(method = "method_15725", at = @At(value = "HEAD"), cancellable = true)
     private void adastra$spread(Level level, BlockPos pos, FluidState state, CallbackInfo ci) {
         if (GravityApi.API.getGravity(level, pos) <= PlanetConstants.ZERO_GRAVITY_THRESHOLD) {
             ci.cancel(); // Prevent fluid from spreading in zero gravity

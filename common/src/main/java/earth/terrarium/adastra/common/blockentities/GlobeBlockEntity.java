@@ -13,6 +13,8 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class GlobeBlockEntity extends BlockEntity implements TickableBlockEntity {
 
@@ -53,18 +55,18 @@ public class GlobeBlockEntity extends BlockEntity implements TickableBlockEntity
     }
 
     @Override
-    public void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
-        torque = tag.getFloat("Torque");
-        yRot = tag.getFloat("YRot");
+    public void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        torque = input.getFloatOr("Torque", 0f);
+        yRot = input.getFloatOr("YRot", 0f);
         lastYRot = yRot;
     }
 
     @Override
-    public void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
-        tag.putFloat("Torque", torque);
-        tag.putFloat("YRot", yRot);
+    public void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        output.putFloat("Torque", torque);
+        output.putFloat("YRot", yRot);
     }
 
     @Override

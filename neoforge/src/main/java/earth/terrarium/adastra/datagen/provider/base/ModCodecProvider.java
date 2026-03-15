@@ -8,7 +8,7 @@ import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +25,7 @@ public abstract class ModCodecProvider<T> implements DataProvider {
     }
 
     public ModCodecProvider(PackOutput packOutput, Codec<T> codec, ResourceKey<Registry<T>> registry, PackOutput.Target target) {
-        this.pathProvider = packOutput.createPathProvider(target, registry.location().getPath());
+        this.pathProvider = packOutput.createPathProvider(target, registry.identifier().getPath());
         this.codec = codec;
     }
 
@@ -44,5 +44,5 @@ public abstract class ModCodecProvider<T> implements DataProvider {
         return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
     }
 
-    protected abstract void build(BiConsumer<ResourceLocation, T> consumer);
+    protected abstract void build(BiConsumer<Identifier, T> consumer);
 }

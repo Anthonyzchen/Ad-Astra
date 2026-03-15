@@ -18,12 +18,12 @@ import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.Ingredient;
 
 public record OxygenLoadingCategory(IGuiHelper guiHelper) implements IRecipeCategory<OxygenLoadingRecipe> {
 
-    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "oxygen_loading");
+    public static final Identifier ID = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "oxygen_loading");
     public static final RecipeType<OxygenLoadingRecipe> RECIPE = new RecipeType<>(ID, OxygenLoadingRecipe.class);
 
     @Override
@@ -37,8 +37,13 @@ public record OxygenLoadingCategory(IGuiHelper guiHelper) implements IRecipeCate
     }
 
     @Override
-    public IDrawable getBackground() {
-        return guiHelper.createBlankDrawable(180, 105);
+    public int getWidth() {
+        return 180;
+    }
+
+    @Override
+    public int getHeight() {
+        return 105;
     }
 
     @Override
@@ -48,7 +53,7 @@ public record OxygenLoadingCategory(IGuiHelper guiHelper) implements IRecipeCate
 
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, OxygenLoadingRecipe recipe, IFocusGroup focuses) {
-        builder.addInvisibleIngredients(RecipeIngredientRole.CATALYST).addIngredients(Ingredient.of(ModItems.OXYGEN_LOADER.get()));
+        // Catalyst role removed in JEI for 1.21.1; catalyst registration handled in registerRecipeCatalysts
         builder.addSlot(RecipeIngredientRole.RENDER_ONLY, 14, 18);
         builder.addSlot(RecipeIngredientRole.RENDER_ONLY, 14, 48);
         builder.addSlot(RecipeIngredientRole.RENDER_ONLY, 129, 18);

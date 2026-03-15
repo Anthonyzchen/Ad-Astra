@@ -2,7 +2,7 @@ package earth.terrarium.adastra.client.renderers.blocks;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import com.teamresourceful.resourcefullib.client.CloseablePoseStack;
+
 import earth.terrarium.adastra.AdAstra;
 import earth.terrarium.adastra.client.ClientPlatformUtils;
 import earth.terrarium.adastra.common.blockentities.SlidingDoorBlockEntity;
@@ -11,72 +11,42 @@ import earth.terrarium.adastra.common.registry.ModBlocks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.Sheets;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
-import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.block.model.BlockStateModel;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec3;
 
-public class SlidingDoorBlockEntityRenderer implements BlockEntityRenderer<SlidingDoorBlockEntity> {
+public class SlidingDoorBlockEntityRenderer implements BlockEntityRenderer<SlidingDoorBlockEntity, SlidingDoorBlockEntityRenderer.SlidingDoorRenderState> {
+
+    public static class SlidingDoorRenderState extends BlockEntityRenderState {
+        public float slide;
+        public Direction direction;
+        public boolean flipSecondDoor;
+    }
 
     @Override
-    public void render(SlidingDoorBlockEntity entity, float partialTick, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay) {
-        float slide = Mth.lerp(partialTick, entity.lastSlideTicks(), entity.slideTicks()) / 81.0f;
-        var state = entity.getBlockState();
-        var direction = state.getValue(SlidingDoorBlock.FACING);
-        var minecraft = Minecraft.getInstance();
-        var model = minecraft.getBlockRenderer().getBlockModel(state);
-        boolean flipSecondDoor = ModBlocks.SIMPLE_SLIDING_DOORS.stream().noneMatch(block -> block.get().equals(state.getBlock()));
+    public SlidingDoorRenderState createRenderState() {
+        return new SlidingDoorRenderState();
+    }
 
-        try (var pose = new CloseablePoseStack(poseStack)) {
-            pose.translate(0.5f, 1, 0.5f);
-            pose.mulPose(Axis.YP.rotationDegrees(direction.toYRot()));
-            pose.translate(-0.5f, 0, -0.5f);
+    @Override
+    public void extractRenderState(SlidingDoorBlockEntity entity, SlidingDoorRenderState state, float partialTick, Vec3 cameraPos, ModelFeatureRenderer.CrumblingOverlay crumblingOverlay) {
+        state.slide = Mth.lerp(partialTick, entity.lastSlideTicks(), entity.slideTicks()) / 81.0f;
+        state.direction = entity.getBlockState().getValue(SlidingDoorBlock.FACING);
+        state.flipSecondDoor = ModBlocks.SIMPLE_SLIDING_DOORS.stream().noneMatch(block -> block.get().equals(entity.getBlockState().getBlock()));
+    }
 
-            pose.translate(slide, 0, 0.0625f);
-            if (direction.getAxis() == Direction.Axis.Z) {
-                pose.translate(0, 0, 0.6875f);
-                if (state.is(ModBlocks.REINFORCED_DOOR.get())) {
-                    pose.translate(0, 0, -0.3125f);
-                }
-            }
-
-            minecraft.getBlockRenderer().getModelRenderer().renderModel(poseStack.last(),
-                buffer.getBuffer(Sheets.cutoutBlockSheet()),
-                state,
-                model,
-                1f, 1f, 1f,
-                packedLight, packedOverlay);
-
-            pose.translate(-slide - slide, 0, 0);
-
-            if (!flipSecondDoor) {
-                pose.translate(0.5f, 0, 0.5f);
-                pose.mulPose(Axis.YP.rotationDegrees(180));
-                pose.translate(-0.5f, 0, -0.5f);
-                pose.translate(0, 0, 0.8125f);
-
-                minecraft.getBlockRenderer().getModelRenderer().renderModel(poseStack.last(),
-                    buffer.getBuffer(Sheets.cutoutBlockSheet()),
-                    state,
-                    model,
-                    1f, 1f, 1f,
-                    packedLight, packedOverlay);
-            } else {
-                pose.translate(-1.25f, 0, 0);
-                String blockId = BuiltInRegistries.BLOCK.getKey(state.getBlock()).getPath();
-                BakedModel blockModel = ClientPlatformUtils.getModel(
-                    Minecraft.getInstance().getModelManager(),
-                    ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "block/%s_flipped".formatted(blockId)));
-                Minecraft.getInstance().getBlockRenderer().getModelRenderer().renderModel(
-                    poseStack.last(),
-                    buffer.getBuffer(Sheets.cutoutBlockSheet()),
-                    state,
-                    blockModel,
-                    1f, 1f, 1f,
-                    packedLight, packedOverlay);
-            }
-        }
+    @Override
+    public void submit(SlidingDoorRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState cameraState) {
+        // TODO: 1.21.11 - Migrate to new SubmitNodeCollector rendering pipeline.
+        // The old MultiBufferSource-based rendering needs to be converted to the new
+        // deferred rendering system. For now, this is a stub.
     }
 }

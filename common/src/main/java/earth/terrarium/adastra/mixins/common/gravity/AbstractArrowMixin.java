@@ -3,7 +3,7 @@ package earth.terrarium.adastra.mixins.common.gravity;
 import earth.terrarium.adastra.api.systems.GravityApi;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.entity.projectile.arrow.AbstractArrow;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
@@ -18,7 +18,7 @@ public abstract class AbstractArrowMixin extends Entity {
         super(entityType, level);
     }
 
-    @Inject(method = "tick", at = @At("TAIL"))
+    @Inject(method = "method_5773", at = @At("TAIL"))
     public void adastra$tick(CallbackInfo ci) {
         double gravity = 0.05 * GravityApi.API.getGravity(this);
         Vec3 velocity = this.getDeltaMovement();

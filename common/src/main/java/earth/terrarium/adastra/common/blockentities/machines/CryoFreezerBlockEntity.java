@@ -20,11 +20,9 @@ import earth.terrarium.common_storage_lib.fluid.impl.SimpleFluidStorage;
 import earth.terrarium.common_storage_lib.fluid.util.FluidStorageData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtOps;
-import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -81,21 +79,16 @@ public class CryoFreezerBlockEntity extends RecipeMachineBlockEntity<CryoFreezin
     }
 
     @Override
-    public void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
-        if (tag.contains("FluidData")) {
-            FluidStorageData.CODEC.parse(NbtOps.INSTANCE, tag.get("FluidData"))
-                .resultOrPartial(s -> {})
-                .ifPresent(data -> getFluidContainer().readSnapshot(data));
-        }
+    public void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        input.read("FluidData", FluidStorageData.CODEC)
+            .ifPresent(data -> getFluidContainer().readSnapshot(data));
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
-        FluidStorageData.CODEC.encodeStart(NbtOps.INSTANCE, getFluidContainer().createSnapshot())
-            .resultOrPartial(s -> {})
-            .ifPresent(nbt -> tag.put("FluidData", nbt));
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        output.store("FluidData", FluidStorageData.CODEC, getFluidContainer().createSnapshot());
     }
 
     @Override
@@ -150,7 +143,7 @@ public class CryoFreezerBlockEntity extends RecipeMachineBlockEntity<CryoFreezin
     @Override
     public void update() {
         if (level().isClientSide()) return;
-        quickCheck.getRecipeFor(toRecipeInput(), level()).ifPresent(r -> {
+        quickCheck.getRecipeFor(toRecipeInput(), (ServerLevel) level()).ifPresent(r -> {
             recipe = r.value();
             cookTimeTotal = r.value().cookingTime();
         });

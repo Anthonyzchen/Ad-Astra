@@ -25,10 +25,11 @@ import net.minecraft.resources.RegistryOps;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.portal.DimensionTransition;
+import net.minecraft.world.level.portal.TeleportTransition;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.Locale;
@@ -38,7 +39,7 @@ public final class ModUtils {
 
     public static <T extends ParticleOptions> void sendParticles(ServerLevel level, T particle, double x, double y, double z, int count, double deltaX, double deltaY, double deltaZ, double speed) {
         for (ServerPlayer player : level.players()) {
-            level.sendParticles(player, particle, true, x, y, z, count, deltaX, deltaY, deltaZ, speed);
+            level.sendParticles(particle, x, y, z, count, deltaX, deltaY, deltaZ, speed);
         }
     }
 
@@ -71,11 +72,11 @@ public final class ModUtils {
      */
     public static boolean canTeleportToPlanet(Player player, Planet targetPlanet) {
         if (!(player.containerMenu instanceof PlanetsMenu)) return false;
-        if (player.isCreative() || player.isSpectator() || player.hasPermissions(2)) return true;
+        if (player.isCreative() || player.isSpectator() || player.canUseGameMasterBlocks()) return true;
 
         String[] planets = AdAstraConfig.disabledPlanets.split(",");
         for (var planet : planets) {
-            if (planet.equals(targetPlanet.dimension().location().toString())) return false;
+            if (planet.equals(targetPlanet.dimension().identifier().toString())) return false;
         }
 
         if (!(player.getVehicle() instanceof Rocket rocket)) return false;
@@ -102,18 +103,18 @@ public final class ModUtils {
     }
 
     public static Entity teleportToDimension(Entity entity, ServerLevel level) {
-        DimensionTransition target = new DimensionTransition(level, entity.position(), entity.getDeltaMovement(), entity.getYRot(), entity.getXRot(), DimensionTransition.DO_NOTHING);
+        TeleportTransition target = new TeleportTransition(level, entity.position(), entity.getDeltaMovement(), entity.getYRot(), entity.getXRot(), TeleportTransition.DO_NOTHING);
         return PlatformUtils.teleportToDimension(entity, level, target);
     }
 
     public static void land(ServerPlayer player, ServerLevel targetLevel, Vec3 pos) {
         Entity vehicle = player.getVehicle();
         player.stopRiding();
-        player.moveTo(pos);
+        player.setPos(pos.x, pos.y, pos.z);
         var teleportedPlayer = teleportToDimension(player, targetLevel);
 
         if (!(vehicle instanceof Rocket rocket)) return;
-        Lander lander = ModEntityTypes.LANDER.get().create(targetLevel);
+        Lander lander = ModEntityTypes.LANDER.get().create(targetLevel, EntitySpawnReason.TRIGGERED);
         if (lander == null) return;
         lander.setPos(pos);
         targetLevel.addFreshEntity(lander);

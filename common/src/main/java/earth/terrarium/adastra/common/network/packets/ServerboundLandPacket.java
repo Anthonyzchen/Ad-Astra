@@ -16,7 +16,7 @@ import earth.terrarium.adastra.common.utils.ModUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -35,12 +35,11 @@ public record ServerboundLandPacket(ResourceKey<Level> dimension,
         return TYPE;
     }
 
-    private static class Type extends CodecPacketType<ServerboundLandPacket> implements ServerboundPacketType<ServerboundLandPacket> {
+    private static class Type extends CodecPacketType.Server<ServerboundLandPacket> {
 
         public Type() {
             super(
-                ServerboundLandPacket.class,
-                ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "land"),
+                Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "land"),
                 ObjectByteCodec.create(
                     ExtraByteCodecs.DIMENSION.fieldOf(ServerboundLandPacket::dimension),
                     ByteCodec.BOOLEAN.fieldOf(ServerboundLandPacket::tryPreviousLocation),

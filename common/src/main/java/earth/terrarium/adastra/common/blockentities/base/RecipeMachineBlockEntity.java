@@ -2,9 +2,9 @@ package earth.terrarium.adastra.common.blockentities.base;
 
 import earth.terrarium.common_storage_lib.storage.base.ValueStorage;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.item.crafting.Recipe;
@@ -60,17 +60,17 @@ public abstract class RecipeMachineBlockEntity<T extends Recipe<RecipeInput>> ex
     public void updateSlots() {}
 
     @Override
-    public void loadAdditional(@NotNull CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
-        cookTime = tag.getInt("CookTime");
-        cookTimeTotal = tag.getInt("CookTimeTotal");
+    public void loadAdditional(@NotNull ValueInput input) {
+        super.loadAdditional(input);
+        cookTime = input.getIntOr("CookTime", 0);
+        cookTimeTotal = input.getIntOr("CookTimeTotal", 0);
     }
 
     @Override
-    protected void saveAdditional(@NotNull CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
-        tag.putInt("CookTime", cookTime);
-        tag.putInt("CookTimeTotal", cookTimeTotal);
+    protected void saveAdditional(@NotNull ValueOutput output) {
+        super.saveAdditional(output);
+        output.putInt("CookTime", cookTime);
+        output.putInt("CookTimeTotal", cookTimeTotal);
     }
 
     public void clearRecipe() {

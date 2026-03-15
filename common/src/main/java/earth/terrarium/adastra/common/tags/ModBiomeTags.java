@@ -2,7 +2,7 @@ package earth.terrarium.adastra.common.tags;
 
 import earth.terrarium.adastra.AdAstra;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
 
@@ -19,6 +19,6 @@ public final class ModBiomeTags {
     public static final TagKey<Biome> VENUS_BULLET = tag("has_structure/venus_bullet");
 
     private static TagKey<Biome> tag(String name) {
-        return TagKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, name));
+        return TagKey.create(Registries.BIOME, Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, name));
     }
 }

@@ -70,15 +70,12 @@ public abstract class BasicEntityBlock extends BaseEntityBlock {
         };
     }
 
-    @SuppressWarnings("deprecation")
     @Override
-    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean moved) {
-        if (state.getBlock() != newState.getBlock()) {
-            if (level.getBlockEntity(pos) instanceof TickableBlockEntity tickable) {
-                tickable.onRemoved();
-            }
-            super.onRemove(state, level, pos, newState, moved);
+    protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston) {
+        if (level.getBlockEntity(pos) instanceof TickableBlockEntity tickable) {
+            tickable.onRemoved();
         }
+        super.affectNeighborsAfterRemoval(state, level, pos, movedByPiston);
     }
 
     public static void preventCreativeDropFromBottomPart(Level level, BlockPos pos, BlockState state, Player player) {

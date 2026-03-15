@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(LivingEntity.class)
 public class LivingEntityMixin {
 
-    @Inject(method = "stopRiding", at = @At("HEAD"))
+    @Inject(method = "method_5848", at = @At("HEAD"))
     private void adastra$stopRiding(CallbackInfo ci) {
         //noinspection ConstantValue
         if ((Object) this instanceof Player player && player.level().isClientSide() && player.getVehicle() instanceof RadioHolder) {

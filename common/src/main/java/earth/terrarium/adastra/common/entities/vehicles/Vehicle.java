@@ -10,10 +10,9 @@ import earth.terrarium.adastra.mixins.common.LivingEntityAccessor;
 import com.teamresourceful.resourcefullib.common.menu.ContentMenuProvider;
 import com.teamresourceful.resourcefullib.common.menu.MenuContentHelper;
 import earth.terrarium.adastra.common.menus.base.EntityIdContent;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.DamageTypeTags;
@@ -24,9 +23,11 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.vehicle.Boat;
+import net.minecraft.world.entity.vehicle.boat.AbstractBoat;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -67,18 +68,18 @@ public abstract class Vehicle extends Entity implements PlayerRideable, ContentM
     protected void defineSynchedData(SynchedEntityData.Builder builder) {}
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag compound) {
-        inventory.fromTag(compound.getList("Inventory", Tag.TAG_COMPOUND), this.registryAccess());
+    protected void readAdditionalSaveData(ValueInput input) {
+        inventory.fromTag(input);
     }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag compound) {
-        compound.put("Inventory", inventory.createTag(this.registryAccess()));
+    protected void addAdditionalSaveData(ValueOutput output) {
+        inventory.toTag(output);
     }
 
     @Override
     public boolean canCollideWith(Entity entity) {
-        return Boat.canVehicleCollide(this, entity);
+        return AbstractBoat.canVehicleCollide(this, entity);
     }
 
     @Override
@@ -102,8 +103,10 @@ public abstract class Vehicle extends Entity implements PlayerRideable, ContentM
         this.tickLerp();
         if (!isNoGravity()) tickGravity();
         setPos(getX(), getY(), getZ());
-        if (isControlledByLocalInstance()) {
-            if (level().isClientSide() && isVehicle() && getControllingPassenger() instanceof Player player) {
+
+        boolean hasControllingPassenger = isVehicle() && getControllingPassenger() != null;
+        if (hasControllingPassenger) {
+            if (level().isClientSide() && getControllingPassenger() instanceof Player player) {
                 NetworkHandler.CHANNEL.sendToServer(new ServerboundVehicleControlPacket(player.xxa, player.zza));
             }
             move(MoverType.SELF, getDeltaMovement());
@@ -116,11 +119,6 @@ public abstract class Vehicle extends Entity implements PlayerRideable, ContentM
     }
 
     public void tickLerp() {
-        if (isControlledByLocalInstance()) {
-            lerpSteps = 0;
-            syncPacketPositionCodec(getX(), getY(), getZ());
-        }
-
         if (lerpSteps > 0) {
             double x = getX() + (lerpX - getX()) / lerpSteps;
             double y = getY() + (lerpY - getY()) / lerpSteps;
@@ -159,9 +157,8 @@ public abstract class Vehicle extends Entity implements PlayerRideable, ContentM
         return !isRemoved();
     }
 
-    @Override
-    public boolean hurt(DamageSource source, float amount) {
-        if (this.isInvulnerableTo(source)) return false;
+    public boolean hurtVehicle(DamageSource source, float amount) {
+        if (this.isInvulnerableTo(level() instanceof ServerLevel sl ? sl : null, source)) return false;
         if (source.is(DamageTypeTags.IS_PROJECTILE)) return false;
         if (amount >= 0
             && source.getEntity() instanceof Player player

@@ -8,7 +8,7 @@ import earth.terrarium.adastra.AdAstra;
 import earth.terrarium.adastra.common.blockentities.flag.FlagColor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.SimpleTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
 import org.slf4j.Logger;
 
@@ -17,7 +17,7 @@ import java.io.IOException;
 public class FlagImageTexture extends SimpleTexture {
 
     private static final Logger LOGGER = LogUtils.getLogger();
-    private static final ResourceLocation DEFAULT_FLAG = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/block/flag/warning_flag.png");
+    private static final Identifier DEFAULT_FLAG = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/block/flag/warning_flag.png");
 
     private final FlagColor[] colors;
     private boolean loaded;

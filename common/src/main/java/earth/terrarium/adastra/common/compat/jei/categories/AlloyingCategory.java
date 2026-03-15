@@ -19,12 +19,12 @@ import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.Ingredient;
 
 public record AlloyingCategory(IGuiHelper guiHelper) implements IRecipeCategory<AlloyingRecipe> {
 
-    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "alloying");
+    public static final Identifier ID = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "alloying");
     public static final RecipeType<AlloyingRecipe> RECIPE = new RecipeType<>(ID, AlloyingRecipe.class);
 
     @Override
@@ -38,8 +38,13 @@ public record AlloyingCategory(IGuiHelper guiHelper) implements IRecipeCategory<
     }
 
     @Override
-    public IDrawable getBackground() {
-        return guiHelper.createBlankDrawable(180, 110);
+    public int getWidth() {
+        return 180;
+    }
+
+    @Override
+    public int getHeight() {
+        return 110;
     }
 
     @Override
@@ -49,7 +54,7 @@ public record AlloyingCategory(IGuiHelper guiHelper) implements IRecipeCategory<
 
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, AlloyingRecipe recipe, IFocusGroup focuses) {
-        builder.addInvisibleIngredients(RecipeIngredientRole.CATALYST).addIngredients(Ingredient.of(ModItems.ETRIONIC_BLAST_FURNACE.get()));
+        // Catalyst role removed in JEI for 1.21.1; catalyst registration handled in registerRecipeCatalysts
         builder.addSlot(RecipeIngredientRole.INPUT, 27, 34).addIngredients(recipe.ingredients().get(0));
         builder.addSlot(RecipeIngredientRole.INPUT, 45, 34).addIngredients(recipe.ingredients().get(1));
         if (recipe.ingredients().size() > 2) {

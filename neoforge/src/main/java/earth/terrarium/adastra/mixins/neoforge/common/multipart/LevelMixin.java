@@ -30,7 +30,9 @@ public class LevelMixin implements MultipartPartsHolder {
         return adastra$multipartEntityParts;
     }
 
-    // TODO: Verify SRG/intermediary/lambda names are still correct for 1.21.1 NeoForge
+    // TODO: 1.21.11 - Verify SRG/intermediary/lambda names are still correct for 1.21.11 NeoForge.
+    // Lambda names and SRG names frequently change between MC versions. Check Level.getEntities
+    // in 1.21.11 NeoForge mappings. The lambda indices may have shifted.
     @Inject(
         method = {"method_31593", "lambda$getEntities$1", "m_151518_"},
         at = @At("TAIL")
@@ -46,7 +48,8 @@ public class LevelMixin implements MultipartPartsHolder {
         }
     }
 
-    // TODO: Verify SRG/intermediary/lambda names are still correct for 1.21.1 NeoForge
+    // TODO: 1.21.11 - Verify SRG/intermediary/lambda names are still correct for 1.21.11 NeoForge.
+    // Lambda names and SRG names frequently change between MC versions.
     @Inject(
         method = {"method_47576", "lambda$getEntities$2", "m_260792_"},
         at = @At(value = "RETURN", ordinal = 1),

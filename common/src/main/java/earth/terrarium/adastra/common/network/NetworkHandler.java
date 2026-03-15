@@ -3,11 +3,11 @@ package earth.terrarium.adastra.common.network;
 import com.teamresourceful.resourcefullib.common.network.Network;
 import earth.terrarium.adastra.AdAstra;
 import earth.terrarium.adastra.common.network.packets.*;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public final class NetworkHandler {
 
-    public static final Network CHANNEL = new Network(ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "main"), 1);
+    public static final Network CHANNEL = new Network(Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "main"), 1);
 
     public static void init() {
         CHANNEL.register(ClientboundSyncPlanetsPacket.TYPE);

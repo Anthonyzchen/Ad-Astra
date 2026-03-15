@@ -20,7 +20,7 @@ public abstract class ServerPlayerMixin extends Player {
     }
 
     @WrapWithCondition(
-        method = "changeDimension",
+        method = "teleport",
         at = @At(
             value = "INVOKE",
             target = "Lnet/minecraft/server/network/ServerCommonPacketListenerImpl;send(Lnet/minecraft/network/protocol/Packet;)V",

@@ -6,7 +6,7 @@ import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.math.Axis;
-import com.teamresourceful.resourcefullib.client.utils.RenderUtils;
+import com.teamresourceful.resourcefullib.client.closables.CloseableScissor;
 import earth.terrarium.adastra.AdAstra;
 import earth.terrarium.adastra.api.client.events.AdAstraClientEvents;
 import earth.terrarium.adastra.api.planets.Planet;
@@ -22,19 +22,19 @@ import earth.terrarium.adastra.common.network.packets.ServerboundLandOnSpaceStat
 import earth.terrarium.adastra.common.network.packets.ServerboundLandPacket;
 import earth.terrarium.adastra.common.planets.AdAstraData;
 import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import com.mojang.blaze3d.vertex.BufferUploader;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -50,22 +50,22 @@ import java.util.List;
 
 public class PlanetsScreen extends AbstractContainerScreen<PlanetsMenu> {
 
-    public static final ResourceLocation SELECTION_MENU = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "planets/selection_menu");
-    public static final ResourceLocation SMALL_SELECTION_MENU = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "planets/small_selection_menu");
+    public static final Identifier SELECTION_MENU = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "planets/selection_menu");
+    public static final Identifier SMALL_SELECTION_MENU = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "planets/small_selection_menu");
 
     public static final WidgetSprites BUTTON_SPRITES = new WidgetSprites(
-        ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "planets/button"),
-        ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "planets/button_highlighted")
+        Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "planets/button"),
+        Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "planets/button_highlighted")
     );
 
     public static final WidgetSprites BACK_BUTTON_SPRITES = new WidgetSprites(
-        ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "planets/back_button"),
-        ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "planets/back_button_highlighted")
+        Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "planets/back_button"),
+        Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "planets/back_button_highlighted")
     );
 
     public static final WidgetSprites PLUS_BUTTON_SPRITES = new WidgetSprites(
-        ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "planets/plus_button"),
-        ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "planets/plus_button_highlighted")
+        Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "planets/plus_button"),
+        Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "planets/plus_button_highlighted")
     );
 
     private final List<Button> buttons = new ArrayList<>();
@@ -79,7 +79,7 @@ public class PlanetsScreen extends AbstractContainerScreen<PlanetsMenu> {
     private final boolean hasMultipleSolarSystems;
     private int pageIndex;
     @Nullable
-    private ResourceLocation selectedSolarSystem = PlanetConstants.SOLAR_SYSTEM;
+    private Identifier selectedSolarSystem = PlanetConstants.SOLAR_SYSTEM;
 
     @Nullable
     private Planet selectedPlanet;
@@ -90,7 +90,7 @@ public class PlanetsScreen extends AbstractContainerScreen<PlanetsMenu> {
         this.imageHeight = height;
 
         var planets = AdAstraData.planets().values().stream()
-            .filter(planet -> !menu.disabledPlanets().contains(planet.dimension().location()))
+            .filter(planet -> !menu.disabledPlanets().contains(planet.dimension().identifier()))
             .filter(planet -> menu.tier() >= planet.tier()).toList();
         hasMultipleSolarSystems = planets.stream().map(Planet::solarSystem).distinct().count() > 1;
         pageIndex = hasMultipleSolarSystems ? 0 : 1;
@@ -139,8 +139,8 @@ public class PlanetsScreen extends AbstractContainerScreen<PlanetsMenu> {
     private void createSolarSystemButtons() {
         selectedSolarSystem = null;
 
-        List<ResourceLocation> solarSystems = new ArrayList<>(AdAstraData.solarSystems());
-        solarSystems.sort(Comparator.comparing(ResourceLocation::getPath));
+        List<Identifier> solarSystems = new ArrayList<>(AdAstraData.solarSystems());
+        solarSystems.sort(Comparator.comparing(Identifier::getPath));
         solarSystems.forEach(solarSystem -> {
             var button = addWidget(new LabeledImageButton(10, 0, 99, 20, BUTTON_SPRITES, b -> {
                 pageIndex = 1;
@@ -239,7 +239,7 @@ public class PlanetsScreen extends AbstractContainerScreen<PlanetsMenu> {
     private void renderButtons(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         int scrollPixels = (int) scrollAmount;
 
-        try (var ignored = RenderUtils.createScissorBox(Minecraft.getInstance(), graphics.pose(), 0, height / 2 - 43, 112, 131)) {
+        try (var ignored = new CloseableScissor(graphics, 0, height / 2 - 43, 112, 131)) {
             for (var button : buttons) {
                 button.render(graphics, mouseX, mouseY, partialTick);
             }
@@ -253,7 +253,7 @@ public class PlanetsScreen extends AbstractContainerScreen<PlanetsMenu> {
         if (pageIndex == 2 && selectedPlanet != null) {
             int spaceStationScrollPixels = (int) spaceStationScrollAmount;
 
-            try (var ignored = RenderUtils.createScissorBox(Minecraft.getInstance(), graphics.pose(), 112, height / 2 - 2, 112, 90)) {
+            try (var ignored = new CloseableScissor(graphics, 112, height / 2 - 2, 112, 90)) {
                 for (var button : spaceStationButtons) {
                     button.render(graphics, mouseX, mouseY, partialTick);
                 }
@@ -274,20 +274,9 @@ public class PlanetsScreen extends AbstractContainerScreen<PlanetsMenu> {
         super.renderBackground(graphics, mouseX, mouseY, partialTick);
         graphics.fill(0, 0, width, height, 0xff000419);
 
-        // Render diamond pattern lines
-        BufferBuilder bufferBuilder = Tesselator.getInstance().begin(VertexFormat.Mode.DEBUG_LINES, DefaultVertexFormat.POSITION_COLOR);
-
-        for (int i = -height; i <= width; i += 24) {
-            bufferBuilder.addVertex(i, 0, 0).setColor(0xff0f2559);
-            bufferBuilder.addVertex(i + height, height, 0).setColor(0xff0f2559);
-        }
-
-        for (int i = width + height; i >= 0; i -= 24) {
-            bufferBuilder.addVertex(i, 0, 0).setColor(0xff0f2559);
-            bufferBuilder.addVertex(i - height, height, 0).setColor(0xff0f2559);
-        }
-
-        BufferUploader.drawWithShader(bufferBuilder.buildOrThrow());
+        // TODO: 1.21.11 - BufferUploader.drawWithShader() is removed. The diamond pattern line
+        // rendering needs to use the new pipeline (e.g., MultiBufferSource with a line RenderType,
+        // or GuiGraphics.fill for thin rectangles). For now, the diamond pattern is skipped.
 
         AdAstraClientEvents.RenderSolarSystemEvent.fire(graphics, selectedSolarSystem, width, height);
         renderSelectionMenu(graphics);
@@ -295,14 +284,14 @@ public class PlanetsScreen extends AbstractContainerScreen<PlanetsMenu> {
 
     protected void renderSelectionMenu(GuiGraphics graphics) {
         if (pageIndex == 2) {
-            graphics.blitSprite(SELECTION_MENU, 7, height / 2 - 88, 209, 177);
+            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, SELECTION_MENU, 7, height / 2 - 88, 209, 177);
             graphics.drawCenteredString(font, ConstantComponents.SPACE_STATION, 163, height / 2 - 15, 0xffffff);
         } else {
-            graphics.blitSprite(SMALL_SELECTION_MENU, 7, height / 2 - 88, 105, 177);
+            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, SMALL_SELECTION_MENU, 7, height / 2 - 88, 105, 177);
         }
 
         if (pageIndex == 2 && selectedPlanet != null) {
-            var title = Component.translatableWithFallback("planet.%s.%s".formatted(selectedPlanet.dimension().location().getNamespace(), selectedPlanet.dimension().location().getPath()), title(selectedPlanet.dimension().location().getPath()));
+            var title = Component.translatableWithFallback("planet.%s.%s".formatted(selectedPlanet.dimension().identifier().getNamespace(), selectedPlanet.dimension().identifier().getPath()), title(selectedPlanet.dimension().identifier().getPath()));
             graphics.drawCenteredString(font, title, 57, height / 2 - 60, 0xffffff);
         } else if (pageIndex == 1 && selectedSolarSystem != null) {
             var title = Component.translatableWithFallback("solar_system.%s.%s".formatted(selectedSolarSystem.getNamespace(), selectedSolarSystem.getPath()), title(selectedSolarSystem.getPath()));
@@ -405,9 +394,10 @@ public class PlanetsScreen extends AbstractContainerScreen<PlanetsMenu> {
     static {
         AdAstraClientEvents.RenderSolarSystemEvent.register((graphics, solarSystem, width, height) -> {
             if (PlanetConstants.SOLAR_SYSTEM.equals(solarSystem)) {
-                BufferBuilder bufferBuilder = Tesselator.getInstance().begin(VertexFormat.Mode.DEBUG_LINES, DefaultVertexFormat.POSITION_COLOR);
-                drawCircles(0, 4, 0xff24327b, bufferBuilder, width, height);
-                BufferUploader.drawWithShader(bufferBuilder.buildOrThrow());
+                // TODO: 1.21.11 - BufferUploader.drawWithShader() removed.
+                // Orbit circle rendering needs to use the new pipeline.
+                // BufferBuilder bufferBuilder = Tesselator.getInstance().begin(VertexFormat.Mode.DEBUG_LINES, DefaultVertexFormat.POSITION_COLOR);
+                // drawCircles(0, 4, 0xff24327b, bufferBuilder, width, height);
 
                 graphics.blit(DimensionRenderingUtils.SUN, width / 2 - 8, height / 2 - 8, 0, 0, 16, 16, 16, 16);
                 float rotation = Util.getMillis() / 100f;
@@ -424,9 +414,10 @@ public class PlanetsScreen extends AbstractContainerScreen<PlanetsMenu> {
 
         AdAstraClientEvents.RenderSolarSystemEvent.register((graphics, solarSystem, width, height) -> {
             if (PlanetConstants.PROXIMA_CENTAURI.equals(solarSystem)) {
-                BufferBuilder bufferBuilder = Tesselator.getInstance().begin(VertexFormat.Mode.DEBUG_LINES, DefaultVertexFormat.POSITION_COLOR);
-                drawCircles(1, 1, 0xff008080, bufferBuilder, width, height);
-                BufferUploader.drawWithShader(bufferBuilder.buildOrThrow());
+                // TODO: 1.21.11 - BufferUploader.drawWithShader() removed.
+                // Orbit circle rendering needs to use the new pipeline.
+                // BufferBuilder bufferBuilder = Tesselator.getInstance().begin(VertexFormat.Mode.DEBUG_LINES, DefaultVertexFormat.POSITION_COLOR);
+                // drawCircles(1, 1, 0xff008080, bufferBuilder, width, height);
 
                 graphics.blit(DimensionRenderingUtils.BLUE_SUN, width / 2 - 8, height / 2 - 8, 0, 0, 16, 16, 16, 16);
                 float rotation = Util.getMillis() / 100f % 360f;

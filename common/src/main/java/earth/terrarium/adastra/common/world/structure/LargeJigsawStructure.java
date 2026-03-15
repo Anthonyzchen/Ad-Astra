@@ -7,7 +7,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import earth.terrarium.adastra.common.registry.ModStructures;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.WorldGenerationContext;
@@ -35,7 +35,7 @@ public class LargeJigsawStructure extends Structure {
     public static final MapCodec<LargeJigsawStructure> CODEC = RecordCodecBuilder.<LargeJigsawStructure>mapCodec(instance -> instance.group(
                 settingsCodec(instance),
                 StructureTemplatePool.CODEC.fieldOf("start_pool").forGetter(jigsawStructure -> jigsawStructure.startPool),
-                ResourceLocation.CODEC.optionalFieldOf("start_jigsaw_name").forGetter(jigsawStructure -> jigsawStructure.startJigsawName),
+                Identifier.CODEC.optionalFieldOf("start_jigsaw_name").forGetter(jigsawStructure -> jigsawStructure.startJigsawName),
                 Codec.intRange(0, MAX_DEPTH).fieldOf("size").forGetter(jigsawStructure -> jigsawStructure.maxDepth),
                 HeightProvider.CODEC.fieldOf("start_height").forGetter(jigsawStructure -> jigsawStructure.startHeight),
                 Codec.BOOL.fieldOf("use_expansion_hack").forGetter(jigsawStructure -> jigsawStructure.useExpansionHack),
@@ -46,7 +46,7 @@ public class LargeJigsawStructure extends Structure {
         ).validate(LargeJigsawStructure::verifyRange);
 
     private final Holder<StructureTemplatePool> startPool;
-    private final Optional<ResourceLocation> startJigsawName;
+    private final Optional<Identifier> startJigsawName;
     private final int maxDepth;
     private final HeightProvider startHeight;
     private final boolean useExpansionHack;
@@ -67,7 +67,7 @@ public class LargeJigsawStructure extends Structure {
     public LargeJigsawStructure(
         Structure.StructureSettings settings,
         Holder<StructureTemplatePool> startPool,
-        Optional<ResourceLocation> startJigsawName,
+        Optional<Identifier> startJigsawName,
         int maxDepth,
         HeightProvider startHeight,
         boolean useExpansionHack,
@@ -99,7 +99,7 @@ public class LargeJigsawStructure extends Structure {
             blockPos,
             this.useExpansionHack,
             this.projectStartToHeightmap,
-            this.maxDistanceFromCenter,
+            new JigsawStructure.MaxDistance(this.maxDistanceFromCenter),
             PoolAliasLookup.create(this.poolAliases, blockPos, context.seed()),
             DimensionPadding.ZERO,
             LiquidSettings.APPLY_WATERLOGGING

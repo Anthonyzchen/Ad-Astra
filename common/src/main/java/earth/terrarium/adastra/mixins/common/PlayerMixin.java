@@ -17,7 +17,7 @@ public abstract class PlayerMixin {
     @Unique
     private int adastra$dismountTicks;
 
-    @Inject(method = "wantsToStopRiding", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "method_21824", at = @At("HEAD"), cancellable = true)
     private void adastra$wantsToStopRiding(CallbackInfoReturnable<Boolean> cir) {
         var player = (Player) (Object) this;
         if (player.getVehicle() instanceof Vehicle vehicle) {

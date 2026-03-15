@@ -8,7 +8,7 @@ import me.shedaniel.rei.api.client.gui.widgets.Widget;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.events.GuiEventListener;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -18,11 +18,11 @@ public class ReiEtaWidget extends Widget {
 
     private final Rectangle bounds;
     private final int cookTime;
-    private final ResourceLocation texture;
+    private final Identifier texture;
     private final int textureWidth;
     private final int textureHeight;
 
-    public ReiEtaWidget(Point point, int cookTime, ResourceLocation texture, int textureWidth, int textureHeight) {
+    public ReiEtaWidget(Point point, int cookTime, Identifier texture, int textureWidth, int textureHeight) {
         this.bounds = new Rectangle(new Rectangle(point.x, point.y, GuiUtils.ENERGY_BAR_WIDTH, GuiUtils.ENERGY_BAR_HEIGHT));
         this.cookTime = cookTime;
         this.texture = texture;

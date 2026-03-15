@@ -5,7 +5,7 @@ import earth.terrarium.adastra.api.planets.Planet;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.valueproviders.IntProvider;
@@ -31,16 +31,16 @@ public class ModDimensionTypeProvider {
     public static final ResourceKey<DimensionType> GLACIO = register("glacio");
 
     private static ResourceKey<DimensionType> register(String name) {
-        return ResourceKey.create(Registries.DIMENSION_TYPE, new ResourceLocation(AdAstra.MOD_ID, name));
+        return ResourceKey.create(Registries.DIMENSION_TYPE, new Identifier(AdAstra.MOD_ID, name));
     }
 
     public static void bootstrap(BootstapContext<DimensionType> context) {
-        orbit(context, EARTH_ORBIT, Planet.EARTH_ORBIT.location());
-        orbit(context, MOON_ORBIT, Planet.MOON_ORBIT.location());
-        orbit(context, MARS_ORBIT, Planet.MARS_ORBIT.location());
-        orbit(context, VENUS_ORBIT, Planet.VENUS_ORBIT.location());
-        orbit(context, MERCURY_ORBIT, Planet.MERCURY_ORBIT.location());
-        orbit(context, GLACIO_ORBIT, Planet.GLACIO_ORBIT.location());
+        orbit(context, EARTH_ORBIT, Planet.EARTH_ORBIT.identifier());
+        orbit(context, MOON_ORBIT, Planet.MOON_ORBIT.identifier());
+        orbit(context, MARS_ORBIT, Planet.MARS_ORBIT.identifier());
+        orbit(context, VENUS_ORBIT, Planet.VENUS_ORBIT.identifier());
+        orbit(context, MERCURY_ORBIT, Planet.MERCURY_ORBIT.identifier());
+        orbit(context, GLACIO_ORBIT, Planet.GLACIO_ORBIT.identifier());
 
         context.register(
             MOON,
@@ -57,7 +57,7 @@ public class ModDimensionTypeProvider {
                 384,
                 384,
                 BlockTags.INFINIBURN_OVERWORLD,
-                Planet.MOON.location(),
+                Planet.MOON.identifier(),
                 0.0f,
                 createMonsterSettings(
                     false,
@@ -80,7 +80,7 @@ public class ModDimensionTypeProvider {
                 384,
                 384,
                 BlockTags.INFINIBURN_OVERWORLD,
-                Planet.MARS.location(),
+                Planet.MARS.identifier(),
                 0.0f,
                 createMonsterSettings(
                     false,
@@ -103,7 +103,7 @@ public class ModDimensionTypeProvider {
                 384,
                 384,
                 BlockTags.INFINIBURN_OVERWORLD,
-                Planet.VENUS.location(),
+                Planet.VENUS.identifier(),
                 0.0f,
                 createMonsterSettings(
                     true,
@@ -126,7 +126,7 @@ public class ModDimensionTypeProvider {
                 384,
                 384,
                 BlockTags.INFINIBURN_OVERWORLD,
-                Planet.MERCURY.location(),
+                Planet.MERCURY.identifier(),
                 0.0f,
                 createMonsterSettings(
                     true,
@@ -149,7 +149,7 @@ public class ModDimensionTypeProvider {
                 384,
                 384,
                 BlockTags.INFINIBURN_OVERWORLD,
-                Planet.GLACIO.location(),
+                Planet.GLACIO.identifier(),
                 0.0f,
                 createMonsterSettings(
                     false,
@@ -158,7 +158,7 @@ public class ModDimensionTypeProvider {
                     0)));
     }
 
-    private static void orbit(BootstapContext<DimensionType> context, ResourceKey<DimensionType> key, ResourceLocation dimensionSpecialEffects) {
+    private static void orbit(BootstapContext<DimensionType> context, ResourceKey<DimensionType> key, Identifier dimensionSpecialEffects) {
         context.register(
             key,
             create(
@@ -184,7 +184,7 @@ public class ModDimensionTypeProvider {
     }
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    public static DimensionType create(OptionalLong fixedTime, boolean hasSkyLight, boolean hasCeiling, boolean ultraWarm, boolean natural, double coordinateScale, boolean bedWorks, boolean respawnAnchorWorks, int minY, int height, int logicalHeight, TagKey<Block> infiniburn, ResourceLocation effectsLocation, float ambientLight, DimensionType.MonsterSettings monsterSettings) {
+    public static DimensionType create(OptionalLong fixedTime, boolean hasSkyLight, boolean hasCeiling, boolean ultraWarm, boolean natural, double coordinateScale, boolean bedWorks, boolean respawnAnchorWorks, int minY, int height, int logicalHeight, TagKey<Block> infiniburn, Identifier effectsLocation, float ambientLight, DimensionType.MonsterSettings monsterSettings) {
         return new DimensionType(fixedTime, hasSkyLight, hasCeiling, ultraWarm, natural, coordinateScale, bedWorks, respawnAnchorWorks, minY, height, logicalHeight, infiniburn, effectsLocation, ambientLight, monsterSettings);
     }
 

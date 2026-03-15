@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(targets = {"net.minecraft.client.multiplayer.ClientLevel$EntityCallbacks"})
 public class ClientLevelEntityCallbacksMixin {
 
-    @Inject(method = "onTrackingStart(Lnet/minecraft/world/entity/Entity;)V", at = @At("TAIL"))
+    @Inject(method = "onTrackingStart(Lnet/minecraft/world/entity/Entity;)V", at = @At("TAIL"), remap = false)
     private void adastra$onTrackingStart(Entity entity, CallbackInfo ci) {
         if (entity instanceof MultipartEntity multipartEntity) {
             MultipartPartsHolder holder = (MultipartPartsHolder) entity.level();
@@ -23,7 +23,7 @@ public class ClientLevelEntityCallbacksMixin {
         }
     }
 
-    @Inject(method = "onTrackingEnd(Lnet/minecraft/world/entity/Entity;)V", at = @At("TAIL"))
+    @Inject(method = "onTrackingEnd(Lnet/minecraft/world/entity/Entity;)V", at = @At("TAIL"), remap = false)
     private void adastra$onTrackingStop(Entity entity, CallbackInfo ci) {
         if (entity instanceof MultipartEntity multipartEntity) {
             MultipartPartsHolder holder = (MultipartPartsHolder) entity.level();

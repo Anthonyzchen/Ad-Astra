@@ -10,7 +10,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.TagsProvider;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagEntry;
 import net.minecraft.tags.TagKey;
@@ -40,22 +40,22 @@ public class ModItemTagProvider extends TagsProvider<Item> {
         add(ModItemTags.SPACE_SUITS, ModItems.SPACE_SUIT.get());
         add(ModItemTags.SPACE_SUITS, ModItems.SPACE_PANTS.get());
         add(ModItemTags.SPACE_SUITS, ModItems.SPACE_BOOTS.get());
-        tag(ModItemTags.SPACE_SUITS).add(TagEntry.tag(ModItemTags.NETHERITE_SPACE_SUITS.location()));
-        tag(ModItemTags.SPACE_SUITS).add(TagEntry.tag(ModItemTags.JET_SUITS.location()));
+        tag(ModItemTags.SPACE_SUITS).add(TagEntry.tag(ModItemTags.NETHERITE_SPACE_SUITS.identifier()));
+        tag(ModItemTags.SPACE_SUITS).add(TagEntry.tag(ModItemTags.JET_SUITS.identifier()));
 
         add(ModItemTags.NETHERITE_SPACE_SUITS, ModItems.NETHERITE_SPACE_HELMET.get());
         add(ModItemTags.NETHERITE_SPACE_SUITS, ModItems.NETHERITE_SPACE_SUIT.get());
         add(ModItemTags.NETHERITE_SPACE_SUITS, ModItems.NETHERITE_SPACE_PANTS.get());
         add(ModItemTags.NETHERITE_SPACE_SUITS, ModItems.NETHERITE_SPACE_BOOTS.get());
-        tag(ModItemTags.NETHERITE_SPACE_SUITS).add(TagEntry.tag(ModItemTags.JET_SUITS.location()));
+        tag(ModItemTags.NETHERITE_SPACE_SUITS).add(TagEntry.tag(ModItemTags.JET_SUITS.identifier()));
 
         add(ModItemTags.JET_SUITS, ModItems.JET_SUIT_HELMET.get());
         add(ModItemTags.JET_SUITS, ModItems.JET_SUIT.get());
         add(ModItemTags.JET_SUITS, ModItems.JET_SUIT_PANTS.get());
         add(ModItemTags.JET_SUITS, ModItems.JET_SUIT_BOOTS.get());
 
-        tag(ModItemTags.FREEZE_RESISTANT_ARMOR).add(TagEntry.tag(ModItemTags.SPACE_SUITS.location()));
-        tag(ModItemTags.HEAT_RESISTANT_ARMOR).add(TagEntry.tag(ModItemTags.NETHERITE_SPACE_SUITS.location()));
+        tag(ModItemTags.FREEZE_RESISTANT_ARMOR).add(TagEntry.tag(ModItemTags.SPACE_SUITS.identifier()));
+        tag(ModItemTags.HEAT_RESISTANT_ARMOR).add(TagEntry.tag(ModItemTags.NETHERITE_SPACE_SUITS.identifier()));
 
         add(ModItemTags.HELD_OVER_HEAD, ModItems.LAUNCH_PAD.get());
 
@@ -250,27 +250,27 @@ public class ModItemTagProvider extends TagsProvider<Item> {
     }
 
     private void addFabricTag(Item item, TagKey<Item> tag, String fabricCommonTag) {
-        tag(tag).add(TagEntry.optionalTag(new ResourceLocation("c", fabricCommonTag)));
+        tag(tag).add(TagEntry.optionalTag(new Identifier("c", fabricCommonTag)));
 
-        var commonTag = TagKey.create(Registries.ITEM, new ResourceLocation("c", fabricCommonTag));
+        var commonTag = TagKey.create(Registries.ITEM, new Identifier("c", fabricCommonTag));
         tag(commonTag).add(element(item));
     }
 
     private void addForgeTag(Item item, TagKey<Item> tag, String forgeCommonTag) {
-        tag(tag).add(TagEntry.optionalTag(new ResourceLocation("forge", forgeCommonTag)));
+        tag(tag).add(TagEntry.optionalTag(new Identifier("forge", forgeCommonTag)));
 
-        var commonTag = TagKey.create(Registries.ITEM, new ResourceLocation("forge", forgeCommonTag));
+        var commonTag = TagKey.create(Registries.ITEM, new Identifier("forge", forgeCommonTag));
         tag(commonTag).add(element(item));
 
-        var folderTag = TagKey.create(Registries.ITEM, new ResourceLocation("forge", forgeCommonTag.split("/")[0]));
-        tag(folderTag).add(TagEntry.tag(commonTag.location()));
+        var folderTag = TagKey.create(Registries.ITEM, new Identifier("forge", forgeCommonTag.split("/")[0]));
+        tag(folderTag).add(TagEntry.tag(commonTag.identifier()));
     }
 
     private static TagEntry element(Item item) {
         return TagEntry.element(loc(item));
     }
 
-    private static ResourceLocation loc(Item item) {
+    private static Identifier loc(Item item) {
         return BuiltInRegistries.ITEM.getKey(item);
     }
 }

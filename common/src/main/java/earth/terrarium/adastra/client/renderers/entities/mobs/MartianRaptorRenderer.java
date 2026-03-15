@@ -5,19 +5,20 @@ import earth.terrarium.adastra.client.models.entities.mobs.MartianRaptorModel;
 import earth.terrarium.adastra.common.entities.mob.MartianRaptor;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
+import net.minecraft.resources.Identifier;
 
 // LEGACY ENTITY. WILL BE REPLACED IN THE FUTURE.
-public class MartianRaptorRenderer extends MobRenderer<MartianRaptor, MartianRaptorModel> {
+public class MartianRaptorRenderer extends MobRenderer<MartianRaptor, LivingEntityRenderState, MartianRaptorModel> {
 
-    public static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/entity/mob/martian_raptor.png");
+    public static final Identifier TEXTURE = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/entity/mob/martian_raptor.png");
 
     public MartianRaptorRenderer(EntityRendererProvider.Context context) {
         super(context, new MartianRaptorModel(context.bakeLayer(MartianRaptorModel.LAYER_LOCATION)), 0.5f);
     }
 
     @Override
-    public ResourceLocation getTextureLocation(MartianRaptor entity) {
+    public Identifier getTextureLocation(LivingEntityRenderState state) {
         return TEXTURE;
     }
 }

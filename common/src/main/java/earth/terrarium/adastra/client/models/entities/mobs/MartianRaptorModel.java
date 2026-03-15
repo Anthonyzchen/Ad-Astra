@@ -3,19 +3,19 @@ package earth.terrarium.adastra.client.models.entities.mobs;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import earth.terrarium.adastra.AdAstra;
-import earth.terrarium.adastra.common.entities.mob.MartianRaptor;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 
 // LEGACY ENTITY. WILL BE REPLACED IN THE FUTURE
-public class MartianRaptorModel extends EntityModel<MartianRaptor> {
+public class MartianRaptorModel extends EntityModel<LivingEntityRenderState> {
 
-    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "martian_raptor"), "main");
+    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "martian_raptor"), "main");
 
     private final ModelPart body;
     private final ModelPart left_leg;
@@ -78,7 +78,11 @@ public class MartianRaptorModel extends EntityModel<MartianRaptor> {
     }
 
     @Override
-    public void setupAnim(MartianRaptor entity, float limbAngle, float limbDistance, float animationProgress, float headYaw, float headPitch) {
+    public void setupAnim(LivingEntityRenderState state) {
+        float limbAngle = state.walkAnimationPos;
+        float limbDistance = state.walkAnimationSpeed;
+        float headYaw = state.yRot;
+        float headPitch = state.xRot;
 
         this.left_leg.xRot = Mth.cos(limbAngle) * -1.0f * limbDistance;
         this.right_leg.xRot = Mth.cos(limbAngle) * 1.0f * limbDistance;

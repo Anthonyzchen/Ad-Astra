@@ -6,7 +6,7 @@ import earth.terrarium.adastra.common.handlers.base.SpaceStation;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,7 +15,7 @@ import java.util.Set;
 import java.util.UUID;
 
 public record PlanetsMenuContent(
-    Set<ResourceLocation> disabledPlanets,
+    Set<Identifier> disabledPlanets,
     Map<ResourceKey<Level>, Map<UUID, Set<SpaceStation>>> spaceStations,
     Set<GlobalPos> spawnLocations
 ) implements MenuContent<PlanetsMenuContent> {
@@ -23,7 +23,7 @@ public record PlanetsMenuContent(
     public static final MenuContentSerializer<PlanetsMenuContent> SERIALIZER = new MenuContentSerializer<>() {
         @Override
         public @Nullable PlanetsMenuContent from(FriendlyByteBuf buffer) {
-            Set<ResourceLocation> disabledPlanets = PlanetsMenuProvider.createDisabledPlanetsFromBuf(buffer);
+            Set<Identifier> disabledPlanets = PlanetsMenuProvider.createDisabledPlanetsFromBuf(buffer);
             Map<ResourceKey<Level>, Map<UUID, Set<SpaceStation>>> spaceStations = PlanetsMenuProvider.createSpaceStationsFromBuf(buffer);
             Set<GlobalPos> spawnLocations = PlanetsMenuProvider.createSpawnLocationsFromBuf(buffer);
             return new PlanetsMenuContent(disabledPlanets, spaceStations, spawnLocations);

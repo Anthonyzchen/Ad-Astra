@@ -19,6 +19,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
@@ -28,10 +29,10 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.level.pathfinder.PathComputationType;
+import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -46,7 +47,7 @@ import java.util.List;
 public class SlidingDoorBlock extends BasicEntityBlock implements Wrenchable {
 
     public static final MapCodec<SlidingDoorBlock> CODEC = simpleCodec(SlidingDoorBlock::new);
-    public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
+    public static final EnumProperty<Direction> FACING = HorizontalDirectionalBlock.FACING;
     public static final BooleanProperty OPEN = BlockStateProperties.OPEN;
     public static final BooleanProperty LOCKED = BlockStateProperties.LOCKED;
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
@@ -87,7 +88,6 @@ public class SlidingDoorBlock extends BasicEntityBlock implements Wrenchable {
         };
     }
 
-    @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
         TooltipUtils.addDescriptionComponent(tooltip, ConstantComponents.SLIDING_DOOR_INFO);
     }
@@ -113,7 +113,7 @@ public class SlidingDoorBlock extends BasicEntityBlock implements Wrenchable {
 
     @Override
     public @NotNull RenderShape getRenderShape(BlockState state) {
-        return RenderShape.ENTITYBLOCK_ANIMATED; // Rendering is done in the BER
+        return RenderShape.INVISIBLE; // Rendering is done in the BER
     }
 
     @Override
@@ -165,7 +165,7 @@ public class SlidingDoorBlock extends BasicEntityBlock implements Wrenchable {
     }
 
     @Override
-    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos neighborPos, boolean movedByPiston) {
+    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, @Nullable Orientation orientation, boolean movedByPiston) {
         if (!level.isClientSide()) {
             BlockPos controllerPos = getController(state, pos);
             BlockState controllerState = level.getBlockState(controllerPos);
@@ -193,15 +193,13 @@ public class SlidingDoorBlock extends BasicEntityBlock implements Wrenchable {
     }
 
     @Override
-    public void wasExploded(Level level, BlockPos pos, Explosion explosion) {
-        if (!level.isClientSide()) {
-            for (var direction : Direction.values()) {
-                BlockPos offset = pos.relative(direction);
-                BlockState state = level.getBlockState(offset);
-                if (state.getBlock().equals(this)) {
-                    destroy(level, offset, state);
-                    break;
-                }
+    public void wasExploded(ServerLevel level, BlockPos pos, Explosion explosion) {
+        for (var direction : Direction.values()) {
+            BlockPos offset = pos.relative(direction);
+            BlockState state = level.getBlockState(offset);
+            if (state.getBlock().equals(this)) {
+                destroy(level, offset, state);
+                break;
             }
         }
         super.wasExploded(level, pos, explosion);

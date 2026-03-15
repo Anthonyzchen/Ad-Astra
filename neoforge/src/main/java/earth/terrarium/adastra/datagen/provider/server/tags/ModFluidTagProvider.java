@@ -8,7 +8,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.TagsProvider;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagEntry;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.material.Fluid;
@@ -44,15 +44,15 @@ public class ModFluidTagProvider extends TagsProvider<Fluid> {
         add(ModFluidTags.FREEZES_IN_SPACE, Fluids.WATER);
         add(ModFluidTags.EVAPORATES_IN_SPACE, Fluids.WATER);
 
-        tag(ModFluidTags.FUEL).add(TagEntry.optionalTag(new ResourceLocation("c:diesel")));
-        tag(ModFluidTags.FUEL).add(TagEntry.optionalTag(new ResourceLocation("forge:diesel")));
-        tag(ModFluidTags.FUEL).add(TagEntry.optionalTag(new ResourceLocation("c:biodiesel")));
-        tag(ModFluidTags.FUEL).add(TagEntry.optionalTag(new ResourceLocation("forge:biodiesel")));
-        tag(ModFluidTags.FUEL).add(TagEntry.optionalTag(new ResourceLocation("forge:biodiesel")));
+        tag(ModFluidTags.FUEL).add(TagEntry.optionalTag(new Identifier("c:diesel")));
+        tag(ModFluidTags.FUEL).add(TagEntry.optionalTag(new Identifier("forge:diesel")));
+        tag(ModFluidTags.FUEL).add(TagEntry.optionalTag(new Identifier("c:biodiesel")));
+        tag(ModFluidTags.FUEL).add(TagEntry.optionalTag(new Identifier("forge:biodiesel")));
+        tag(ModFluidTags.FUEL).add(TagEntry.optionalTag(new Identifier("forge:biodiesel")));
 
-        tag(ModFluidTags.OIL).add(TagEntry.optionalElement(new ResourceLocation("techreborn:oil")));
-        tag(ModFluidTags.OIL).add(TagEntry.optionalTag(new ResourceLocation("forge:crude_oil")));
-        tag(ModFluidTags.OIL).add(TagEntry.optionalTag(new ResourceLocation("c:crude_oil")));
+        tag(ModFluidTags.OIL).add(TagEntry.optionalElement(new Identifier("techreborn:oil")));
+        tag(ModFluidTags.OIL).add(TagEntry.optionalTag(new Identifier("forge:crude_oil")));
+        tag(ModFluidTags.OIL).add(TagEntry.optionalTag(new Identifier("c:crude_oil")));
     }
 
     private void add(TagKey<Fluid> tag, Fluid fluid) {
@@ -70,16 +70,16 @@ public class ModFluidTagProvider extends TagsProvider<Fluid> {
     }
 
     private void addFabricTag(Fluid fluid, TagKey<Fluid> tag, String fabricCommonTag) {
-        tag(tag).add(TagEntry.optionalTag(new ResourceLocation("c", fabricCommonTag)));
+        tag(tag).add(TagEntry.optionalTag(new Identifier("c", fabricCommonTag)));
 
-        var commonTag = TagKey.create(Registries.FLUID, new ResourceLocation("c", fabricCommonTag));
+        var commonTag = TagKey.create(Registries.FLUID, new Identifier("c", fabricCommonTag));
         tag(commonTag).add(element(fluid));
     }
 
     private void addForgeTag(Fluid fluid, TagKey<Fluid> tag, String forgeCommonTag) {
-        tag(tag).add(TagEntry.optionalTag(new ResourceLocation("forge", forgeCommonTag)));
+        tag(tag).add(TagEntry.optionalTag(new Identifier("forge", forgeCommonTag)));
 
-        var commonTag = TagKey.create(Registries.FLUID, new ResourceLocation("forge", forgeCommonTag));
+        var commonTag = TagKey.create(Registries.FLUID, new Identifier("forge", forgeCommonTag));
         tag(commonTag).add(element(fluid));
     }
 
@@ -87,7 +87,7 @@ public class ModFluidTagProvider extends TagsProvider<Fluid> {
         return TagEntry.element(loc(fluid));
     }
 
-    private static ResourceLocation loc(Fluid fluid) {
+    private static Identifier loc(Fluid fluid) {
         return BuiltInRegistries.FLUID.getKey(fluid);
     }
 }
