@@ -128,6 +128,7 @@ public class OxygenDistributorBlockEntity extends OxygenLoaderBlockEntity {
 
         long fluidPerTick = calculateFluidPerTick();
         boolean canDistribute = canCraftDistribution(Math.max(1 * 81L, fluidPerTick));
+
         if (canFunction() && canDistribute) {
             getEnergyStorage().extract(calculateEnergyPerTick(), false);
             setLit(true);
@@ -329,7 +330,11 @@ public class OxygenDistributorBlockEntity extends OxygenLoaderBlockEntity {
     }
 
     private long calculateFluidPerTick() {
-        return Math.max(1, lastDistributedBlocks.size() / 1500) * 81L;
+        // Use ceiling division to ensure any distributed blocks consume fluid proportionally.
+        // Previously, integer division caused 0 consumption for < 1500 blocks.
+        int blocks = lastDistributedBlocks.size();
+        if (blocks <= 0) return 81L;
+        return Math.max(1, (blocks + 1499) / 1500) * 81L;
     }
 
     @Override

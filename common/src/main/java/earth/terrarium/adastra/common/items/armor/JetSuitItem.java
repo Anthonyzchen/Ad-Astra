@@ -40,10 +40,11 @@ public class JetSuitItem extends SpaceSuitItem implements EnergyProvider.Item {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @NotNull Item.TooltipContext context, @NotNull List<Component> tooltipComponents, @NotNull TooltipFlag isAdvanced) {
+        var fluidContainer = getFluidContainer(stack);
+        long fluidAmount = fluidContainer.get(0).getAmount();
+        long fluidCapacity = fluidContainer.get(0).getLimit(fluidContainer.get(0).getResource());
         tooltipComponents.add(TooltipUtils.getFluidComponent(
-            FluidUtils.getTank(stack),
-            tankSize * BUCKET / 1000L,
-            ModFluids.OXYGEN.get()));
+            fluidAmount, fluidCapacity, ModFluids.OXYGEN.get()));
         var energy = getEnergyStorage(stack);
         tooltipComponents.add(TooltipUtils.getEnergyComponent(energy.getStoredAmount(), energyCapacity));
         tooltipComponents.add(TooltipUtils.getMaxEnergyInComponent(energy.getCapacity()));

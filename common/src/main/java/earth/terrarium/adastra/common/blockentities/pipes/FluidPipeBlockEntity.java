@@ -19,19 +19,30 @@ public class FluidPipeBlockEntity extends PipeBlockEntity {
 
     @Override
     public void addNode(@NotNull BlockEntity entity, PipeProperty pipeProperty, Direction direction, BlockPos pos) {
-        // TODO: CSL migration - rework fluid pipe node detection for CSL API
         if (pipeProperty.isNone()) return;
-        if (pipeProperty.isNormal() || pipeProperty.isInsert()) {
-            consumers.put(pos, direction);
-        } else if (pipeProperty.isExtract()) {
+        CommonStorage<FluidResource> container = FluidApi.BLOCK.find(entity.getLevel(), pos, direction.getOpposite());
+        if (container == null) return;
+
+        if (!pipeProperty.isInsert() && (pipeProperty.isExtract() || canExtractFluid(container))) {
             sources.put(pos, direction);
+        } else if (pipeProperty.isNormal() || pipeProperty.isInsert()) {
+            consumers.put(pos, direction);
         }
+    }
+
+    private boolean canExtractFluid(CommonStorage<FluidResource> container) {
+        for (int i = 0; i < container.size(); i++) {
+            FluidResource resource = container.get(i).getResource();
+            if (resource.isBlank()) continue;
+            if (container.extract(resource, 1, true) > 0) return true;
+        }
+        return false;
     }
 
     @Override
     public void moveContents(long transferRate, @NotNull BlockEntity source, @NotNull BlockEntity consumer, Direction sourceDirection, Direction consumerDirection) {
-        CommonStorage<FluidResource> sourceStorage = FluidApi.BLOCK.find(source.getLevel(), source.getBlockPos(), sourceDirection);
-        CommonStorage<FluidResource> consumerStorage = FluidApi.BLOCK.find(consumer.getLevel(), consumer.getBlockPos(), consumerDirection);
+        CommonStorage<FluidResource> sourceStorage = FluidApi.BLOCK.find(source.getLevel(), source.getBlockPos(), sourceDirection.getOpposite());
+        CommonStorage<FluidResource> consumerStorage = FluidApi.BLOCK.find(consumer.getLevel(), consumer.getBlockPos(), consumerDirection.getOpposite());
         if (sourceStorage == null || consumerStorage == null) return;
 
         for (int i = 0; i < sourceStorage.size(); i++) {
@@ -44,12 +55,12 @@ public class FluidPipeBlockEntity extends PipeBlockEntity {
                     sourceStorage.extract(resource, inserted, false);
                 }
             }
-            break; // Only transfer first non-blank fluid per tick
+            break;
         }
     }
 
     @Override
     public boolean isValid(@NotNull BlockEntity entity, Direction direction) {
-        return FluidApi.BLOCK.find(entity.getLevel(), entity.getBlockPos(), direction) != null;
+        return FluidApi.BLOCK.find(entity.getLevel(), entity.getBlockPos(), direction.getOpposite()) != null;
     }
 }

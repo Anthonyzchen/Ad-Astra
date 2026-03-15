@@ -84,6 +84,15 @@ public class TooltipUtils {
         ).withStyle(ChatFormatting.GOLD);
     }
 
+    public static Component getFluidComponent(long amount, long capacity, Fluid fluid) {
+        Component fluidName = fluid != null ? fluid.getBucket().getDescription() : Component.literal("Empty");
+        return Component.translatable("tooltip.ad_astra.fluid",
+            getFormattedAmount(amount / 81L),
+            getFormattedAmount(capacity / 81L),
+            fluidName
+        ).withStyle(ChatFormatting.GOLD);
+    }
+
     public static Component getFluidComponent(Object fluid, long capacity, Fluid fallback) {
         Component fluidName;
         if (fallback != null) {

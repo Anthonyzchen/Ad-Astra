@@ -232,6 +232,8 @@ public class PlanetsScreen extends AbstractContainerScreen<PlanetsMenu> {
 
         // Prevent buttons from being pressed when outside view area.
         buttons.forEach(button -> button.active = button.getY() > height / 2 - 63 && button.getY() < height / 2 + 88);
+        // Also activate space station buttons within view area.
+        spaceStationButtons.forEach(button -> button.active = button.getY() > height / 2 - 22 && button.getY() < height / 2 + 88);
     }
 
     private void renderButtons(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {

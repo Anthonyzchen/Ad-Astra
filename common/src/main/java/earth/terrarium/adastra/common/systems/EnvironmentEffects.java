@@ -76,6 +76,9 @@ public class EnvironmentEffects {
     }
 
     private static void tickCold(ServerLevel level, BlockPos pos, BlockState state) {
+        // Don't freeze water in oxygenated areas (oxygen distributors warm the area)
+        if (OxygenApi.API.hasOxygen(level, pos) || hasOxygenOnAnySide(level, pos)) return;
+
         FluidState fluidState = state.getFluidState();
         if (state.hasProperty(BlockStateProperties.WATERLOGGED)) {
             level.setBlockAndUpdate(pos, state.setValue(BlockStateProperties.WATERLOGGED, false));

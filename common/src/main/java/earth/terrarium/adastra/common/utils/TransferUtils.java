@@ -13,6 +13,7 @@ import earth.terrarium.common_storage_lib.storage.base.ValueStorage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.Container;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.HopperBlockEntity;
 
 import java.util.function.Predicate;
@@ -20,6 +21,10 @@ import java.util.function.Predicate;
 public class TransferUtils {
 
     public static void pushEnergyNearby(ContainerMachineBlockEntity machine, BlockPos pos, long amount, ConfigurationEntry sideConfig, Predicate<Direction> filter) {
+        pushEnergyNearby(machine, pos, amount, sideConfig, filter, entity -> true);
+    }
+
+    public static void pushEnergyNearby(ContainerMachineBlockEntity machine, BlockPos pos, long amount, ConfigurationEntry sideConfig, Predicate<Direction> filter, Predicate<BlockEntity> entityFilter) {
         ValueStorage container = EnergyApi.BLOCK.find(machine.getLevel(), pos, null);
         if (container == null) return;
         if (container.getStoredAmount() == 0) return;
@@ -30,6 +35,8 @@ public class TransferUtils {
             Direction direction = ModUtils.relative(machine, entry.getKey());
             if (!filter.test(direction)) continue;
             BlockPos nearbyPos = pos.relative(direction);
+            BlockEntity nearbyEntity = machine.getLevel().getBlockEntity(nearbyPos);
+            if (nearbyEntity != null && !entityFilter.test(nearbyEntity)) continue;
             ValueStorage nearbyContainer = EnergyApi.BLOCK.find(machine.getLevel(), nearbyPos, direction.getOpposite());
             if (nearbyContainer == null) continue;
             long extracted = container.extract(amount, true);

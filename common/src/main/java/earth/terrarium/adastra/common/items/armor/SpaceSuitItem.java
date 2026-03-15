@@ -9,6 +9,7 @@ import earth.terrarium.adastra.common.tags.ModItemTags;
 import earth.terrarium.adastra.common.utils.FluidUtils;
 import earth.terrarium.adastra.common.utils.TooltipUtils;
 import earth.terrarium.common_storage_lib.fluid.impl.SimpleFluidStorage;
+import earth.terrarium.common_storage_lib.resources.fluid.FluidResource;
 // TODO: Migrate to CSL
 // import earth.terrarium.botarium.common.fluid.base.FluidContainer;
 // import earth.terrarium.botarium.common.fluid.base.FluidHolder;
@@ -43,15 +44,15 @@ public class SpaceSuitItem extends CustomDyeableArmorItem {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @NotNull Item.TooltipContext context, @NotNull List<Component> tooltipComponents, @NotNull TooltipFlag isAdvanced) {
-        tooltipComponents.add(TooltipUtils.getFluidComponent(
-            FluidUtils.getTank(stack),
-            tankSize * BUCKET / 1000L,
-            ModFluids.OXYGEN.get()));
+        var fluidContainer = getFluidContainer(stack);
+        long fluidAmount = fluidContainer.get(0).getAmount();
+        long fluidCapacity = fluidContainer.get(0).getLimit(fluidContainer.get(0).getResource());
+        tooltipComponents.add(TooltipUtils.getFluidComponent(fluidAmount, fluidCapacity, ModFluids.OXYGEN.get()));
         TooltipUtils.addDescriptionComponent(tooltipComponents, ConstantComponents.SPACE_SUIT_INFO);
     }
 
     public SimpleFluidStorage getFluidContainer(ItemStack holder) {
-        return new SimpleFluidStorage(1, tankSize * BUCKET / 1000L);
+        return FluidUtils.getItemFluidStorage(holder, 1, tankSize * BUCKET / 1000L);
     }
 
     public static boolean hasFullSet(LivingEntity entity) {
@@ -95,10 +96,12 @@ public class SpaceSuitItem extends CustomDyeableArmorItem {
     }
 
     public void consumeOxygen(ItemStack stack, long amount) {
-        // TODO: Migrate to CSL FluidResource - re-implement oxygen consumption
         var container = getFluidContainer(stack);
         if (container == null) return;
-        container.extract(container.get(0).getResource(), amount * BUCKET / 1000L, false);
+        FluidResource resource = container.get(0).getResource();
+        if (resource.isBlank()) return;
+        container.get(0).extract(resource, amount * BUCKET / 1000L, false);
+        FluidUtils.saveItemFluidStorage(stack, container);
     }
 
     public static long getOxygenAmount(Entity entity) {

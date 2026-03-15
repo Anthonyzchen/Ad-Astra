@@ -18,11 +18,6 @@ public record ServerboundRequestStationsPacket() implements Packet<ServerboundRe
 
     public static final ServerboundPacketType<ServerboundRequestStationsPacket> TYPE = new Type();
 
-    // Unit ByteCodec: writes nothing, reads nothing, produces a new instance.
-    // ByteCodec.UNIT was removed; using passthrough with no-op encode and constant decode.
-    private static final ByteCodec<ServerboundRequestStationsPacket> UNIT_CODEC =
-        ByteCodec.passthrough((buf, value) -> {}, buf -> new ServerboundRequestStationsPacket());
-
     @Override
     public PacketType<ServerboundRequestStationsPacket> type() {
         return TYPE;
@@ -34,7 +29,7 @@ public record ServerboundRequestStationsPacket() implements Packet<ServerboundRe
             super(
                 ServerboundRequestStationsPacket.class,
                 ResourceLocation.fromNamespaceAndPath(AdAstra.MOD_ID, "request_stations"),
-                UNIT_CODEC
+                ByteCodec.unit(ServerboundRequestStationsPacket::new)
             );
         }
 

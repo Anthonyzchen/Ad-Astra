@@ -138,7 +138,8 @@ public class EnergizerBlockEntity extends EnergyContainerMachineBlockEntity {
         var stack = getItem(0);
         if (stack.isEmpty()) return;
         if (!EnergyUtils.holdsEnergy(stack)) return;
-        if (EnergyUtils.transferToItem(energyContainer, stack, getEnergyStorage().getCapacity()) == 0) return;
+        // Transfer at 50 energy/tick (1,000 energy/second)
+        if (EnergyUtils.transferToItem(energyContainer, stack, 50) == 0) return;
         ModUtils.sendParticles(level,
             ParticleTypes.ELECTRIC_SPARK,
             pos.getX() + 0.5,

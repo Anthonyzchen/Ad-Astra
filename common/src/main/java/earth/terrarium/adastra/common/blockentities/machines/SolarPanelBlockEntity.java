@@ -24,6 +24,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -58,12 +59,53 @@ public class SolarPanelBlockEntity extends EnergyContainerMachineBlockEntity {
         if (canFunction()) {
             distributeToChargeSlots();
             if (isDay()) generateEnergy(PlanetApi.API.getSolarPower(level));
+            equalizeWithAdjacentPanels(level, pos);
+        }
+    }
+
+    /**
+     * Equalizes energy with all adjacent solar panels so that touching panels
+     * share power evenly and fill up at the same rate.
+     */
+    private void equalizeWithAdjacentPanels(ServerLevel level, BlockPos pos) {
+        long myEnergy = this.energyContainer.getStoredAmount();
+        long myCapacity = this.energyContainer.getCapacity();
+
+        // Find all adjacent solar panels
+        List<SolarPanelBlockEntity> neighbors = new ArrayList<>();
+        long totalEnergy = myEnergy;
+        long totalCapacity = myCapacity;
+
+        for (Direction direction : Direction.values()) {
+            BlockPos neighborPos = pos.relative(direction);
+            BlockEntity neighborEntity = level.getBlockEntity(neighborPos);
+            if (neighborEntity instanceof SolarPanelBlockEntity neighbor) {
+                neighbors.add(neighbor);
+                totalEnergy += neighbor.energyContainer.getStoredAmount();
+                totalCapacity += neighbor.energyContainer.getCapacity();
+            }
+        }
+
+        if (neighbors.isEmpty()) return;
+
+        // Calculate the average fill ratio and distribute proportionally
+        int panelCount = neighbors.size() + 1; // include self
+        long averageEnergy = totalEnergy / panelCount;
+        long remainder = totalEnergy % panelCount;
+
+        // Set this panel's energy (give any remainder to self to avoid energy loss)
+        this.energyContainer.set(Math.min(averageEnergy + remainder, myCapacity));
+
+        // Set each neighbor's energy
+        for (SolarPanelBlockEntity neighbor : neighbors) {
+            neighbor.energyContainer.set(Math.min(averageEnergy, neighbor.energyContainer.getCapacity()));
         }
     }
 
     @Override
     public void tickSideInteractions(BlockPos pos, Predicate<Direction> filter, List<ConfigurationEntry> sideConfig) {
-        TransferUtils.pushEnergyNearby(this, pos, getEnergyStorage().getCapacity(), sideConfig.get(0), filter);
+        TransferUtils.pushEnergyNearby(this, pos, getEnergyStorage().getCapacity(), sideConfig.get(0), filter,
+            neighborEntity -> !(neighborEntity instanceof SolarPanelBlockEntity));
     }
 
     @Override

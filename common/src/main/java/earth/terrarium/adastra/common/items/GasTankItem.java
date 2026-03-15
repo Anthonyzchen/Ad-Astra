@@ -63,7 +63,7 @@ public class GasTankItem extends Item {
     }
 
     public SimpleFluidStorage getFluidContainer(ItemStack holder) {
-        return new SimpleFluidStorage(1, tankSize * BUCKET / 1000L);
+        return FluidUtils.getItemFluidStorage(holder, 1, tankSize * BUCKET / 1000L);
     }
 
     @Override

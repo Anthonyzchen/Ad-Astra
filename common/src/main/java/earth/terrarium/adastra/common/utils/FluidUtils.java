@@ -1,17 +1,25 @@
 package earth.terrarium.adastra.common.utils;
 
 import com.teamresourceful.resourcefullib.common.registry.RegistryEntry;
+import earth.terrarium.adastra.common.items.GasTankItem;
+import earth.terrarium.adastra.common.items.ZipGunItem;
+import earth.terrarium.adastra.common.items.armor.SpaceSuitItem;
 import earth.terrarium.common_storage_lib.fluid.impl.SimpleFluidSlot;
 import earth.terrarium.common_storage_lib.fluid.impl.SimpleFluidStorage;
 import earth.terrarium.common_storage_lib.resources.fluid.FluidResource;
 import earth.terrarium.common_storage_lib.resources.fluid.ingredient.FluidIngredient;
 import earth.terrarium.common_storage_lib.storage.base.CommonStorage;
+import earth.terrarium.common_storage_lib.storage.base.StorageSlot;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 
@@ -41,7 +49,9 @@ public class FluidUtils {
 
     public static boolean hasFluid(ItemStack stack) {
         if (stack.isEmpty()) return false;
-        return getFluidFromBucket(stack.getItem()) != Fluids.EMPTY;
+        if (getFluidFromBucket(stack.getItem()) != Fluids.EMPTY) return true;
+        SimpleFluidStorage container = getItemFluidContainer(stack);
+        return container != null && !container.get(0).getResource().isBlank();
     }
 
     public static boolean hasFluid(ItemStack stack, int tank) {
@@ -50,9 +60,9 @@ public class FluidUtils {
 
     public static long getCapacity(ItemStack stack) {
         if (stack.isEmpty()) return 0;
-        if (stack.getItem() instanceof BucketItem) {
-            return 81000L;
-        }
+        if (stack.getItem() instanceof BucketItem) return 81000L;
+        SimpleFluidStorage container = getItemFluidContainer(stack);
+        if (container != null) return container.get(0).getLimit(container.get(0).getResource());
         return 0;
     }
 
@@ -60,8 +70,69 @@ public class FluidUtils {
         return getCapacity(stack);
     }
 
+    /**
+     * Creates an ItemStack filled with the given fluid to capacity.
+     */
     public static ItemStack fluidFilledItem(RegistryEntry<Item> item, RegistryEntry<Fluid> fluid) {
-        return ItemStack.EMPTY; // TODO: CSL migration
+        ItemStack stack = item.get().getDefaultInstance();
+        if (stack.isEmpty()) return ItemStack.EMPTY;
+        SimpleFluidStorage container = getItemFluidContainer(stack);
+        if (container == null) return ItemStack.EMPTY;
+        FluidResource resource = FluidResource.of(fluid.get());
+        container.get(0).insert(resource, container.get(0).getLimit(resource), false);
+        saveItemFluidStorage(stack, container);
+        return stack;
+    }
+
+    /**
+     * Gets an NBT-backed fluid storage for items that hold fluid (SpaceSuit, GasTank, etc.).
+     * Reads the current stored fluid from the stack's CustomData.
+     */
+    public static SimpleFluidStorage getItemFluidStorage(ItemStack stack, int slots, long capacity) {
+        CompoundTag tag = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
+        SimpleFluidStorage storage = new SimpleFluidStorage(slots, capacity);
+        if (tag.contains("FluidType") && tag.contains("FluidAmount")) {
+            String fluidId = tag.getString("FluidType");
+            long amount = tag.getLong("FluidAmount");
+            Fluid fluid = BuiltInRegistries.FLUID.get(ResourceLocation.parse(fluidId));
+            if (fluid != null && fluid != Fluids.EMPTY && amount > 0) {
+                storage.get(0).insert(FluidResource.of(fluid), Math.min(amount, capacity), false);
+            }
+        }
+        return storage;
+    }
+
+    /**
+     * Saves fluid storage state back to the ItemStack's CustomData NBT.
+     */
+    public static void saveItemFluidStorage(ItemStack stack, SimpleFluidStorage storage) {
+        CompoundTag tag = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
+        FluidResource resource = storage.get(0).getResource();
+        if (!resource.isBlank() && storage.get(0).getAmount() > 0) {
+            tag.putString("FluidType", BuiltInRegistries.FLUID.getKey(resource.getType()).toString());
+            tag.putLong("FluidAmount", storage.get(0).getAmount());
+        } else {
+            tag.remove("FluidType");
+            tag.remove("FluidAmount");
+        }
+        stack.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
+    }
+
+    /**
+     * Gets the fluid container for any item that holds fluid (SpaceSuit, JetSuit, GasTank).
+     * Returns null if the item doesn't hold fluid.
+     */
+    public static SimpleFluidStorage getItemFluidContainer(ItemStack stack) {
+        if (stack.isEmpty()) return null;
+        Item item = stack.getItem();
+        if (item instanceof SpaceSuitItem suit) {
+            return suit.getFluidContainer(stack);
+        } else if (item instanceof GasTankItem tank) {
+            return tank.getFluidContainer(stack);
+        } else if (item instanceof ZipGunItem zipGun) {
+            return zipGun.getFluidContainer(stack);
+        }
+        return null;
     }
 
     /**
@@ -107,31 +178,35 @@ public class FluidUtils {
      * the slot's existing FluidResource instance when the fluid type matches.
      */
     public static long insertFluidStorage(CommonStorage<FluidResource> storage, FluidResource resource, long amount, boolean simulate) {
-        if (storage instanceof SimpleFluidStorage sfs) {
-            // First pass: insert into slots that already contain the same fluid
-            long remaining = amount;
-            for (int i = 0; i < sfs.size(); i++) {
-                if (remaining <= 0) break;
-                SimpleFluidSlot slot = sfs.get(i);
-                FluidResource existing = slot.getResource();
-                if (!existing.isBlank() && isSameFluid(existing, resource)) {
-                    long inserted = slot.insert(existing, remaining, simulate);
-                    remaining -= inserted;
-                }
+        // Work with any CommonStorage by iterating slots and reusing existing FluidResource
+        // instances to work around CSL's FluidResource reference equality bug.
+        long remaining = amount;
+
+        // First pass: insert into slots that already contain the same fluid type
+        for (int i = 0; i < storage.size(); i++) {
+            if (remaining <= 0) break;
+            StorageSlot<FluidResource> slot = storage.get(i);
+            FluidResource existing = slot.getResource();
+            if (!existing.isBlank() && isSameFluid(existing, resource)) {
+                // Use the slot's own FluidResource instance to bypass reference equality
+                long inserted = slot.insert(existing, remaining, simulate);
+                remaining -= inserted;
             }
-            // Second pass: insert into empty slots
-            for (int i = 0; i < sfs.size(); i++) {
-                if (remaining <= 0) break;
-                SimpleFluidSlot slot = sfs.get(i);
-                if (slot.getResource().isBlank()) {
-                    long inserted = slot.insert(resource, remaining, simulate);
-                    remaining -= inserted;
-                }
-            }
-            return amount - remaining;
         }
-        // Fallback for non-SimpleFluidStorage
-        return storage.insert(resource, amount, simulate);
+
+        // Second pass: insert into empty slots
+        for (int i = 0; i < storage.size(); i++) {
+            if (remaining <= 0) break;
+            StorageSlot<FluidResource> slot = storage.get(i);
+            if (slot.getResource().isBlank()) {
+                // Test with simulate first to respect slot filters
+                if (slot.insert(resource, 1, true) <= 0) continue;
+                long inserted = slot.insert(resource, remaining, simulate);
+                remaining -= inserted;
+            }
+        }
+
+        return amount - remaining;
     }
 
     /**
@@ -165,16 +240,42 @@ public class FluidUtils {
     }
 
     /**
-     * Moves fluid from a fluid container to a bucket.
+     * Moves fluid from a fluid container to an item (bucket, space suit, gas tank, etc.).
      */
     public static void moveContainerToItem(Container container, Object fluidContainer, int slot, int resultSlot, int tank) {
         if (!(fluidContainer instanceof SimpleFluidStorage storage)) return;
         ItemStack stack = container.getItem(slot);
-        if (stack.isEmpty() || !stack.is(Items.BUCKET)) return;
+        if (stack.isEmpty()) return;
 
         SimpleFluidSlot fluidSlot = storage.get(tank);
         FluidResource resource = fluidSlot.getResource();
         if (resource.isBlank()) return;
+
+        // Handle non-bucket fluid items (space suit, jet suit, gas tank)
+        SimpleFluidStorage itemContainer = getItemFluidContainer(stack);
+        if (itemContainer != null) {
+            long transferAmount = Math.min(fluidSlot.getAmount(), 200 * 81L); // 200 mB per tick
+            long inserted = insertFluid(itemContainer.get(0), resource, transferAmount, true);
+            if (inserted > 0) {
+                insertFluid(itemContainer.get(0), resource, inserted, false);
+                fluidSlot.extract(resource, inserted, false);
+                saveItemFluidStorage(stack, itemContainer);
+            }
+            // When the item is full, move it to the result slot
+            long currentAmount = itemContainer.get(0).getAmount();
+            long capacity = itemContainer.get(0).getLimit(resource);
+            if (currentAmount >= capacity && resultSlot >= 0) {
+                ItemStack result = container.getItem(resultSlot);
+                if (result.isEmpty()) {
+                    container.setItem(resultSlot, stack.copy());
+                    container.setItem(slot, ItemStack.EMPTY);
+                }
+            }
+            return;
+        }
+
+        // Handle buckets
+        if (!stack.is(Items.BUCKET)) return;
         if (fluidSlot.getAmount() < 81000L) return;
 
         ItemStack result = container.getItem(resultSlot);

@@ -125,7 +125,7 @@ public class ZipGunItem extends Item {
     }
 
     public SimpleFluidStorage getFluidContainer(ItemStack holder) {
-        return new SimpleFluidStorage(1, getCapacity());
+        return FluidUtils.getItemFluidStorage(holder, 1, getCapacity());
     }
 
     public long getCapacity() {
@@ -134,10 +134,10 @@ public class ZipGunItem extends Item {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @NotNull Item.TooltipContext context, List<Component> tooltipComponents, @NotNull TooltipFlag isAdvanced) {
-        tooltipComponents.add(TooltipUtils.getFluidComponent(
-            FluidUtils.getTank(stack),
-            FluidUtils.getCapacity(stack),
-            ModFluids.OXYGEN.get()));
+        var fluidContainer = getFluidContainer(stack);
+        long amount = fluidContainer.get(0).getAmount();
+        long capacity = fluidContainer.get(0).getLimit(fluidContainer.get(0).getResource());
+        tooltipComponents.add(TooltipUtils.getFluidComponent(amount, capacity, ModFluids.OXYGEN.get()));
         TooltipUtils.addDescriptionComponent(tooltipComponents, ConstantComponents.ZIP_GUN_INFO);
     }
 

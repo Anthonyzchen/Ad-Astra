@@ -47,11 +47,14 @@ public class PlanetsMenuProvider implements ContentMenuProvider<PlanetsMenuConte
         }
 
         Map<ResourceKey<Level>, Map<UUID, Set<SpaceStation>>> spaceStationsMap = new HashMap<>();
-        AdAstraData.planets().keySet().forEach(dimension -> {
-            ServerLevel targetLevel = player.server.getLevel(dimension);
-            if (targetLevel == null) throw new IllegalStateException("Dimension " + dimension + " does not exist.");
-            var stations = SpaceStationHandler.getAllSpaceStations(targetLevel);
-            spaceStationsMap.put(dimension, stations);
+        AdAstraData.planets().values().forEach(planet -> {
+            // Space stations are stored in the orbit dimension, not the planet dimension
+            ResourceKey<Level> orbitDimension = planet.orbitIfPresent();
+            ServerLevel orbitLevel = player.server.getLevel(orbitDimension);
+            if (orbitLevel != null) {
+                var stations = SpaceStationHandler.getAllSpaceStations(orbitLevel);
+                spaceStationsMap.put(orbitDimension, stations);
+            }
         });
 
         List<GlobalPos> locations = new ArrayList<>();

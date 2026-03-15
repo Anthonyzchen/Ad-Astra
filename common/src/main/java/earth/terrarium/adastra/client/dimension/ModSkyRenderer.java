@@ -94,14 +94,11 @@ public class ModSkyRenderer {
     }
 
     public void renderSky(ClientLevel level, float partialTick, PoseStack poseStack, Matrix4f projectionMatrix) {
-        FogRenderer.levelFogColor();
-        ShaderInstance shader = RenderSystem.getShader();
-        if (shader == null) return;
-
-        var skyBuffer = ((LevelRendererAccessor) Minecraft.getInstance().levelRenderer).getSkyBuffer();
-        skyBuffer.bind();
-        skyBuffer.drawWithShader(poseStack.last().pose(), projectionMatrix, shader);
-        VertexBuffer.unbind();
+        // Skip the vanilla sky dome entirely for custom sky dimensions.
+        // The vanilla sky dome includes atmospheric gradients and a dark bottom plate
+        // that conflict with the custom star/planet rendering (causes bright wedge
+        // artifacts on the moon and black patches in orbit).
+        // The custom renderer handles everything: stars, planets, sunrise.
         RenderSystem.enableBlend();
 
         float[] color = ModDimensionSpecialEffects.getSunriseColor(level.getTimeOfDay(partialTick), partialTick, renderer.sunriseColor());

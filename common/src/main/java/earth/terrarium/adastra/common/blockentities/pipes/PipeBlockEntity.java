@@ -12,13 +12,13 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.IdentityHashMap;
+import java.util.HashMap;
 import java.util.Map;
 
 public abstract class PipeBlockEntity extends BlockEntity implements TickableBlockEntity, Pipe {
 
-    protected final Map<BlockPos, Direction> sources = new IdentityHashMap<>();
-    protected final Map<BlockPos, Direction> consumers = new IdentityHashMap<>();
+    protected final Map<BlockPos, Direction> sources = new HashMap<>();
+    protected final Map<BlockPos, Direction> consumers = new HashMap<>();
     private final long transferRate;
 
     @Nullable
@@ -34,7 +34,6 @@ public abstract class PipeBlockEntity extends BlockEntity implements TickableBlo
 
     @Override
     public void serverTick(ServerLevel level, long time, BlockState state, BlockPos pos) {
-        // Only run if it's a controller i.e. at least one side is connected to something
         if (isController) {
             if (time % MachineConfig.pipeRefreshRate == 0) {
                 sources.clear();

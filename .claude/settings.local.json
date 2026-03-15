@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./gradlew tasks:*)",
+      "Bash(./gradlew fabric:runClient 2>&1)",
+      "Bash(./gradlew fabric:classes 2>&1 | tail -30)",
+      "Bash(./gradlew fabric:classes 2>&1 | tail -15)",
+      "Bash(find:*)",
+      "Bash(unzip:*)",
+      "Bash(./gradlew fabric:classes 2>&1 | tail -10)",
+      "Bash(./gradlew fabric:classes 2>&1 | tail -5)",
+      "mcp__google-calendar__gcal_create_event",
+      "Bash(grep:*)",
+      "Bash(git log:*)",
+      "Bash(./gradlew fabric:classes 2>&1 | tail -3)",
+      "Bash(./gradlew fabric:classes 2>&1 | grep -i \"error\" | head -10)",
+      "mcp__google-calendar__gcal_update_event"
+    ]
+  }
+}
