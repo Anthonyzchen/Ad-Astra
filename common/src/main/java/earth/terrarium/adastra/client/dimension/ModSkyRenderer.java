@@ -10,6 +10,7 @@ import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.FogRenderer;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;
@@ -37,6 +38,11 @@ public class ModSkyRenderer {
         if (isFoggy || inFog(camera)) return;
         if (!renderer.renderInRain() && level.isRaining()) return;
         if (starBuffer == null) createStars();
+
+        // Apply camera rotation so sky elements rotate with the player's view
+        poseStack.pushPose();
+        poseStack.mulPose(Axis.XP.rotationDegrees(camera.getXRot()));
+        poseStack.mulPose(Axis.YP.rotationDegrees(camera.getYRot() + 180.0f));
 
         setSkyColor(level, camera, partialTick);
 
@@ -73,7 +79,8 @@ public class ModSkyRenderer {
         RenderSystem.setShaderColor(1, 1, 1, 1);
         RenderSystem.disableBlend();
         RenderSystem.defaultBlendFunc();
-        poseStack.popPose();
+        poseStack.popPose(); // pop from renderables
+        poseStack.popPose(); // pop camera rotation
         RenderSystem.depthMask(true);
     }
 
@@ -94,11 +101,19 @@ public class ModSkyRenderer {
     }
 
     public void renderSky(ClientLevel level, float partialTick, PoseStack poseStack, Matrix4f projectionMatrix) {
-        // Skip the vanilla sky dome entirely for custom sky dimensions.
-        // The vanilla sky dome includes atmospheric gradients and a dark bottom plate
-        // that conflict with the custom star/planet rendering (causes bright wedge
-        // artifacts on the moon and black patches in orbit).
-        // The custom renderer handles everything: stars, planets, sunrise.
+        // Render the vanilla sky dome only for dimensions with atmosphere (fog).
+        // Space/orbit dimensions (no fog) skip this to avoid the dark bottom plate
+        // that hides stars below the horizon.
+        if (renderer.hasFog()) {
+            FogRenderer.levelFogColor();
+            ShaderInstance shader = RenderSystem.getShader();
+            if (shader != null) {
+                var skyBuffer = ((LevelRendererAccessor) Minecraft.getInstance().levelRenderer).getSkyBuffer();
+                skyBuffer.bind();
+                skyBuffer.drawWithShader(poseStack.last().pose(), projectionMatrix, shader);
+                VertexBuffer.unbind();
+            }
+        }
         RenderSystem.enableBlend();
 
         float[] color = ModDimensionSpecialEffects.getSunriseColor(level.getTimeOfDay(partialTick), partialTick, renderer.sunriseColor());
@@ -153,6 +168,7 @@ public class ModSkyRenderer {
         poseStack.translate(0, -100, 0);
 
         var matrix = poseStack.last().pose();
+        RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderTexture(0, texture);
         BufferBuilder bufferBuilder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
         bufferBuilder.addVertex(matrix, -scale, 100, -scale).setUv(1, 0);
