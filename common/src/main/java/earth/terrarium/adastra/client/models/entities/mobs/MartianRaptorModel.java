@@ -1,7 +1,5 @@
 package earth.terrarium.adastra.client.models.entities.mobs;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import earth.terrarium.adastra.AdAstra;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
@@ -22,6 +20,7 @@ public class MartianRaptorModel extends EntityModel<LivingEntityRenderState> {
     private final ModelPart right_leg;
 
     public MartianRaptorModel(ModelPart root) {
+        super(root);
         this.body = root.getChild("body");
         this.left_leg = root.getChild("left_leg");
         this.right_leg = root.getChild("right_leg");
@@ -91,10 +90,4 @@ public class MartianRaptorModel extends EntityModel<LivingEntityRenderState> {
         this.body.getChild("head").xRot = headPitch / (180f / (float) Math.PI);
     }
 
-    @Override
-    public void renderToBuffer(PoseStack poseStack, VertexConsumer vertices, int packedLight, int packedOverlay, int color) {
-        body.render(poseStack, vertices, packedLight, packedOverlay, color);
-        left_leg.render(poseStack, vertices, packedLight, packedOverlay, color);
-        right_leg.render(poseStack, vertices, packedLight, packedOverlay, color);
-    }
 }

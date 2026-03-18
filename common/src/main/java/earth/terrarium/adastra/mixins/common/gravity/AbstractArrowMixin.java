@@ -18,7 +18,7 @@ public abstract class AbstractArrowMixin extends Entity {
         super(entityType, level);
     }
 
-    @Inject(method = "method_5773", at = @At("TAIL"))
+    @Inject(method = "tick", at = @At("TAIL"))
     public void adastra$tick(CallbackInfo ci) {
         double gravity = 0.05 * GravityApi.API.getGravity(this);
         Vec3 velocity = this.getDeltaMovement();

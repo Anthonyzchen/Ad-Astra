@@ -1,7 +1,5 @@
 package earth.terrarium.adastra.client.models.entities.mobs;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import earth.terrarium.adastra.AdAstra;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
@@ -24,6 +22,7 @@ public class StarCrawlerModel extends EntityModel<LivingEntityRenderState> {
     private final ModelPart leg4;
 
     public StarCrawlerModel(ModelPart root) {
+        super(root);
         this.body = root.getChild("body");
         this.leg1 = root.getChild("leg1");
         this.leg2 = root.getChild("leg2");
@@ -107,6 +106,7 @@ public class StarCrawlerModel extends EntityModel<LivingEntityRenderState> {
 
     @Override
     public void setupAnim(LivingEntityRenderState state) {
+        super.setupAnim(state);
         float limbAngle = state.walkAnimationPos;
         float limbDistance = state.walkAnimationSpeed;
 
@@ -114,14 +114,5 @@ public class StarCrawlerModel extends EntityModel<LivingEntityRenderState> {
         this.leg2.yRot = Mth.cos(limbAngle * 0.6662f) * limbDistance;
         this.leg3.yRot = Mth.cos(limbAngle * 0.6662f) * limbDistance;
         this.leg4.yRot = Mth.cos(limbAngle * 0.6662f) * limbDistance;
-    }
-
-    @Override
-    public void renderToBuffer(PoseStack poseStack, VertexConsumer vertices, int packedLight, int packedOverlay, int color) {
-        body.render(poseStack, vertices, packedLight, packedOverlay, color);
-        leg1.render(poseStack, vertices, packedLight, packedOverlay, color);
-        leg2.render(poseStack, vertices, packedLight, packedOverlay, color);
-        leg3.render(poseStack, vertices, packedLight, packedOverlay, color);
-        leg4.render(poseStack, vertices, packedLight, packedOverlay, color);
     }
 }

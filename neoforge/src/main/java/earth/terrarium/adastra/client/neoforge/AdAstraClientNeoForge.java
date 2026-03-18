@@ -2,22 +2,21 @@ package earth.terrarium.adastra.client.neoforge;
 
 import earth.terrarium.adastra.client.AdAstraClient;
 import earth.terrarium.adastra.common.entities.vehicles.Vehicle;
+import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.item.Item;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.*;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.TickEvent;
 
 import java.util.HashMap;
 import java.util.Map;
 
-// TODO: 1.21.11 - NeoForge annotation may have changed to @EventBusSubscriber(value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
-@Mod.EventBusSubscriber(value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(value = Dist.CLIENT)
 public class AdAstraClientNeoForge {
 
     public static final Map<Item, AdAstraClient.CustomItemRenderer> ITEM_RENDERERS = new HashMap<>();
@@ -48,48 +47,37 @@ public class AdAstraClientNeoForge {
     }
 
     @SubscribeEvent
-    public static void modelLoading(ModelEvent.RegisterAdditional event) {
-        AdAstraClient.onRegisterModels(event::register);
-    }
-
-    @SubscribeEvent
     public static void onRegisterLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
         AdAstraClient.onRegisterEntityLayers(event::registerLayerDefinition);
     }
 
     @SubscribeEvent
-    public static void onClientReloadListeners(RegisterClientReloadListenersEvent event) {
-        AdAstraClient.onAddReloadListener((id, listener) -> event.registerReloadListener(listener));
+    public static void onClientReloadListeners(AddClientReloadListenersEvent event) {
+        AdAstraClient.onAddReloadListener((id, listener) -> event.addListener(id, listener));
     }
 
-    // TODO: 1.21.11 - NeoForge may have changed TickEvent.ClientTickEvent. In newer NeoForge,
-    // it may be split into ClientTickEvent.Pre and ClientTickEvent.Post instead of using Phase.
-    private static void onClientTick(TickEvent.ClientTickEvent event) {
-        if (event.phase.equals(TickEvent.Phase.START)) {
-            AdAstraClient.clientTick(Minecraft.getInstance());
-        }
+    private static void onClientTick(ClientTickEvent.Pre event) {
+        AdAstraClient.clientTick(Minecraft.getInstance());
     }
 
-    // TODO: 1.21.11 - RenderLevelStageEvent may have changed. Verify Stage.AFTER_PARTICLES still exists.
-    private static void onRenderLevelStage(RenderLevelStageEvent event) {
-        if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_PARTICLES) {
-            AdAstraClient.renderOverlays(event.getPoseStack(), event.getCamera());
-        }
+    private static void onRenderLevelStage(RenderLevelStageEvent.AfterParticles event) {
+        Camera camera = Minecraft.getInstance().gameRenderer.getMainCamera();
+        AdAstraClient.renderOverlays(event.getPoseStack(), camera);
     }
 
     private static void onRegisterClientHud(RenderGuiEvent.Post event) {
-        AdAstraClient.onRegisterHud(hud -> hud.renderHud(event.getGuiGraphics(), event.getPartialTick()));
+        AdAstraClient.onRegisterHud(hud -> hud.renderHud(event.getGuiGraphics(), event.getPartialTick().getGameTimeDeltaPartialTick(true)));
     }
 
-    private static void onSetupItemColors(RegisterColorHandlersEvent.Item event) {
+    private static void onSetupItemColors(RegisterColorHandlersEvent.ItemTintSources event) {
         // TODO: 1.21.11 - Item color registration has changed. The old ItemColor interface is gone.
         // NeoForge RegisterColorHandlersEvent.Item may use a different API now.
         // AdAstraClient.onAddItemColors(event::register);
     }
 
     private static void onCalculateCameraDistance(CalculateDetachedCameraDistanceEvent event) {
-        if (event.getDistance() < 12.0 && event.getCamera().getEntity().getVehicle() instanceof Vehicle vehicle && vehicle.zoomOutCameraInThirdPerson()) {
-            event.setDistance(12.0);
+        if (event.getDistance() < 12.0f && event.getCamera().entity().getVehicle() instanceof Vehicle vehicle && vehicle.zoomOutCameraInThirdPerson()) {
+            event.setDistance(12.0f);
         }
     }
 }

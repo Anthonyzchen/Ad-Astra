@@ -4,6 +4,8 @@
     "package": "earth.terrarium.adastra.mixins",
     "compatibilityLevel": "JAVA_21",
     "mixins": [
+        "common.BlockBehaviourPropertiesMixin",
+        "common.ItemPropertiesMixin",
         "common.EntityBelowWorldMixin",
         "common.LivingEntityAccessor",
         "common.LivingEntityMixin",

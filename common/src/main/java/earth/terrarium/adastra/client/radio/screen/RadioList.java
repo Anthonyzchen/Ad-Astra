@@ -15,6 +15,7 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.NotNull;
@@ -124,7 +125,9 @@ public class RadioList extends AbstractWidget {
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(net.minecraft.client.input.MouseButtonEvent event, boolean bl) {
+        double mouseX = event.x();
+        double mouseY = event.y();
         if (!isMouseOver(mouseX, mouseY)) return false;
 
         int scrollOffset = (int) scrollAmount;
@@ -135,7 +138,7 @@ public class RadioList extends AbstractWidget {
             if (mouseY >= entryTop && mouseY < entryTop + itemHeight) {
                 double relX = relativeClicks ? mouseX - getX() : mouseX;
                 double relY = relativeClicks ? mouseY - entryTop : mouseY;
-                if (entry.mouseClicked(relX, relY, button)) {
+                if (entry.mouseClicked(relX, relY, event.button())) {
                     return true;
                 }
                 selected = entry;
@@ -174,20 +177,18 @@ public class RadioList extends AbstractWidget {
 
         protected void render(@NotNull GuiGraphics graphics, int id, int left, int top, int width, int height, int mouseX, int mouseY, boolean hovered, float partialTick, boolean selected) {
             int v = selected ? 66 : hovered ? 42 : 54;
-            graphics.blit(TEXTURE, left + 1, top, 253, v, 89, 12, 512, 256);
+            graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, left + 1, top, 253, v, 89, 12, 512, 256);
             int textStart = left + 3;
             if ((favorite || hovered) && this.info != null) {
                 String text = favorite ? "\u2605" : "\u2606";
-                textStart = graphics.drawString(Minecraft.getInstance().font, text, textStart, top + 3, favorite ? 0xFFAA00 : 0xFFFFFF) + 2;
+                graphics.drawString(Minecraft.getInstance().font, text, textStart, top + 3, favorite ? 0xFFAA00 : 0xFFFFFF);
+                textStart += Minecraft.getInstance().font.width(text) + 2;
             }
             graphics.drawString(Minecraft.getInstance().font, getName(), textStart, top + 3, 0xFFFFFF);
 
             if (hovered) {
                 if (info != null) {
-                    var screen = Minecraft.getInstance().screen;
-                    if (screen != null) {
-                        screen.setTooltipForNextRenderPass(Component.literal(info.name()));
-                    }
+                    graphics.setTooltipForNextFrame(Component.literal(info.name()), mouseX + left, mouseY + top);
                 }
                 CursorScreen.Cursor.POINTER.apply(graphics);
             }

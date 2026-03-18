@@ -9,24 +9,22 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
-import net.minecraft.data.tags.TagsProvider;
+import net.minecraft.data.tags.IntrinsicHolderTagsProvider;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagEntry;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
 @SuppressWarnings("deprecation")
-public class ModItemTagProvider extends TagsProvider<Item> {
+public class ModItemTagProvider extends IntrinsicHolderTagsProvider<Item> {
 
-    public ModItemTagProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> completableFuture, ExistingFileHelper existingFileHelper) {
-        super(output, Registries.ITEM, completableFuture, AdAstra.MOD_ID, existingFileHelper);
+    public ModItemTagProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> completableFuture) {
+        super(output, Registries.ITEM, completableFuture, item -> BuiltInRegistries.ITEM.getResourceKey(item).orElseThrow(), AdAstra.MOD_ID);
     }
 
     @Override
@@ -40,22 +38,22 @@ public class ModItemTagProvider extends TagsProvider<Item> {
         add(ModItemTags.SPACE_SUITS, ModItems.SPACE_SUIT.get());
         add(ModItemTags.SPACE_SUITS, ModItems.SPACE_PANTS.get());
         add(ModItemTags.SPACE_SUITS, ModItems.SPACE_BOOTS.get());
-        tag(ModItemTags.SPACE_SUITS).add(TagEntry.tag(ModItemTags.NETHERITE_SPACE_SUITS.identifier()));
-        tag(ModItemTags.SPACE_SUITS).add(TagEntry.tag(ModItemTags.JET_SUITS.identifier()));
+        tag(ModItemTags.SPACE_SUITS).add(TagEntry.tag(ModItemTags.NETHERITE_SPACE_SUITS.location()));
+        tag(ModItemTags.SPACE_SUITS).add(TagEntry.tag(ModItemTags.JET_SUITS.location()));
 
         add(ModItemTags.NETHERITE_SPACE_SUITS, ModItems.NETHERITE_SPACE_HELMET.get());
         add(ModItemTags.NETHERITE_SPACE_SUITS, ModItems.NETHERITE_SPACE_SUIT.get());
         add(ModItemTags.NETHERITE_SPACE_SUITS, ModItems.NETHERITE_SPACE_PANTS.get());
         add(ModItemTags.NETHERITE_SPACE_SUITS, ModItems.NETHERITE_SPACE_BOOTS.get());
-        tag(ModItemTags.NETHERITE_SPACE_SUITS).add(TagEntry.tag(ModItemTags.JET_SUITS.identifier()));
+        tag(ModItemTags.NETHERITE_SPACE_SUITS).add(TagEntry.tag(ModItemTags.JET_SUITS.location()));
 
         add(ModItemTags.JET_SUITS, ModItems.JET_SUIT_HELMET.get());
         add(ModItemTags.JET_SUITS, ModItems.JET_SUIT.get());
         add(ModItemTags.JET_SUITS, ModItems.JET_SUIT_PANTS.get());
         add(ModItemTags.JET_SUITS, ModItems.JET_SUIT_BOOTS.get());
 
-        tag(ModItemTags.FREEZE_RESISTANT_ARMOR).add(TagEntry.tag(ModItemTags.SPACE_SUITS.identifier()));
-        tag(ModItemTags.HEAT_RESISTANT_ARMOR).add(TagEntry.tag(ModItemTags.NETHERITE_SPACE_SUITS.identifier()));
+        tag(ModItemTags.FREEZE_RESISTANT_ARMOR).add(TagEntry.tag(ModItemTags.SPACE_SUITS.location()));
+        tag(ModItemTags.HEAT_RESISTANT_ARMOR).add(TagEntry.tag(ModItemTags.NETHERITE_SPACE_SUITS.location()));
 
         add(ModItemTags.HELD_OVER_HEAD, ModItems.LAUNCH_PAD.get());
 
@@ -250,20 +248,20 @@ public class ModItemTagProvider extends TagsProvider<Item> {
     }
 
     private void addFabricTag(Item item, TagKey<Item> tag, String fabricCommonTag) {
-        tag(tag).add(TagEntry.optionalTag(new Identifier("c", fabricCommonTag)));
+        tag(tag).add(TagEntry.optionalTag(Identifier.fromNamespaceAndPath("c", fabricCommonTag)));
 
-        var commonTag = TagKey.create(Registries.ITEM, new Identifier("c", fabricCommonTag));
+        var commonTag = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", fabricCommonTag));
         tag(commonTag).add(element(item));
     }
 
     private void addForgeTag(Item item, TagKey<Item> tag, String forgeCommonTag) {
-        tag(tag).add(TagEntry.optionalTag(new Identifier("forge", forgeCommonTag)));
+        tag(tag).add(TagEntry.optionalTag(Identifier.fromNamespaceAndPath("forge", forgeCommonTag)));
 
-        var commonTag = TagKey.create(Registries.ITEM, new Identifier("forge", forgeCommonTag));
+        var commonTag = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("forge", forgeCommonTag));
         tag(commonTag).add(element(item));
 
-        var folderTag = TagKey.create(Registries.ITEM, new Identifier("forge", forgeCommonTag.split("/")[0]));
-        tag(folderTag).add(TagEntry.tag(commonTag.identifier()));
+        var folderTag = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("forge", forgeCommonTag.split("/")[0]));
+        tag(folderTag).add(TagEntry.tag(commonTag.location()));
     }
 
     private static TagEntry element(Item item) {

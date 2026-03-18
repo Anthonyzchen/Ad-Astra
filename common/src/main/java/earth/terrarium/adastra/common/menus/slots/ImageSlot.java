@@ -1,9 +1,7 @@
 package earth.terrarium.adastra.common.menus.slots;
 
-import com.mojang.datafixers.util.Pair;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.Container;
-import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.inventory.Slot;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,12 +15,7 @@ public class ImageSlot extends Slot {
     }
 
     @Override
-    public Pair<Identifier, Identifier> getNoItemIcon() {
-        return Pair.of(InventoryMenu.BLOCK_ATLAS, icon);
-    }
-
-    @Nullable
-    public Identifier getSlotTexture() {
-        return null;
+    public @Nullable Identifier getNoItemIcon() {
+        return icon;
     }
 }

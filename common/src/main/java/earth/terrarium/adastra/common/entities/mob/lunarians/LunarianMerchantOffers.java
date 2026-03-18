@@ -15,6 +15,8 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.npc.villager.VillagerProfession;
 import net.minecraft.world.entity.npc.villager.VillagerTrades.ItemListing;
@@ -39,8 +41,8 @@ import java.util.Optional;
 // LEGACY ENTITY. WILL BE REPLACED IN THE FUTURE.
 public class LunarianMerchantOffers {
 
-    public static final Map<VillagerProfession, Int2ObjectMap<ItemListing[]>> PROFESSION_TO_LEVELED_TRADE = Util.make(Maps.newHashMap(), map -> {
-        map.put(VillagerProfession.FARMER, copyToFastUtilMap(Map.of(1, new ItemListing[]{new BuyForOneEmeraldFactory(ModItems.CHEESE.get(), 20, 20, 5), new BuyForOneEmeraldFactory(Items.GLOW_BERRIES, 22, 16, 3), new SellItemFactory(Items.BREAD, 1, 6, 16, 1)}, 2, new ItemListing[]{new SellItemFactory(Items.PUMPKIN_PIE, 1, 4, 5), new SellItemFactory(Items.GOLDEN_APPLE, 8, 1, 8, 20)}, 3, new ItemListing[]{new SellItemFactory(Items.COOKIE, 3, 18, 10), new BuyForOneEmeraldFactory(Blocks.MELON, 4, 12, 20)}, 4, new ItemListing[]{new SellItemFactory(Blocks.CAKE, 1, 1, 12, 15), new BuyForOneEmeraldFactory(Items.DIRT, 63, 16, 2), new SellSuspiciousStewFactory(MobEffects.NIGHT_VISION, 100, 15), new SellSuspiciousStewFactory(MobEffects.JUMP, 160, 15), new SellSuspiciousStewFactory(MobEffects.WEAKNESS, 140, 15), new SellSuspiciousStewFactory(MobEffects.BLINDNESS, 120, 15), new SellSuspiciousStewFactory(MobEffects.POISON, 280, 15), new SellSuspiciousStewFactory(MobEffects.SATURATION, 7, 15)},
+    public static final Map<ResourceKey<VillagerProfession>, Int2ObjectMap<ItemListing[]>> PROFESSION_TO_LEVELED_TRADE = Util.make(Maps.newHashMap(), map -> {
+        map.put(VillagerProfession.FARMER, copyToFastUtilMap(Map.of(1, new ItemListing[]{new BuyForOneEmeraldFactory(ModItems.CHEESE.get(), 20, 20, 5), new BuyForOneEmeraldFactory(Items.GLOW_BERRIES, 22, 16, 3), new SellItemFactory(Items.BREAD, 1, 6, 16, 1)}, 2, new ItemListing[]{new SellItemFactory(Items.PUMPKIN_PIE, 1, 4, 5), new SellItemFactory(Items.GOLDEN_APPLE, 8, 1, 8, 20)}, 3, new ItemListing[]{new SellItemFactory(Items.COOKIE, 3, 18, 10), new BuyForOneEmeraldFactory(Blocks.MELON, 4, 12, 20)}, 4, new ItemListing[]{new SellItemFactory(Blocks.CAKE, 1, 1, 12, 15), new BuyForOneEmeraldFactory(Items.DIRT, 63, 16, 2), new SellSuspiciousStewFactory(MobEffects.NIGHT_VISION, 100, 15), new SellSuspiciousStewFactory(MobEffects.JUMP_BOOST, 160, 15), new SellSuspiciousStewFactory(MobEffects.WEAKNESS, 140, 15), new SellSuspiciousStewFactory(MobEffects.BLINDNESS, 120, 15), new SellSuspiciousStewFactory(MobEffects.POISON, 280, 15), new SellSuspiciousStewFactory(MobEffects.SATURATION, 7, 15)},
             5, new ItemListing[]{new SellItemFactory(Items.GOLDEN_CARROT, 3, 3, 30), new SellItemFactory(Items.GLISTERING_MELON_SLICE, 4, 3, 30)})));
         map.put(VillagerProfession.FISHERMAN, copyToFastUtilMap(Map.of(1, new ItemListing[]{new BuyForOneEmeraldFactory(ModItems.CHEESE.get(), 20, 20, 5), new BuyForOneEmeraldFactory(Items.STRING, 20, 16, 2), new BuyForOneEmeraldFactory(Items.COAL, 10, 16, 2), new ProcessItemFactory(Items.COD, 6, Items.COOKED_COD, 6, 16, 1),}, 2, new ItemListing[]{new BuyForOneEmeraldFactory(Items.COD, 15, 16, 10), new ProcessItemFactory(Items.SALMON, 6, Items.COOKED_SALMON, 6, 16, 5), new SellItemFactory(Items.SOUL_CAMPFIRE, 2, 1, 5)}, 3, new ItemListing[]{new BuyForOneEmeraldFactory(Items.SALMON, 13, 16, 20), new SellEnchantedToolFactory(Items.FISHING_ROD, 3, 3, 10, 0.2f)}, 4, new ItemListing[]{new BuyForOneEmeraldFactory(Items.TROPICAL_FISH, 6, 12, 30)}, 5, new ItemListing[]{new BuyForOneEmeraldFactory(Items.PUFFERFISH, 4, 12, 30), new SellItemFactory(new ItemStack(Items.WATER_BUCKET), 8, 1, 2, 9, 0.2f), new SellItemFactory(new ItemStack(Items.ICE), 4, 1, 8, 9, 0.2f)})));
         map.put(VillagerProfession.SHEPHERD,
@@ -101,7 +103,7 @@ public class LunarianMerchantOffers {
         }
 
         @Override
-        public MerchantOffer getOffer(Entity entity, RandomSource random) {
+        public MerchantOffer getOffer(ServerLevel level, Entity entity, RandomSource random) {
             return new MerchantOffer(new ItemCost(this.buy, this.price), new ItemStack(Items.EMERALD), this.maxUses, this.experience, this.multiplier);
         }
     }
@@ -141,7 +143,7 @@ public class LunarianMerchantOffers {
         }
 
         @Override
-        public MerchantOffer getOffer(Entity entity, RandomSource random) {
+        public MerchantOffer getOffer(ServerLevel level, Entity entity, RandomSource random) {
             ItemStack stack = this.sell.copyWithCount(this.count);
             return new MerchantOffer(new ItemCost(Items.EMERALD, this.price), stack, this.maxUses, this.experience, this.multiplier);
         }
@@ -163,7 +165,7 @@ public class LunarianMerchantOffers {
 
         @Override
         @Nullable
-        public MerchantOffer getOffer(Entity entity, RandomSource random) {
+        public MerchantOffer getOffer(ServerLevel level, Entity entity, RandomSource random) {
             ItemStack itemStack = new ItemStack(Items.SUSPICIOUS_STEW, 1);
             SuspiciousStewEffects effects = new SuspiciousStewEffects(
                 List.of(new SuspiciousStewEffects.Entry(this.effect, this.duration))
@@ -201,7 +203,7 @@ public class LunarianMerchantOffers {
 
         @Override
         @Nullable
-        public MerchantOffer getOffer(Entity entity, RandomSource random) {
+        public MerchantOffer getOffer(ServerLevel level, Entity entity, RandomSource random) {
             return new MerchantOffer(new ItemCost(Items.EMERALD, this.price), Optional.of(new ItemCost(this.secondBuy.getItem(), this.secondCount)), new ItemStack(this.sell.getItem(), this.sellCount), this.maxUses, this.experience, this.multiplier);
         }
     }
@@ -227,7 +229,7 @@ public class LunarianMerchantOffers {
         }
 
         @Override
-        public MerchantOffer getOffer(Entity entity, RandomSource random) {
+        public MerchantOffer getOffer(ServerLevel level, Entity entity, RandomSource random) {
             int i = 5 + random.nextInt(15);
             ItemStack itemStack = EnchantmentHelper.enchantItem(random, new ItemStack(this.tool.getItem()), i, entity.level().registryAccess(), Optional.empty());
             int j = Math.min(this.basePrice + i, 64);
@@ -258,10 +260,11 @@ public class LunarianMerchantOffers {
         }
 
         @Override
-        public MerchantOffer getOffer(Entity entity, RandomSource random) {
-            List<Holder<Potion>> list = BuiltInRegistries.POTION.holders()
-                .filter(potion -> !potion.value().getEffects().isEmpty())
-                .<Holder<Potion>>map(ref -> ref)
+        public MerchantOffer getOffer(ServerLevel level, Entity entity, RandomSource random) {
+            var potionRegistry = entity.level().registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.POTION);
+            List<Holder<Potion>> list = potionRegistry.stream()
+                .filter(potion -> !potion.getEffects().isEmpty())
+                .map(potion -> potionRegistry.wrapAsHolder(potion))
                 .toList();
             if (list.isEmpty()) return null;
             Holder<Potion> potion = list.get(random.nextInt(list.size()));
@@ -280,17 +283,20 @@ public class LunarianMerchantOffers {
         }
 
         @Override
-        public MerchantOffer getOffer(Entity entity, RandomSource random) {
-            // In 1.21.1, enchantments are data-driven; use registryAccess to look them up
-            var registry = entity.level().registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.ENCHANTMENT);
-            List<Holder.Reference<net.minecraft.world.item.enchantment.Enchantment>> list = registry.holders()
-                .filter(e -> e.value().getMaxLevel() > 0)
+        public MerchantOffer getOffer(ServerLevel level, Entity entity, RandomSource random) {
+            var registry = entity.level().registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.ENCHANTMENT);
+            List<Holder<net.minecraft.world.item.enchantment.Enchantment>> list = registry.stream()
+                .filter(e -> e.getMaxLevel() > 0)
+                .map(e -> registry.wrapAsHolder(e))
                 .toList();
             if (list.isEmpty()) return null;
             var enchantmentHolder = list.get(random.nextInt(list.size()));
             var enchantment = enchantmentHolder.value();
             int i = Mth.nextInt(random, enchantment.getMinLevel(), enchantment.getMaxLevel());
-            ItemStack itemStack = EnchantedBookItem.createForEnchantment(new net.minecraft.world.item.enchantment.EnchantmentInstance(enchantmentHolder, i));
+            ItemStack itemStack = new ItemStack(Items.ENCHANTED_BOOK);
+            var enchantments = new net.minecraft.world.item.enchantment.ItemEnchantments.Mutable(net.minecraft.world.item.enchantment.ItemEnchantments.EMPTY);
+            enchantments.set(enchantmentHolder, i);
+            itemStack.set(DataComponents.STORED_ENCHANTMENTS, enchantments.toImmutable());
             int j = 2 + random.nextInt(5 + i * 10) + 3 * i;
             if (j > 64) {
                 j = 64;
@@ -323,7 +329,7 @@ public class LunarianMerchantOffers {
         }
 
         @Override
-        public MerchantOffer getOffer(Entity entity, RandomSource random) {
+        public MerchantOffer getOffer(ServerLevel level, Entity entity, RandomSource random) {
             ItemStack itemStack2 = new ItemStack(this.sell);
             // In 1.21.11, ArmorItem no longer exists. Check if the item supports dyeing via DYEABLE repair tag
             {

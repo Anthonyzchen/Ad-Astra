@@ -1,6 +1,5 @@
 package earth.terrarium.adastra.client.models.armor;
 
-import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.architectury.injectables.targets.ArchitecturyTarget;
@@ -50,7 +49,7 @@ public class SpaceSuitModel extends HumanoidModel<HumanoidRenderState> {
     private float r, g, b;
 
     public SpaceSuitModel(ModelPart root, EquipmentSlot slot, ItemStack stack, @Nullable HumanoidModel<HumanoidRenderState> parentModel) {
-        super(root, RenderType::entityTranslucent);
+        super(root);
 
         this.visor = root.getChild("visor");
         this.belt = root.getChild("belt");
@@ -69,23 +68,8 @@ public class SpaceSuitModel extends HumanoidModel<HumanoidRenderState> {
         }
     }
 
-    @Override
-    public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay, int color) {
-        if (ArchitecturyTarget.getCurrentTarget().equals("neoforge") && texture != null) {
-            MultiBufferSource.BufferSource bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
-            buffer = bufferSource.getBuffer(RenderType.entityTranslucent(texture));
-        }
-
-        if (this.parentModel == null) return;
-        this.visor.copyFrom(parentModel.head);
-        this.belt.copyFrom(parentModel.body);
-        this.rightBoot.copyFrom(parentModel.rightLeg);
-        this.leftBoot.copyFrom(parentModel.leftLeg);
-        parentModel.copyPropertiesTo(this);
-
-        int packedColor = ARGB.color(255, (int)(r * 255), (int)(g * 255), (int)(b * 255));
-        super.renderToBuffer(poseStack, buffer, packedLight, packedOverlay, packedColor);
-    }
+    // renderToBuffer is now final in Model.
+    // Custom rendering with parent model syncing should be done via setupAnim or the renderer.
 
     @Override
     public void setAllVisible(boolean visible) {
@@ -118,16 +102,6 @@ public class SpaceSuitModel extends HumanoidModel<HumanoidRenderState> {
                 this.leftBoot.visible = true;
             }
         }
-    }
-
-    @Override
-    protected Iterable<ModelPart> headParts() {
-        return ImmutableList.of(head, visor);
-    }
-
-    @Override
-    protected Iterable<ModelPart> bodyParts() {
-        return ImmutableList.of(body, rightArm, leftArm, rightLeg, leftLeg, hat, belt, rightBoot, leftBoot);
     }
 
     @Nullable

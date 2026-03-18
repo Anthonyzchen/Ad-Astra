@@ -5,31 +5,49 @@ import com.teamresourceful.resourcefullib.common.registry.ResourcefulRegistry;
 import earth.terrarium.adastra.AdAstra;
 import earth.terrarium.adastra.common.registry.ModItems;
 import earth.terrarium.adastra.common.tags.ModItemTags;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.Recipe;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class ModRecipeProvider extends RecipeProvider {
 
-    private RecipeOutput output;
+    public ModRecipeProvider(HolderLookup.Provider registries, RecipeOutput output) {
+        super(registries, output);
+    }
 
-    public ModRecipeProvider(PackOutput packOutput) {
-        super(packOutput);
+    public RecipeOutput getOutput() {
+        return this.output;
+    }
+
+    public Ingredient tagIngredient(TagKey<Item> tag) {
+        return this.tag(tag);
+    }
+
+    public net.minecraft.advancements.Criterion<net.minecraft.advancements.criterion.InventoryChangeTrigger.TriggerInstance> hasItem(net.minecraft.world.level.ItemLike item) {
+        return this.has(item);
+    }
+
+    public net.minecraft.advancements.Criterion<net.minecraft.advancements.criterion.InventoryChangeTrigger.TriggerInstance> hasTag(TagKey<Item> tag) {
+        return this.has(tag);
     }
 
     @Override
-    protected void buildRecipes(RecipeOutput output) {
-        this.output = output;
-        ModCustomRecipeProvider.createRecipes(output);
+    protected void buildRecipes() {
+        ModCustomRecipeProvider.createRecipes(this);
 
         shaped(ModItems.ROVER, 1, ModItems.DESH_ENGINE, r -> r
             .define('W', ModItems.WHEEL.get())
@@ -1143,35 +1161,35 @@ public class ModRecipeProvider extends RecipeProvider {
     }
 
     private void shaped(RegistryEntry<Item> result, int count, Supplier<Item> mainItem, Function<ShapedRecipeBuilder, ShapedRecipeBuilder> builder) {
-        builder.apply(ShapedRecipeBuilder.shaped(RecipeCategory.MISC, result.get(), count)
+        builder.apply(shaped(RecipeCategory.MISC, result.get(), count)
                 .define('#', mainItem.get())
                 .unlockedBy("has_" + result.getId().getPath(), has(mainItem.get())))
             .save(output);
     }
 
     private void shaped(RegistryEntry<Item> result, int count, TagKey<Item> mainItem, Function<ShapedRecipeBuilder, ShapedRecipeBuilder> builder) {
-        builder.apply(ShapedRecipeBuilder.shaped(RecipeCategory.MISC, result.get(), count)
+        builder.apply(shaped(RecipeCategory.MISC, result.get(), count)
                 .define('#', mainItem)
                 .unlockedBy("has_" + result.getId().getPath(), has(mainItem)))
             .save(output);
     }
 
     private void shapeless(RegistryEntry<Item> result, int count, Supplier<Item> mainItem, Function<ShapelessRecipeBuilder, ShapelessRecipeBuilder> builder) {
-        builder.apply(ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, result.get(), count)
+        builder.apply(shapeless(RecipeCategory.MISC, result.get(), count)
                 .requires(mainItem.get())
                 .unlockedBy("has_" + result.getId().getPath(), has(mainItem.get())))
             .save(output);
     }
 
     private void shapeless(RegistryEntry<Item> result, int count, Supplier<Item> mainItem, String file, Function<ShapelessRecipeBuilder, ShapelessRecipeBuilder> builder) {
-        builder.apply(ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, result.get(), count)
+        builder.apply(shapeless(RecipeCategory.MISC, result.get(), count)
                 .requires(mainItem.get())
                 .unlockedBy("has_" + result.getId().getPath(), has(mainItem.get())))
-            .save(output, new Identifier(AdAstra.MOD_ID, file));
+            .save(output, ResourceKey.create(Registries.RECIPE, Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, file)));
     }
 
     private void shapeless(RegistryEntry<Item> result, int count, TagKey<Item> mainItem, Function<ShapelessRecipeBuilder, ShapelessRecipeBuilder> builder) {
-        builder.apply(ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, result.get(), count)
+        builder.apply(shapeless(RecipeCategory.MISC, result.get(), count)
                 .requires(mainItem)
                 .unlockedBy("has_" + result.getId().getPath(), has(mainItem)))
             .save(output);
@@ -1180,7 +1198,7 @@ public class ModRecipeProvider extends RecipeProvider {
     private void coloredSet(ResourcefulRegistry<Item> registry, int count, Function<ShapedRecipeBuilder, ShapedRecipeBuilder> builder) {
         registry.stream().forEach(result -> {
             Item wool = getWool(result);
-            builder.apply(ShapedRecipeBuilder.shaped(RecipeCategory.MISC, result.get(), count)
+            builder.apply(shaped(RecipeCategory.MISC, result.get(), count)
                     .define('#', wool)
                     .unlockedBy("has_" + result.getId().getPath(), has(wool)))
                 .save(output);
@@ -1190,7 +1208,7 @@ public class ModRecipeProvider extends RecipeProvider {
     private void dyeSet(ResourcefulRegistry<Item> registry, int count, int splitPoint, Function<ShapedRecipeBuilder, ShapedRecipeBuilder> builder) {
         registry.stream().forEach(result -> {
             Item dye = getDye(result, splitPoint);
-            builder.apply(ShapedRecipeBuilder.shaped(RecipeCategory.MISC, result.get(), count)
+            builder.apply(shaped(RecipeCategory.MISC, result.get(), count)
                     .define('#', dye)
                     .unlockedBy("has_" + result.getId().getPath(), has(dye)))
                 .save(output);
@@ -1204,7 +1222,7 @@ public class ModRecipeProvider extends RecipeProvider {
         if (result.getId().getPath().contains("light_gray")) {
             return Items.LIGHT_GRAY_WOOL;
         }
-        return BuiltInRegistries.ITEM.get(new Identifier(result.getId().getPath().split("_")[0] + "_wool"));
+        return BuiltInRegistries.ITEM.getValue(Identifier.withDefaultNamespace(result.getId().getPath().split("_")[0] + "_wool"));
     }
 
     private Item getDye(RegistryEntry<Item> result, int splitPoint) {
@@ -1214,7 +1232,7 @@ public class ModRecipeProvider extends RecipeProvider {
         if (result.getId().getPath().contains("light_gray")) {
             return Items.LIGHT_GRAY_DYE;
         }
-        return BuiltInRegistries.ITEM.get(new Identifier(result.getId().getPath().split("_")[splitPoint] + "_dye"));
+        return BuiltInRegistries.ITEM.getValue(Identifier.withDefaultNamespace(result.getId().getPath().split("_")[splitPoint] + "_dye"));
     }
 
     private void oreSmelt(Supplier<Item> result, Supplier<Item> mainItem) {
@@ -1230,42 +1248,58 @@ public class ModRecipeProvider extends RecipeProvider {
     private void smelt(Supplier<Item> result, Supplier<Item> mainItem) {
         SimpleCookingRecipeBuilder.smelting(Ingredient.of(mainItem.get()), RecipeCategory.MISC, result.get(), 0.1f, 200)
             .unlockedBy("has_" + BuiltInRegistries.ITEM.getKey(result.get()).getPath(), has(mainItem.get()))
-            .save(output, new Identifier(AdAstra.MOD_ID, "smelting/%s_from_smelting_%s"
-                .formatted(BuiltInRegistries.ITEM.getKey(result.get()).getPath(), BuiltInRegistries.ITEM.getKey(mainItem.get()).getPath())));
+            .save(output, ResourceKey.create(Registries.RECIPE, Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "smelting/%s_from_smelting_%s"
+                .formatted(BuiltInRegistries.ITEM.getKey(result.get()).getPath(), BuiltInRegistries.ITEM.getKey(mainItem.get()).getPath()))));
     }
 
     private void smelt(Supplier<Item> result, TagKey<Item> mainItem) {
-        SimpleCookingRecipeBuilder.smelting(Ingredient.of(mainItem), RecipeCategory.MISC, result.get(), 0.1f, 200)
+        SimpleCookingRecipeBuilder.smelting(tag(mainItem), RecipeCategory.MISC, result.get(), 0.1f, 200)
             .unlockedBy("has_" + BuiltInRegistries.ITEM.getKey(result.get()).getPath(), has(mainItem))
-            .save(output, new Identifier(AdAstra.MOD_ID, "smelting/%s_from_smelting_%s"
-                .formatted(BuiltInRegistries.ITEM.getKey(result.get()).getPath(), mainItem.identifier().getPath())));
+            .save(output, ResourceKey.create(Registries.RECIPE, Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "smelting/%s_from_smelting_%s"
+                .formatted(BuiltInRegistries.ITEM.getKey(result.get()).getPath(), mainItem.location().getPath()))));
     }
 
     private void blast(Supplier<Item> result, Supplier<Item> mainItem) {
         SimpleCookingRecipeBuilder.blasting(Ingredient.of(mainItem.get()), RecipeCategory.MISC, result.get(), 0.1f, 100)
             .unlockedBy("has_" + BuiltInRegistries.ITEM.getKey(result.get()).getPath(), has(mainItem.get()))
-            .save(output, new Identifier(AdAstra.MOD_ID, "blasting/%s_from_blasting_%s"
-                .formatted(BuiltInRegistries.ITEM.getKey(result.get()).getPath(), BuiltInRegistries.ITEM.getKey(mainItem.get()).getPath())));
+            .save(output, ResourceKey.create(Registries.RECIPE, Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "blasting/%s_from_blasting_%s"
+                .formatted(BuiltInRegistries.ITEM.getKey(result.get()).getPath(), BuiltInRegistries.ITEM.getKey(mainItem.get()).getPath()))));
     }
 
     private void blast(Supplier<Item> result, TagKey<Item> mainItem) {
-        SimpleCookingRecipeBuilder.blasting(Ingredient.of(mainItem), RecipeCategory.MISC, result.get(), 0.1f, 100)
+        SimpleCookingRecipeBuilder.blasting(tag(mainItem), RecipeCategory.MISC, result.get(), 0.1f, 100)
             .unlockedBy("has_" + BuiltInRegistries.ITEM.getKey(result.get()).getPath(), has(mainItem))
-            .save(output, new Identifier(AdAstra.MOD_ID, "blasting/%s_from_blasting_%s"
-                .formatted(BuiltInRegistries.ITEM.getKey(result.get()).getPath(), mainItem.identifier().getPath())));
+            .save(output, ResourceKey.create(Registries.RECIPE, Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "blasting/%s_from_blasting_%s"
+                .formatted(BuiltInRegistries.ITEM.getKey(result.get()).getPath(), mainItem.location().getPath()))));
     }
 
     private void stoneCutting(Supplier<Item> result, int count, Supplier<Item> mainItem) {
         SingleItemRecipeBuilder.stonecutting(Ingredient.of(mainItem.get()), RecipeCategory.MISC, result.get(), count)
             .unlockedBy("has_" + BuiltInRegistries.ITEM.getKey(result.get()).getPath(), has(mainItem.get()))
-            .save(output, new Identifier(AdAstra.MOD_ID, "stonecutting/%s_from_%s_stonecutting"
-                .formatted(BuiltInRegistries.ITEM.getKey(result.get()).getPath(), BuiltInRegistries.ITEM.getKey(mainItem.get()).getPath())));
+            .save(output, ResourceKey.create(Registries.RECIPE, Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "stonecutting/%s_from_%s_stonecutting"
+                .formatted(BuiltInRegistries.ITEM.getKey(result.get()).getPath(), BuiltInRegistries.ITEM.getKey(mainItem.get()).getPath()))));
     }
 
     private void stoneCutting(Supplier<Item> result, int count, TagKey<Item> mainItem) {
-        SingleItemRecipeBuilder.stonecutting(Ingredient.of(mainItem), RecipeCategory.MISC, result.get(), count)
+        SingleItemRecipeBuilder.stonecutting(tag(mainItem), RecipeCategory.MISC, result.get(), count)
             .unlockedBy("has_" + BuiltInRegistries.ITEM.getKey(result.get()).getPath(), has(mainItem))
-            .save(output, new Identifier(AdAstra.MOD_ID, "stonecutting/%s_from_%s_stonecutting"
-                .formatted(BuiltInRegistries.ITEM.getKey(result.get()).getPath(), mainItem.identifier().getPath())));
+            .save(output, ResourceKey.create(Registries.RECIPE, Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "stonecutting/%s_from_%s_stonecutting"
+                .formatted(BuiltInRegistries.ITEM.getKey(result.get()).getPath(), mainItem.location().getPath()))));
+    }
+
+    public static class Runner extends RecipeProvider.Runner {
+        public Runner(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> registries) {
+            super(packOutput, registries);
+        }
+
+        @Override
+        protected RecipeProvider createRecipeProvider(HolderLookup.Provider registries, RecipeOutput output) {
+            return new ModRecipeProvider(registries, output);
+        }
+
+        @Override
+        public String getName() {
+            return "Ad Astra Recipes";
+        }
     }
 }

@@ -4,6 +4,7 @@ import earth.terrarium.adastra.common.registry.ModEntityTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.ConversionParams;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -31,9 +32,8 @@ public class PygroBrute extends PiglinBrute {
 
     @Override
     protected void finishConversion(ServerLevel level) {
-        ZombifiedPygro zombifiedPygroEntity = this.convertTo(ModEntityTypes.ZOMBIFIED_PYGRO.get(), true);
-        if (zombifiedPygroEntity != null) {
-            zombifiedPygroEntity.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 200, 0));
-        }
+        this.convertTo(ModEntityTypes.ZOMBIFIED_PYGRO.get(), ConversionParams.single(this, true, true), zombifiedPygroEntity -> {
+            zombifiedPygroEntity.addEffect(new MobEffectInstance(MobEffects.NAUSEA, 200, 0));
+        });
     }
 }

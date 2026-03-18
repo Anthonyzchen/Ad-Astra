@@ -13,14 +13,16 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 
-import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class RocketItem extends VehicleItem {
@@ -44,11 +46,11 @@ public class RocketItem extends VehicleItem {
             return InteractionResult.PASS;
         }
 
-        var vehicle = type().create(level);
+        var vehicle = type().create(level, EntitySpawnReason.SPAWN_ITEM_USE);
         if (vehicle == null) {
             return InteractionResult.PASS;
         }
-        level.playSound(null, pos, SoundEvents.NETHERITE_BLOCK_PLACE, SoundSource.BLOCKS, 1, 1);
+        level.playSound(context.getPlayer(), pos, SoundEvents.NETHERITE_BLOCK_PLACE, SoundSource.BLOCKS, 1, 1);
         vehicle.setPos(pos.getX() + 0.5, pos.getY() + 0.125f, pos.getZ() + 0.5);
         vehicle.setYRot(context.getHorizontalDirection().getOpposite().toYRot());
         level.addFreshEntity(vehicle);
@@ -62,8 +64,8 @@ public class RocketItem extends VehicleItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents, TooltipFlag isAdvanced) {
-        super.appendHoverText(stack, context, tooltipComponents, isAdvanced);
-        TooltipUtils.addDescriptionComponent(tooltipComponents, ConstantComponents.ROCKET_INFO);
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay tooltipDisplay, Consumer<Component> consumer, TooltipFlag isAdvanced) {
+        super.appendHoverText(stack, context, tooltipDisplay, consumer, isAdvanced);
+        TooltipUtils.addDescriptionComponent(consumer, ConstantComponents.ROCKET_INFO);
     }
 }

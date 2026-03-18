@@ -43,8 +43,8 @@ public class ConfigurationButton extends PressableImageButton {
     }
 
     @Override
-    public void onPress() {
-        this.configuration = Screen.hasShiftDown() ? this.configuration.previous() : this.configuration.next();
+    public void onPress(net.minecraft.client.input.InputWithModifiers input) {
+        this.configuration = input.hasShiftDown() ? this.configuration.previous() : this.configuration.next();
         entry.set(direction, this.configuration);
         NetworkHandler.CHANNEL.sendToServer(new ServerboundSetSideConfigPacket(entity.getBlockPos(), configIndex, direction, this.configuration));
         setTooltip(Tooltip.create(getSideConfigTooltip(entity, entry.type(), direction, this.configuration)));

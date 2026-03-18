@@ -4,18 +4,20 @@ import earth.terrarium.adastra.AdAstra;
 import earth.terrarium.adastra.api.systems.OxygenApi;
 import earth.terrarium.adastra.common.commands.AdAstraCommands;
 import earth.terrarium.adastra.common.registry.ModEntityTypes;
+import earth.terrarium.adastra.common.items.armor.JetSuitItem;
 import earth.terrarium.adastra.common.tags.ModItemTags;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.entity.event.v1.EntityElytraEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackType;
-import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.world.InteractionResult;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,6 +34,15 @@ public class AdAstraFabric {
         ServerLifecycleEvents.SERVER_STARTED.register(AdAstra::onServerStarted);
         ModEntityTypes.registerAttributes((type, builder) -> FabricDefaultAttributeRegistry.register(type.get(), builder.get()));
         CommandRegistrationCallback.EVENT.register((dispatcher, ctx, environment) -> AdAstraCommands.register(dispatcher));
+
+        // Register custom elytra behavior for JetSuit (replaces FabricElytraItem which was removed)
+        EntityElytraEvents.CUSTOM.register((entity, tickElytra) -> {
+            var chestStack = entity.getItemBySlot(EquipmentSlot.CHEST);
+            if (chestStack.getItem() instanceof JetSuitItem jetSuit) {
+                return jetSuit.canElytraFly(chestStack, entity);
+            }
+            return false;
+        });
 
         UseBlockCallback.EVENT.register((player, level, hand, hitResult) -> {
             var stack = player.getItemInHand(hand);
@@ -53,8 +64,8 @@ public class AdAstraFabric {
             }
 
             @Override
-            public @NotNull CompletableFuture<Void> reload(@NotNull PreparationBarrier synchronizer, @NotNull ResourceManager manager, @NotNull ProfilerFiller prepareProfiler, @NotNull ProfilerFiller applyProfiler, @NotNull Executor prepareExecutor, @NotNull Executor applyExecutor) {
-                return listener.reload(synchronizer, manager, prepareProfiler, applyProfiler, prepareExecutor, applyExecutor);
+            public @NotNull CompletableFuture<Void> reload(@NotNull PreparableReloadListener.SharedState sharedState, @NotNull Executor prepareExecutor, PreparableReloadListener.@NotNull PreparationBarrier synchronizer, @NotNull Executor applyExecutor) {
+                return listener.reload(sharedState, prepareExecutor, synchronizer, applyExecutor);
             }
         }));
     }

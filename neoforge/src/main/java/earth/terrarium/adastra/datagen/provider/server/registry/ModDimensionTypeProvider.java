@@ -3,7 +3,7 @@ package earth.terrarium.adastra.datagen.provider.server.registry;
 import earth.terrarium.adastra.AdAstra;
 import earth.terrarium.adastra.api.planets.Planet;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.data.worldgen.BootstapContext;
+import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BlockTags;
@@ -31,10 +31,10 @@ public class ModDimensionTypeProvider {
     public static final ResourceKey<DimensionType> GLACIO = register("glacio");
 
     private static ResourceKey<DimensionType> register(String name) {
-        return ResourceKey.create(Registries.DIMENSION_TYPE, new Identifier(AdAstra.MOD_ID, name));
+        return ResourceKey.create(Registries.DIMENSION_TYPE, Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, name));
     }
 
-    public static void bootstrap(BootstapContext<DimensionType> context) {
+    public static void bootstrap(BootstrapContext<DimensionType> context) {
         orbit(context, EARTH_ORBIT, Planet.EARTH_ORBIT.identifier());
         orbit(context, MOON_ORBIT, Planet.MOON_ORBIT.identifier());
         orbit(context, MARS_ORBIT, Planet.MARS_ORBIT.identifier());
@@ -158,7 +158,7 @@ public class ModDimensionTypeProvider {
                     0)));
     }
 
-    private static void orbit(BootstapContext<DimensionType> context, ResourceKey<DimensionType> key, Identifier dimensionSpecialEffects) {
+    private static void orbit(BootstrapContext<DimensionType> context, ResourceKey<DimensionType> key, Identifier dimensionSpecialEffects) {
         context.register(
             key,
             create(
@@ -185,10 +185,12 @@ public class ModDimensionTypeProvider {
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     public static DimensionType create(OptionalLong fixedTime, boolean hasSkyLight, boolean hasCeiling, boolean ultraWarm, boolean natural, double coordinateScale, boolean bedWorks, boolean respawnAnchorWorks, int minY, int height, int logicalHeight, TagKey<Block> infiniburn, Identifier effectsLocation, float ambientLight, DimensionType.MonsterSettings monsterSettings) {
-        return new DimensionType(fixedTime, hasSkyLight, hasCeiling, ultraWarm, natural, coordinateScale, bedWorks, respawnAnchorWorks, minY, height, logicalHeight, infiniburn, effectsLocation, ambientLight, monsterSettings);
+        boolean hasFixedTime = fixedTime.isPresent();
+        DimensionType.Skybox skybox = hasCeiling ? DimensionType.Skybox.NONE : DimensionType.Skybox.OVERWORLD;
+        return new DimensionType(hasSkyLight, hasCeiling, hasFixedTime, coordinateScale, minY, height, logicalHeight, infiniburn, ambientLight, monsterSettings, skybox, DimensionType.CardinalLightType.DEFAULT, net.minecraft.world.attribute.EnvironmentAttributeMap.EMPTY, net.minecraft.core.HolderSet.empty());
     }
 
     public static DimensionType.MonsterSettings createMonsterSettings(boolean piglinSafe, boolean hasRaids, IntProvider monsterSpawnLightTest, int monsterSpawnBlockLightLimit) {
-        return new DimensionType.MonsterSettings(piglinSafe, hasRaids, monsterSpawnLightTest, monsterSpawnBlockLightLimit);
+        return new DimensionType.MonsterSettings(monsterSpawnLightTest, monsterSpawnBlockLightLimit);
     }
 }

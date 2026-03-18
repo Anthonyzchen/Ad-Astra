@@ -15,7 +15,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.WidgetSprites;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 
@@ -31,7 +30,7 @@ public class OptionBarOptions {
     public static PressableImageButton createRedstone(ContainerMachineBlockEntity entity) {
         return new PressableImageButton(0, 0, 18, 18, spritesFromRedstoneControl(entity.getRedstoneControl()),
             button -> {
-                RedstoneControl next = Screen.hasShiftDown() ? entity.getRedstoneControl().previous() : entity.getRedstoneControl().next();
+                RedstoneControl next = Minecraft.getInstance().hasShiftDown() ? entity.getRedstoneControl().previous() : entity.getRedstoneControl().next();
                 entity.setRedstoneControl(next);
                 NetworkHandler.CHANNEL.sendToServer(new ServerboundSetRedstoneControlPacket(entity.getBlockPos(), next));
                 button.setTooltip(Tooltip.create(getRedstoneControlTooltip(next)));
@@ -44,7 +43,7 @@ public class OptionBarOptions {
     public static PressableImageButton createBlastFurnaceMode(EtrionicBlastFurnaceBlockEntity entity) {
         return new PressableImageButton(0, 0, 18, 18, spritesFromEtrionicBlastFurnaceMode(entity.mode()),
             button -> {
-                EtrionicBlastFurnaceBlockEntity.Mode next = Screen.hasShiftDown() ? entity.mode().previous() : entity.mode().next();
+                EtrionicBlastFurnaceBlockEntity.Mode next = Minecraft.getInstance().hasShiftDown() ? entity.mode().previous() : entity.mode().next();
                 entity.setMode(next);
                 NetworkHandler.CHANNEL.sendToServer(new ServerboundSetFurnaceModePacket(entity.getBlockPos(), next));
                 button.setTooltip(Tooltip.create(getModeTooltip(next)));
@@ -58,7 +57,7 @@ public class OptionBarOptions {
         return new PressableImageButton(0, 0, 18, 18, AdAstraConfigClient.showOxygenDistributorArea ? GuiUtils.SHOW_BUTTON_SPRITES : GuiUtils.HIDE_BUTTON_SPRITES,
             button -> {
                 AdAstraConfigClient.showOxygenDistributorArea = !AdAstraConfigClient.showOxygenDistributorArea;
-                Minecraft.getInstance().tell(() -> AdAstra.CONFIGURATOR.saveConfig(AdAstraConfigClient.class));
+                Minecraft.getInstance().execute(() -> AdAstra.CONFIGURATOR.saveConfig(AdAstraConfigClient.class));
                 ((PressableImageButton) button).setSprites(AdAstraConfigClient.showOxygenDistributorArea ? GuiUtils.SHOW_BUTTON_SPRITES : GuiUtils.HIDE_BUTTON_SPRITES);
             },
             ConstantComponents.OXYGEN_DISTRIBUTION_AREA
@@ -69,7 +68,7 @@ public class OptionBarOptions {
         return new PressableImageButton(0, 0, 18, 18, AdAstraConfigClient.showGravityNormalizerArea ? GuiUtils.SHOW_BUTTON_SPRITES : GuiUtils.HIDE_BUTTON_SPRITES,
             button -> {
                 AdAstraConfigClient.showGravityNormalizerArea = !AdAstraConfigClient.showGravityNormalizerArea;
-                Minecraft.getInstance().tell(() -> AdAstra.CONFIGURATOR.saveConfig(AdAstraConfigClient.class));
+                Minecraft.getInstance().execute(() -> AdAstra.CONFIGURATOR.saveConfig(AdAstraConfigClient.class));
                 ((PressableImageButton) button).setSprites(AdAstraConfigClient.showGravityNormalizerArea ? GuiUtils.SHOW_BUTTON_SPRITES : GuiUtils.HIDE_BUTTON_SPRITES);
             },
             ConstantComponents.GRAVITY_DISTRIBUTION_AREA

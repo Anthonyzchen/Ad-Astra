@@ -5,6 +5,8 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.AgeableMob;
+import net.minecraft.world.entity.ConversionParams;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -36,7 +38,7 @@ public class Mogler extends Hoglin {
     @Override
     @Nullable
     public AgeableMob getBreedOffspring(ServerLevel level, AgeableMob entity) {
-        Mogler moglerEntity = ModEntityTypes.MOGLER.get().create(level);
+        Mogler moglerEntity = ModEntityTypes.MOGLER.get().create(level, EntitySpawnReason.BREEDING);
         if (moglerEntity != null) {
             moglerEntity.setPersistenceRequired();
         }
@@ -44,9 +46,8 @@ public class Mogler extends Hoglin {
     }
 
     public void finishConversion() {
-        ZombifiedMogler zombifiedMoglerEntity = this.convertTo(ModEntityTypes.ZOMBIFIED_MOGLER.get(), true);
-        if (zombifiedMoglerEntity != null) {
-            zombifiedMoglerEntity.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 200, 0));
-        }
+        this.convertTo(ModEntityTypes.ZOMBIFIED_MOGLER.get(), ConversionParams.single(this, true, true), zombifiedMoglerEntity -> {
+            zombifiedMoglerEntity.addEffect(new MobEffectInstance(MobEffects.NAUSEA, 200, 0));
+        });
     }
 }

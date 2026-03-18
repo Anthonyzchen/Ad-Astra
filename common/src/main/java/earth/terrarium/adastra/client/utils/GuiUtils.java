@@ -72,7 +72,7 @@ public class GuiUtils {
             graphics.blitSprite(RenderPipelines.GUI_TEXTURED, ENERGY_BAR, x + 6, y - 31, ENERGY_BAR_WIDTH, ENERGY_BAR_HEIGHT);
         }
 
-        drawTooltips(mouseX, mouseY, x + 6, x + 19, y - 31, y + 15, list -> {
+        drawTooltips(graphics, mouseX, mouseY, x + 6, x + 19, y - 31, y + 15, list -> {
             list.add(TooltipUtils.getEnergyComponent(energy, capacity));
             Collections.addAll(list, tooltips);
             return list;
@@ -93,7 +93,7 @@ public class GuiUtils {
         // Draw the bar frame overlay on top
         graphics.blitSprite(RenderPipelines.GUI_TEXTURED, FLUID_BAR, barX, barY, FLUID_BAR_WIDTH, FLUID_BAR_HEIGHT);
 
-        drawTooltips(mouseX, mouseY, x + 6, x + 18, y - 31, y + 15, list -> {
+        drawTooltips(graphics, mouseX, mouseY, x + 6, x + 18, y - 31, y + 15, list -> {
             list.add(TooltipUtils.getFluidComponent(fluid, amount, capacity));
             Collections.addAll(list, tooltips);
             return list;
@@ -105,7 +105,7 @@ public class GuiUtils {
         if (reverse) widthProgress = width - widthProgress;
         graphics.blit(RenderPipelines.GUI_TEXTURED, texture, x, y, 0, 0, widthProgress, height, width, height);
 
-        drawTooltips(mouseX, mouseY, x, x + width, y, y + height, list -> {
+        drawTooltips(graphics, mouseX, mouseY, x, x + width, y, y + height, list -> {
             Collections.addAll(list, tooltips);
             return list;
         });
@@ -116,7 +116,7 @@ public class GuiUtils {
         heightProgress = height - heightProgress;
         graphics.blit(RenderPipelines.GUI_TEXTURED, texture, x, y + heightProgress, 0, heightProgress, width, height - heightProgress, width, height);
 
-        drawTooltips(mouseX, mouseY, x, x + width, y, y + height, list -> {
+        drawTooltips(graphics, mouseX, mouseY, x, x + width, y, y + height, list -> {
             Collections.addAll(list, tooltips);
             return list;
         });
@@ -137,8 +137,7 @@ public class GuiUtils {
         Identifier stillTexture = getFluidStillTexture(fluid);
         int color = getFluidColor(fluid);
 
-        @SuppressWarnings("deprecation")
-        TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(stillTexture);
+        TextureAtlasSprite sprite = Minecraft.getInstance().getAtlasManager().getAtlasOrThrow(TextureAtlas.LOCATION_BLOCKS).getSprite(stillTexture);
 
         // Use GuiGraphics to render the fluid sprite tiled
         // TODO: 1.21.11 - The tiling approach needs to be updated for the new rendering pipeline.
@@ -203,15 +202,22 @@ public class GuiUtils {
         return 0xFFFFFFFF; // Default: no tint
     }
 
-    public static void drawTooltips(int mouseX, int mouseY, int minX, int maxX, int minY, int maxY, Function<List<Component>, List<Component>> tooltips) {
+    public static void drawTooltips(GuiGraphics graphics, int mouseX, int mouseY, int minX, int maxX, int minY, int maxY, Function<List<Component>, List<Component>> tooltips) {
         if (mouseX >= minX && mouseX <= maxX && mouseY >= minY && mouseY <= maxY) {
             List<Component> lines = tooltips.apply(new ArrayList<>());
             lines.removeIf(c -> c.getString().isEmpty());
-            var screen = Minecraft.getInstance().screen;
-            if (screen != null) {
-                screen.setTooltipForNextRenderPass(lines.stream().map(Component::getVisualOrderText).toList());
+            if (!lines.isEmpty()) {
+                graphics.setTooltipForNextFrame(Minecraft.getInstance().font, lines.stream().map(Component::getVisualOrderText).toList(), mouseX, mouseY);
             }
         }
+    }
+
+    /**
+     * @deprecated Use {@link #drawTooltips(GuiGraphics, int, int, int, int, int, int, Function)} instead.
+     */
+    @Deprecated
+    public static void drawTooltips(int mouseX, int mouseY, int minX, int maxX, int minY, int maxY, Function<List<Component>, List<Component>> tooltips) {
+        // No-op: callers should be migrated to the GuiGraphics version
     }
 
     public static void drawColoredShadowCenteredString(GuiGraphics graphics, Font font, Component text, int x, int y, int color, int shadowColor) {

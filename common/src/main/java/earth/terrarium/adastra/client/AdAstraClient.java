@@ -4,6 +4,8 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 import earth.terrarium.adastra.AdAstra;
 import earth.terrarium.adastra.client.config.AdAstraConfigClient;
+import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import earth.terrarium.adastra.client.dimension.AdAstraPlanetRenderers;
 import earth.terrarium.adastra.client.models.armor.SpaceSuitModel;
 import earth.terrarium.adastra.client.models.entities.mobs.*;
@@ -46,7 +48,6 @@ import net.minecraft.client.Options;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.particle.SplashParticle;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.entity.NoopRenderer;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.core.RegistryAccess;
@@ -69,15 +70,18 @@ public class AdAstraClient {
     public static final OverlayRenderer OXYGEN_OVERLAY_RENDERER = new OverlayRenderer(0x4099ccff, () -> AdAstraConfigClient.showOxygenDistributorArea, ModBlocks.OXYGEN_DISTRIBUTOR);
     public static final OverlayRenderer GRAVITY_OVERLAY_RENDERER = new OverlayRenderer(0x40DE2F14, () -> AdAstraConfigClient.showGravityNormalizerArea, ModBlocks.GRAVITY_NORMALIZER);
 
+    public static final KeyMapping.Category AD_ASTRA_KEY_CATEGORY = KeyMapping.Category.register(
+        Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "key_category"));
+
     public static final KeyMapping KEY_TOGGLE_SUIT_FLIGHT = new KeyMapping(
         ConstantComponents.TOGGLE_SUIT_FLIGHT_KEY.getString(),
         InputConstants.KEY_V,
-        ConstantComponents.AD_ASTRA_CATEGORY.getString());
+        AD_ASTRA_KEY_CATEGORY);
 
     public static final KeyMapping KEY_OPEN_RADIO = new KeyMapping(
         ConstantComponents.OPEN_RADIO_KEY.getString(),
         InputConstants.KEY_R,
-        ConstantComponents.AD_ASTRA_CATEGORY.getString());
+        AD_ASTRA_KEY_CATEGORY);
 
     public static void init() {
         AdAstra.CONFIGURATOR.register(AdAstraConfigClient.class);
@@ -126,14 +130,17 @@ public class AdAstraClient {
     // Entity renderers are registered in platform-specific code (Fabric/NeoForge)
     // because EntityRenderers.register() is not accessible from the common module.
 
+    @SuppressWarnings("unchecked")
     public static void registerArmor() {
-        ClientPlatformUtils.registerArmor(SpaceSuitModel.SPACE_SUIT_TEXTURE, SpaceSuitModel.SPACE_SUIT_LAYER, SpaceSuitModel::new,
+        ClientPlatformUtils.ArmorFactory spaceSuitFactory = (root, slot, stack, parentModel) ->
+            new SpaceSuitModel(root, slot, stack, (HumanoidModel<HumanoidRenderState>) parentModel);
+        ClientPlatformUtils.registerArmor(SpaceSuitModel.SPACE_SUIT_TEXTURE, SpaceSuitModel.SPACE_SUIT_LAYER, spaceSuitFactory,
             ModItems.SPACE_HELMET.get(), ModItems.SPACE_SUIT.get(),
             ModItems.SPACE_PANTS.get(), ModItems.SPACE_BOOTS.get());
-        ClientPlatformUtils.registerArmor(SpaceSuitModel.NETHERITE_SPACE_SUIT_TEXTURE, SpaceSuitModel.NETHERITE_SPACE_SUIT_LAYER, SpaceSuitModel::new,
+        ClientPlatformUtils.registerArmor(SpaceSuitModel.NETHERITE_SPACE_SUIT_TEXTURE, SpaceSuitModel.NETHERITE_SPACE_SUIT_LAYER, spaceSuitFactory,
             ModItems.NETHERITE_SPACE_HELMET.get(), ModItems.NETHERITE_SPACE_SUIT.get(),
             ModItems.NETHERITE_SPACE_PANTS.get(), ModItems.NETHERITE_SPACE_BOOTS.get());
-        ClientPlatformUtils.registerArmor(SpaceSuitModel.JET_SUIT_TEXTURE, SpaceSuitModel.JET_SUIT_LAYER, SpaceSuitModel::new,
+        ClientPlatformUtils.registerArmor(SpaceSuitModel.JET_SUIT_TEXTURE, SpaceSuitModel.JET_SUIT_LAYER, spaceSuitFactory,
             ModItems.JET_SUIT_HELMET.get(), ModItems.JET_SUIT.get(),
             ModItems.JET_SUIT_PANTS.get(), ModItems.JET_SUIT_BOOTS.get());
     }
@@ -161,12 +168,14 @@ public class AdAstraClient {
     }
 
     public static void registerRenderLayers() {
-        ClientRegistrationHooks.setRenderLayer(ModBlocks.VENT.get(), RenderType.cutout());
-        ClientRegistrationHooks.setRenderLayer(ModBlocks.STEEL_DOOR.get(), RenderType.cutout());
-        ClientRegistrationHooks.setRenderLayer(ModBlocks.STEEL_TRAPDOOR.get(), RenderType.cutout());
-        ClientRegistrationHooks.setRenderLayer(ModBlocks.AERONOS_LADDER.get(), RenderType.cutout());
-        ClientRegistrationHooks.setRenderLayer(ModBlocks.STROPHAR_LADDER.get(), RenderType.cutout());
-        ClientRegistrationHooks.setRenderLayer(ModBlocks.GLACIAN_TRAPDOOR.get(), RenderType.cutout());
+        // In 1.21.11, block render layers are determined by block model JSON, not set programmatically.
+        // These calls are no-ops but kept for documentation of which blocks need cutout render type.
+        ClientRegistrationHooks.setRenderLayer(ModBlocks.VENT.get(), "cutout");
+        ClientRegistrationHooks.setRenderLayer(ModBlocks.STEEL_DOOR.get(), "cutout");
+        ClientRegistrationHooks.setRenderLayer(ModBlocks.STEEL_TRAPDOOR.get(), "cutout");
+        ClientRegistrationHooks.setRenderLayer(ModBlocks.AERONOS_LADDER.get(), "cutout");
+        ClientRegistrationHooks.setRenderLayer(ModBlocks.STROPHAR_LADDER.get(), "cutout");
+        ClientRegistrationHooks.setRenderLayer(ModBlocks.GLACIAN_TRAPDOOR.get(), "cutout");
     }
 
     public static void onRegisterParticles(BiConsumer<ParticleType<SimpleParticleType>, ClientPlatformUtils.SpriteParticleRegistration<SimpleParticleType>> consumer) {
@@ -194,14 +203,24 @@ public class AdAstraClient {
     }
 
     public static void onRegisterItemRenderers(BiConsumer<Item, CustomItemRenderer> consumer) {
-        ModItems.GLOBES.stream().forEach(item -> consumer.accept(item.get(), new GlobeBlockEntityRenderer.ItemRenderer()));
-        consumer.accept(ModItems.OXYGEN_DISTRIBUTOR.get(), new OxygenDistributorBlockEntityRenderer.ItemRenderer());
-        consumer.accept(ModItems.GRAVITY_NORMALIZER.get(), new GravityNormalizerBlockEntityRenderer.ItemRenderer());
-        consumer.accept(ModItems.ROVER.get(), new RoverRenderer.ItemRenderer());
-        consumer.accept(ModItems.TIER_1_ROCKET.get(), new RocketRenderer.ItemRenderer(RocketModel.TIER_1_LAYER, RocketRenderer.TIER_1_TEXTURE));
-        consumer.accept(ModItems.TIER_2_ROCKET.get(), new RocketRenderer.ItemRenderer(RocketModel.TIER_2_LAYER, RocketRenderer.TIER_2_TEXTURE));
-        consumer.accept(ModItems.TIER_3_ROCKET.get(), new RocketRenderer.ItemRenderer(RocketModel.TIER_3_LAYER, RocketRenderer.TIER_3_TEXTURE));
-        consumer.accept(ModItems.TIER_4_ROCKET.get(), new RocketRenderer.ItemRenderer(RocketModel.TIER_4_LAYER, RocketRenderer.TIER_4_TEXTURE));
+        ModItems.GLOBES.stream().forEach(item -> {
+            var renderer = new GlobeBlockEntityRenderer.ItemRenderer();
+            consumer.accept(item.get(), renderer::renderByItem);
+        });
+        var oxygenRenderer = new OxygenDistributorBlockEntityRenderer.ItemRenderer();
+        consumer.accept(ModItems.OXYGEN_DISTRIBUTOR.get(), oxygenRenderer::renderByItem);
+        var gravityRenderer = new GravityNormalizerBlockEntityRenderer.ItemRenderer();
+        consumer.accept(ModItems.GRAVITY_NORMALIZER.get(), gravityRenderer::renderByItem);
+        var roverRenderer = new RoverRenderer.ItemRenderer();
+        consumer.accept(ModItems.ROVER.get(), roverRenderer::renderByItem);
+        var tier1Renderer = new RocketRenderer.ItemRenderer(RocketModel.TIER_1_LAYER, RocketRenderer.TIER_1_TEXTURE);
+        consumer.accept(ModItems.TIER_1_ROCKET.get(), tier1Renderer::renderByItem);
+        var tier2Renderer = new RocketRenderer.ItemRenderer(RocketModel.TIER_2_LAYER, RocketRenderer.TIER_2_TEXTURE);
+        consumer.accept(ModItems.TIER_2_ROCKET.get(), tier2Renderer::renderByItem);
+        var tier3Renderer = new RocketRenderer.ItemRenderer(RocketModel.TIER_3_LAYER, RocketRenderer.TIER_3_TEXTURE);
+        consumer.accept(ModItems.TIER_3_ROCKET.get(), tier3Renderer::renderByItem);
+        var tier4Renderer = new RocketRenderer.ItemRenderer(RocketModel.TIER_4_LAYER, RocketRenderer.TIER_4_TEXTURE);
+        consumer.accept(ModItems.TIER_4_ROCKET.get(), tier4Renderer::renderByItem);
     }
 
     public static void onRegisterHud(Consumer<ClientPlatformUtils.RenderHud> consumer) {
@@ -248,7 +267,7 @@ public class AdAstraClient {
 
             if (KEY_TOGGLE_SUIT_FLIGHT.consumeClick()) {
                 AdAstraConfigClient.jetSuitEnabled = !AdAstraConfigClient.jetSuitEnabled;
-                Minecraft.getInstance().tell(() -> AdAstra.CONFIGURATOR.saveConfig(AdAstraConfigClient.class));
+                Minecraft.getInstance().execute(() -> AdAstra.CONFIGURATOR.saveConfig(AdAstraConfigClient.class));
                 player.displayClientMessage(AdAstraConfigClient.jetSuitEnabled ? ConstantComponents.SUIT_FLIGHT_ENABLED : ConstantComponents.SUIT_FLIGHT_DISABLED, true);
             }
 

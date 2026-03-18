@@ -1,7 +1,6 @@
 package earth.terrarium.adastra.common.menus.slots;
 
 import earth.terrarium.adastra.AdAstra;
-import earth.terrarium.adastra.client.screens.base.MachineScreen;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.Container;
 
@@ -13,8 +12,5 @@ public class BatterySlot extends ImageSlot {
         super(container, slot, 0, 0, BATTERY_SLOT_ICON);
     }
 
-    @Override
-    public Identifier getSlotTexture() {
-        return MachineScreen.STEEL_SLOT;
-    }
+    // TODO: getSlotTexture() was removed in 1.21.11 - custom slot textures need alternative rendering
 }

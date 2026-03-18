@@ -8,6 +8,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.ChunkPos;
@@ -46,7 +47,7 @@ public class SpaceStationHandler extends SavedData {
             Set<SpaceStation> stations = new HashSet<>();
             stationsTag.forEach(stationTag -> {
                 CompoundTag stationCompoundTag = (CompoundTag) stationTag;
-                Component name = Component.Serializer.fromJson(stationCompoundTag.getStringOr("Name", ""), AdAstra.getRegistryAccess());
+                Component name = ComponentSerialization.CODEC.parse(com.mojang.serialization.JsonOps.INSTANCE, com.google.gson.JsonParser.parseString(stationCompoundTag.getStringOr("Name", "\"\""))).result().orElse(Component.empty());
                 ChunkPos position = new ChunkPos(stationCompoundTag.getLongOr("Position", 0L));
                 stations.add(new SpaceStation(position, name));
             });
@@ -59,7 +60,7 @@ public class SpaceStationHandler extends SavedData {
             ListTag ownerTag = new ListTag();
             for (var station : stations) {
                 CompoundTag stationsTag = new CompoundTag();
-                stationsTag.putString("Name", Component.Serializer.toJson(station.name(), AdAstra.getRegistryAccess()));
+                stationsTag.putString("Name", ComponentSerialization.CODEC.encodeStart(com.mojang.serialization.JsonOps.INSTANCE, station.name()).result().map(Object::toString).orElse("\"\""));
                 stationsTag.putLong("Position", station.position().toLong());
                 ownerTag.add(stationsTag);
             }

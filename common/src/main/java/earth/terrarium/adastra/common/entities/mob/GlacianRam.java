@@ -5,7 +5,6 @@ import earth.terrarium.adastra.common.registry.ModBlocks;
 import earth.terrarium.adastra.common.registry.ModEntityTypes;
 import earth.terrarium.adastra.common.registry.ModItems;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -18,6 +17,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.AgeableMob;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Mob;
@@ -36,6 +36,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.pathfinder.PathType;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -104,7 +106,7 @@ public class GlacianRam extends Animal implements Shearable {
         } else {
             InteractionResult actionResult = super.mobInteract(player, hand);
             if (actionResult.consumesAction() && this.isFood(itemStack)) {
-                this.level().playSound(null, this, this.getEatingSound(itemStack), SoundSource.NEUTRAL, 1.0f, Mth.randomBetween(this.level().random, 0.8f, 1.2f));
+                this.level().playSound(null, this, this.getEatingSound(), SoundSource.NEUTRAL, 1.0f, Mth.randomBetween(this.level().random, 0.8f, 1.2f));
             }
 
             return this.shear(player, hand);
@@ -112,9 +114,9 @@ public class GlacianRam extends Animal implements Shearable {
     }
 
     @Override
-    protected void customServerAiStep() {
+    protected void customServerAiStep(ServerLevel level) {
         this.eatPermafrostTimer = this.eatPermafrostGoal.getTimer();
-        super.customServerAiStep();
+        super.customServerAiStep(level);
     }
 
     @Override
@@ -130,7 +132,7 @@ public class GlacianRam extends Animal implements Shearable {
         ItemStack itemStack = player.getItemInHand(hand);
         if (itemStack.is(Items.SHEARS)) {
             if (!this.level().isClientSide() && this.readyForShearing()) {
-                this.shear(player, SoundSource.PLAYERS);
+                this.shearInternal((ServerLevel) this.level(), player, SoundSource.PLAYERS);
                 itemStack.hurtAndBreak(1, player, hand == InteractionHand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND);
                 return InteractionResult.SUCCESS;
             } else {
@@ -142,13 +144,13 @@ public class GlacianRam extends Animal implements Shearable {
     }
 
     @Override
-    public void shear(SoundSource shearedSoundCategory) {
-        this.shear(null, shearedSoundCategory);
+    public void shear(ServerLevel level, SoundSource shearedSoundCategory, ItemStack shears) {
+        this.shearInternal(level, null, shearedSoundCategory);
     }
 
-    public void shear(@Nullable Player player, SoundSource shearedSoundCategory) {
+    public void shearInternal(ServerLevel level, @Nullable Player player, SoundSource shearedSoundCategory) {
         for (ItemStack item : this.onSheared(player, shearedSoundCategory)) {
-            ItemEntity itemEntity = this.spawnAtLocation(item);
+            ItemEntity itemEntity = this.spawnAtLocation(level, item);
             if (itemEntity != null) {
                 itemEntity.setDeltaMovement(itemEntity.getDeltaMovement().add((this.random.nextFloat() - this.random.nextFloat()) * 0.1F, this.random.nextFloat() * 0.05F, (this.random.nextFloat() - this.random.nextFloat()) * 0.1F));
             }
@@ -173,24 +175,23 @@ public class GlacianRam extends Animal implements Shearable {
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag nbt) {
-        super.addAdditionalSaveData(nbt);
-        nbt.putBoolean("Sheared", this.isSheared());
+    public void addAdditionalSaveData(ValueOutput output) {
+        super.addAdditionalSaveData(output);
+        output.putBoolean("Sheared", this.isSheared());
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag nbt) {
-        super.readAdditionalSaveData(nbt);
-        this.setSheared(nbt.getBoolean("Sheared"));
+    public void readAdditionalSaveData(ValueInput input) {
+        super.readAdditionalSaveData(input);
+        this.setSheared(input.getBooleanOr("Sheared", false));
     }
 
     @Override
     public GlacianRam getBreedOffspring(ServerLevel serverWorld, AgeableMob passiveEntity) {
-        return ModEntityTypes.GLACIAN_RAM.get().create(serverWorld);
+        return ModEntityTypes.GLACIAN_RAM.get().create(serverWorld, EntitySpawnReason.BREEDING);
     }
 
-    @Override
-    public SoundEvent getEatingSound(ItemStack stack) {
+    public SoundEvent getEatingSound() {
         return SoundEvents.GOAT_EAT;
     }
 

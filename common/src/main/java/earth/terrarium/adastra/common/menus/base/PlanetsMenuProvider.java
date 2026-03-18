@@ -7,11 +7,17 @@ import earth.terrarium.adastra.common.handlers.SpaceStationHandler;
 import earth.terrarium.adastra.common.handlers.base.SpaceStation;
 import earth.terrarium.adastra.common.menus.PlanetsMenu;
 import earth.terrarium.adastra.common.planets.AdAstraData;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.mojang.serialization.JsonOps;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentSerialization;
+import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
@@ -42,7 +48,7 @@ public class PlanetsMenuProvider implements ContentMenuProvider<PlanetsMenuConte
         String[] planets = AdAstraConfig.disabledPlanets.split(",");
         for (var planet : planets) {
             if (!planet.isBlank()) {
-                disabledPlanets.add(Identifier.fromNamespaceAndPath(planet));
+                disabledPlanets.add(Identifier.tryParse(planet));
             }
         }
 
@@ -50,7 +56,7 @@ public class PlanetsMenuProvider implements ContentMenuProvider<PlanetsMenuConte
         AdAstraData.planets().values().forEach(planet -> {
             // Space stations are stored in the orbit dimension, not the planet dimension
             ResourceKey<Level> orbitDimension = planet.orbitIfPresent();
-            ServerLevel orbitLevel = player.server.getLevel(orbitDimension);
+            ServerLevel orbitLevel = player.level().getServer().getLevel(orbitDimension);
             if (orbitLevel != null) {
                 var stations = SpaceStationHandler.getAllSpaceStations(orbitLevel);
                 spaceStationsMap.put(orbitDimension, stations);
@@ -59,7 +65,7 @@ public class PlanetsMenuProvider implements ContentMenuProvider<PlanetsMenuConte
 
         List<GlobalPos> locations = new ArrayList<>();
         AdAstraData.planets().forEach((dimension, planet) ->
-            LaunchingDimensionHandler.getSpawningLocation(player, player.serverLevel(), planet).ifPresent(locations::add));
+            LaunchingDimensionHandler.getSpawningLocation(player, player.level(), planet).ifPresent(locations::add));
 
         return new PlanetsMenuContent(
             Collections.unmodifiableSet(disabledPlanets),
@@ -78,7 +84,7 @@ public class PlanetsMenuProvider implements ContentMenuProvider<PlanetsMenuConte
             stationGroups.forEach((id, stations) -> {
                 buffer.writeVarInt(stations.size());
                 stations.forEach(station -> {
-                    buffer.writeUtf(Component.Serializer.toJson(station.name(), net.minecraft.core.RegistryAccess.EMPTY));
+                    buffer.writeUtf(componentToJson(station.name()));
                     buffer.writeChunkPos(station.position());
                 });
                 buffer.writeUUID(id);
@@ -97,7 +103,7 @@ public class PlanetsMenuProvider implements ContentMenuProvider<PlanetsMenuConte
         String[] planets = buf.readUtf().split(",");
         for (var planet : planets) {
             if (!planet.isBlank()) {
-                disabledPlanets.add(Identifier.fromNamespaceAndPath(planet));
+                disabledPlanets.add(Identifier.tryParse(planet));
             }
         }
         return Collections.unmodifiableSet(disabledPlanets);
@@ -117,7 +123,7 @@ public class PlanetsMenuProvider implements ContentMenuProvider<PlanetsMenuConte
                 Set<SpaceStation> spaceStations = new HashSet<>();
 
                 for (int k = 0; k < stationGroupSize; k++) {
-                    Component stationName = Component.Serializer.fromJson(buf.readUtf(), net.minecraft.core.RegistryAccess.EMPTY);
+                    Component stationName = componentFromJson(buf.readUtf());
                     ChunkPos stationPos = buf.readChunkPos();
                     spaceStations.add(new SpaceStation(stationPos, stationName));
                 }
@@ -141,5 +147,19 @@ public class PlanetsMenuProvider implements ContentMenuProvider<PlanetsMenuConte
             locations.add(GlobalPos.of(dimension, pos));
         }
         return Collections.unmodifiableSet(locations);
+    }
+
+    private static String componentToJson(Component component) {
+        RegistryOps<JsonElement> ops = RegistryAccess.EMPTY.createSerializationContext(JsonOps.INSTANCE);
+        return ComponentSerialization.CODEC.encodeStart(ops, component)
+            .getOrThrow()
+            .toString();
+    }
+
+    private static Component componentFromJson(String json) {
+        RegistryOps<JsonElement> ops = RegistryAccess.EMPTY.createSerializationContext(JsonOps.INSTANCE);
+        return ComponentSerialization.CODEC.decode(ops, JsonParser.parseString(json))
+            .getOrThrow()
+            .getFirst();
     }
 }

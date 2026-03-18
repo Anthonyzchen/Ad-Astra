@@ -10,7 +10,6 @@
     "common.multipart.LevelMixin"
   ],
   "client": [
-    "common.DimensionSpecialEffectsMixin"
   ],
   "injectors": {
     "defaultRequire": 1

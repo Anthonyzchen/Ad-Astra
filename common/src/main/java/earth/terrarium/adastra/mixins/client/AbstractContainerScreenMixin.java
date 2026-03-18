@@ -13,14 +13,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class AbstractContainerScreenMixin implements AbstractContainerScreenExtension {
 
     @Inject(
-        method = "method_2385",
-        at = @At(
-            value = "INVOKE",
-            target = "Lcom/mojang/blaze3d/vertex/PoseStack;translate(FFF)V",
-            shift = At.Shift.AFTER
-        )
+        method = "renderSlot",
+        at = @At("HEAD")
     )
-    private void adastra$renderPreSlot(GuiGraphics graphics, Slot slot, CallbackInfo ci) {
+    private void adastra$renderPreSlot(GuiGraphics graphics, Slot slot, int mouseX, int mouseY, CallbackInfo ci) {
         this.adastra$renderPreSlot(graphics, slot);
     }
 }

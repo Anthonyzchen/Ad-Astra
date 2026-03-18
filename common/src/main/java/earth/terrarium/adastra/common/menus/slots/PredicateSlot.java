@@ -22,7 +22,8 @@ public class PredicateSlot extends Slot {
     }
 
     public static <T extends Recipe<RecipeInput>> PredicateSlot ofRecipeInput(Container container, int slot, int x, int y, Level level, RecipeType<T> type) {
-        final RecipeManager recipeManager = level.getRecipeManager();
+        final var server = level.getServer();
+        final RecipeManager recipeManager = server != null ? server.getRecipeManager() : null;
         final SingleSlotContainer inventory = new SingleSlotContainer(slot);
         final RecipeInput recipeInput = new RecipeInput() {
             @Override
@@ -36,6 +37,7 @@ public class PredicateSlot extends Slot {
             }
         };
         return new PredicateSlot(container, slot, x, y, item -> {
+            if (recipeManager == null) return false;
             inventory.setItem(item);
             return recipeManager.getRecipeFor(type, recipeInput, level).isPresent();
         });

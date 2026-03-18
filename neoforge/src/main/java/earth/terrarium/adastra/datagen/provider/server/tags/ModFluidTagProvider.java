@@ -13,14 +13,16 @@ import net.minecraft.tags.TagEntry;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
-
 import java.util.concurrent.CompletableFuture;
 
 public class ModFluidTagProvider extends TagsProvider<Fluid> {
 
-    public ModFluidTagProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> completableFuture, ExistingFileHelper existingFileHelper) {
-        super(output, Registries.FLUID, completableFuture, AdAstra.MOD_ID, existingFileHelper);
+    public ModFluidTagProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> completableFuture) {
+        super(output, Registries.FLUID, completableFuture);
+    }
+
+    private net.minecraft.tags.TagBuilder tag(TagKey<Fluid> tagKey) {
+        return getOrCreateRawBuilder(tagKey);
     }
 
     @Override
@@ -44,15 +46,15 @@ public class ModFluidTagProvider extends TagsProvider<Fluid> {
         add(ModFluidTags.FREEZES_IN_SPACE, Fluids.WATER);
         add(ModFluidTags.EVAPORATES_IN_SPACE, Fluids.WATER);
 
-        tag(ModFluidTags.FUEL).add(TagEntry.optionalTag(new Identifier("c:diesel")));
-        tag(ModFluidTags.FUEL).add(TagEntry.optionalTag(new Identifier("forge:diesel")));
-        tag(ModFluidTags.FUEL).add(TagEntry.optionalTag(new Identifier("c:biodiesel")));
-        tag(ModFluidTags.FUEL).add(TagEntry.optionalTag(new Identifier("forge:biodiesel")));
-        tag(ModFluidTags.FUEL).add(TagEntry.optionalTag(new Identifier("forge:biodiesel")));
+        tag(ModFluidTags.FUEL).add(TagEntry.optionalTag(Identifier.parse("c:diesel")));
+        tag(ModFluidTags.FUEL).add(TagEntry.optionalTag(Identifier.parse("forge:diesel")));
+        tag(ModFluidTags.FUEL).add(TagEntry.optionalTag(Identifier.parse("c:biodiesel")));
+        tag(ModFluidTags.FUEL).add(TagEntry.optionalTag(Identifier.parse("forge:biodiesel")));
+        tag(ModFluidTags.FUEL).add(TagEntry.optionalTag(Identifier.parse("forge:biodiesel")));
 
-        tag(ModFluidTags.OIL).add(TagEntry.optionalElement(new Identifier("techreborn:oil")));
-        tag(ModFluidTags.OIL).add(TagEntry.optionalTag(new Identifier("forge:crude_oil")));
-        tag(ModFluidTags.OIL).add(TagEntry.optionalTag(new Identifier("c:crude_oil")));
+        tag(ModFluidTags.OIL).add(TagEntry.optionalElement(Identifier.parse("techreborn:oil")));
+        tag(ModFluidTags.OIL).add(TagEntry.optionalTag(Identifier.parse("forge:crude_oil")));
+        tag(ModFluidTags.OIL).add(TagEntry.optionalTag(Identifier.parse("c:crude_oil")));
     }
 
     private void add(TagKey<Fluid> tag, Fluid fluid) {
@@ -60,7 +62,7 @@ public class ModFluidTagProvider extends TagsProvider<Fluid> {
     }
 
     private void add(TagKey<Fluid> tag, TagKey<Fluid> fluid) {
-        tag(tag).addTag(fluid);
+        tag(tag).addTag(fluid.location());
     }
 
     private void add(TagKey<Fluid> tag, Fluid fluid, String fabricCommonTag, String forgeCommonTag) {
@@ -70,16 +72,16 @@ public class ModFluidTagProvider extends TagsProvider<Fluid> {
     }
 
     private void addFabricTag(Fluid fluid, TagKey<Fluid> tag, String fabricCommonTag) {
-        tag(tag).add(TagEntry.optionalTag(new Identifier("c", fabricCommonTag)));
+        tag(tag).add(TagEntry.optionalTag(Identifier.fromNamespaceAndPath("c", fabricCommonTag)));
 
-        var commonTag = TagKey.create(Registries.FLUID, new Identifier("c", fabricCommonTag));
+        var commonTag = TagKey.create(Registries.FLUID, Identifier.fromNamespaceAndPath("c", fabricCommonTag));
         tag(commonTag).add(element(fluid));
     }
 
     private void addForgeTag(Fluid fluid, TagKey<Fluid> tag, String forgeCommonTag) {
-        tag(tag).add(TagEntry.optionalTag(new Identifier("forge", forgeCommonTag)));
+        tag(tag).add(TagEntry.optionalTag(Identifier.fromNamespaceAndPath("forge", forgeCommonTag)));
 
-        var commonTag = TagKey.create(Registries.FLUID, new Identifier("forge", forgeCommonTag));
+        var commonTag = TagKey.create(Registries.FLUID, Identifier.fromNamespaceAndPath("forge", forgeCommonTag));
         tag(commonTag).add(element(fluid));
     }
 

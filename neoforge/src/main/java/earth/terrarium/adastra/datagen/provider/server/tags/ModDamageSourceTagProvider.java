@@ -9,19 +9,17 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.TagsProvider;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageType;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
-
 import java.util.concurrent.CompletableFuture;
 
 public class ModDamageSourceTagProvider extends TagsProvider<DamageType> {
 
-    public ModDamageSourceTagProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> completableFuture, ExistingFileHelper existingFileHelper) {
-        super(output, Registries.DAMAGE_TYPE, completableFuture, AdAstra.MOD_ID, existingFileHelper);
+    public ModDamageSourceTagProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> completableFuture) {
+        super(output, Registries.DAMAGE_TYPE, completableFuture);
     }
 
     @Override
     protected void addTags(HolderLookup.Provider provider) {
-        tag(DamageTypeTags.BYPASSES_ARMOR).addOptional(ModDamageSources.OXYGEN.identifier());
-        tag(DamageTypeTags.NO_IMPACT).addOptional(ModDamageSources.OXYGEN.identifier());
+        getOrCreateRawBuilder(DamageTypeTags.BYPASSES_ARMOR).addOptionalElement(ModDamageSources.OXYGEN.identifier());
+        getOrCreateRawBuilder(DamageTypeTags.NO_IMPACT).addOptionalElement(ModDamageSources.OXYGEN.identifier());
     }
 }

@@ -4,9 +4,11 @@ import earth.terrarium.adastra.common.blockentities.machines.OxygenDistributorBl
 import earth.terrarium.adastra.common.registry.ModEntityTypes;
 import earth.terrarium.adastra.common.tags.ModEntityTypeTags;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -73,8 +75,13 @@ public class AirVortex extends Entity {
         entity.push(scale.x, scale.y, scale.z);
 
         if (entity instanceof ServerPlayer player) {
-            player.hasImpulse = true;
+            player.hurtMarked = true;
         }
+    }
+
+    @Override
+    public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
+        return false;
     }
 
     @Override
@@ -92,10 +99,10 @@ public class AirVortex extends Entity {
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag compound) {
+    protected void readAdditionalSaveData(ValueInput input) {
     }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag compound) {
+    protected void addAdditionalSaveData(ValueOutput output) {
     }
 }

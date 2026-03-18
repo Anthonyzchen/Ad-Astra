@@ -1,7 +1,5 @@
 package earth.terrarium.adastra.client.models.entities.vehicles;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import earth.terrarium.adastra.AdAstra;
 import earth.terrarium.adastra.client.ClientPlatformUtils;
 import net.minecraft.client.model.EntityModel;
@@ -19,10 +17,11 @@ public class RocketModel extends EntityModel<EntityRenderState> {
     public static final ModelLayerLocation TIER_3_LAYER = new ModelLayerLocation(Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "tier_3_rocket"), "main");
     public static final ModelLayerLocation TIER_4_LAYER = new ModelLayerLocation(Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "tier_4_rocket"), "main");
 
-    private final ModelPart root;
+    private final ModelPart main;
 
     public RocketModel(ModelPart root) {
-        this.root = root.getChild("main");
+        super(root);
+        this.main = root.getChild("main");
     }
 
     @SuppressWarnings({"unused", "DuplicatedCode"})
@@ -386,10 +385,7 @@ public class RocketModel extends EntityModel<EntityRenderState> {
     public void setupAnim(EntityRenderState state) {
     }
 
-    @Override
-    public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay, int color) {
-        root.render(poseStack, buffer, packedLight, packedOverlay, color);
-    }
+    // renderToBuffer is now final in Model - rendering is handled by root().render() automatically
 
     public static void register(ClientPlatformUtils.LayerDefinitionRegistry registry) {
         registry.register(TIER_1_LAYER, RocketModel::createTier1Layer);

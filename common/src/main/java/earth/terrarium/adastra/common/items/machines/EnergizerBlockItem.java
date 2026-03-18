@@ -15,12 +15,13 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 public class EnergizerBlockItem extends BlockItem implements EnergyProvider.Item {
 
@@ -68,11 +69,11 @@ public class EnergizerBlockItem extends BlockItem implements EnergyProvider.Item
 
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents, TooltipFlag isAdvanced) {
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay tooltipDisplay, Consumer<Component> consumer, TooltipFlag isAdvanced) {
         var energy = getEnergyStorage(stack);
-        tooltipComponents.add(TooltipUtils.getEnergyComponent(energy.getStoredAmount(), energy.getCapacity()));
-        tooltipComponents.add(TooltipUtils.getMaxEnergyInComponent(energy.getCapacity()));
-        tooltipComponents.add(TooltipUtils.getMaxEnergyOutComponent(energy.getCapacity()));
-        TooltipUtils.addDescriptionComponent(tooltipComponents, ConstantComponents.ENERGIZER_INFO);
+        consumer.accept(TooltipUtils.getEnergyComponent(energy.getStoredAmount(), energy.getCapacity()));
+        consumer.accept(TooltipUtils.getMaxEnergyInComponent(energy.getCapacity()));
+        consumer.accept(TooltipUtils.getMaxEnergyOutComponent(energy.getCapacity()));
+        TooltipUtils.addDescriptionComponent(consumer, ConstantComponents.ENERGIZER_INFO);
     }
 }

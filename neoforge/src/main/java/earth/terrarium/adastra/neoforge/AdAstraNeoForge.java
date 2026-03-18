@@ -6,19 +6,21 @@ import earth.terrarium.adastra.client.neoforge.AdAstraClientNeoForge;
 import earth.terrarium.adastra.common.commands.AdAstraCommands;
 import earth.terrarium.adastra.common.registry.ModEntityTypes;
 import earth.terrarium.adastra.common.tags.ModBlockTags;
+import earth.terrarium.adastra.datagen.AdAstraDataGenerator;
 import net.minecraft.world.level.Level;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.AddReloadListenerEvent;
+import net.neoforged.neoforge.event.AddServerReloadListenersEvent;
 import net.neoforged.neoforge.event.OnDatapackSyncEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
-import net.neoforged.neoforge.event.TickEvent;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
+import net.neoforged.neoforge.data.event.GatherDataEvent;
 
 @Mod(AdAstra.MOD_ID)
 public class AdAstraNeoForge {
@@ -33,13 +35,14 @@ public class AdAstraNeoForge {
         NeoForge.EVENT_BUS.addListener(AdAstraNeoForge::onServerStarted);
         bus.addListener(AdAstraNeoForge::onAttributes);
         bus.addListener(AdAstraNeoForge::commonSetup);
-        if (FMLEnvironment.dist.isClient()) {
+        bus.addListener(AdAstraDataGenerator::gatherData);
+        if (FMLEnvironment.getDist().isClient()) {
             AdAstraClientNeoForge.init(bus);
         }
     }
 
-    public static void onAddReloadListener(AddReloadListenerEvent event) {
-        AdAstra.onAddReloadListener((id, listener) -> event.addListener(listener));
+    public static void onAddReloadListener(AddServerReloadListenersEvent event) {
+        AdAstra.onAddReloadListener((id, listener) -> event.addListener(id, listener));
     }
 
     public static void onDatapackSync(OnDatapackSyncEvent event) {
@@ -52,10 +55,8 @@ public class AdAstraNeoForge {
         }
     }
 
-    public static void onServerTick(TickEvent.ServerTickEvent event) {
-        if (event.phase == TickEvent.Phase.END) {
-            AdAstra.onServerTick(event.getServer());
-        }
+    public static void onServerTick(ServerTickEvent.Post event) {
+        AdAstra.onServerTick(event.getServer());
     }
 
     public static void onAttributes(EntityAttributeCreationEvent event) {

@@ -32,6 +32,11 @@ public class LanderRenderer extends EntityRenderer<Lander, EntityRenderState> {
     }
 
     @Override
+    public EntityRenderState createRenderState() {
+        return new EntityRenderState();
+    }
+
+    @Override
     public void submit(EntityRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState cameraState) {
         super.submit(state, poseStack, collector, cameraState);
         // TODO: 1.21.11 - Migrate lander rendering to the new SubmitNodeCollector pipeline.

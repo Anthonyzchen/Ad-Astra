@@ -102,7 +102,7 @@ public class LaunchingDimensionHandler extends SavedData {
 
     public static Collection<GlobalPos> getAllSpawnLocations(ServerPlayer player) {
         Set<GlobalPos> positions = new HashSet<>();
-        LaunchedDimensions dimensions = get(player, player.serverLevel(), false);
+        LaunchedDimensions dimensions = get(player, (ServerLevel) player.level(), false);
         if (dimensions == null) return positions;
         for (var entry : dimensions.dimensions.entrySet()) {
             positions.add(entry.getValue());

@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class EntityRendererMixin {
 
     // TODO: 1.21.11 - Verify EntityRenderer.shouldRender() still exists with this signature
-    @Inject(method = "method_3933", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "shouldRender", at = @At("HEAD"), cancellable = true)
     public void adastra$shouldRender(Entity entity, Frustum frustum, double x, double y, double z, CallbackInfoReturnable<Boolean> cir) {
 
         // Make rocket invisible when player is in planets screen.

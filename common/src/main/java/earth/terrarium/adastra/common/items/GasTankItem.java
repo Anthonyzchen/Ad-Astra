@@ -21,7 +21,10 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
+import java.util.function.Consumer;
+
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.item.component.TooltipDisplay;
 
 public class GasTankItem extends Item {
 
@@ -53,7 +56,7 @@ public class GasTankItem extends Item {
         var container = getFluidContainer(stack);
         if (container == null || container.get(0).getAmount() == 0) return;
         if (entity.tickCount % 4 == 0) {
-            level.playSound(null, player.blockPosition(), SoundEvents.GENERIC_DRINK, player.getSoundSource(), 1.0F, 1.0F);
+            level.playSound(player, player.blockPosition(), SoundEvents.GENERIC_DRINK.value(), SoundSource.PLAYERS, 1.0F, 1.0F);
         }
     }
 
@@ -67,10 +70,10 @@ public class GasTankItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents, TooltipFlag isAdvanced) {
-        tooltipComponents.add(TooltipUtils.getFluidComponent(FluidUtils.getTank(stack), FluidUtils.getCapacity(stack)));
-        tooltipComponents.add(TooltipUtils.getMaxFluidOutComponent(distributionAmount * BUCKET / 1000L));
-        TooltipUtils.addDescriptionComponent(tooltipComponents, ConstantComponents.GAS_TANK_INFO);
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay tooltipDisplay, Consumer<Component> consumer, TooltipFlag isAdvanced) {
+        consumer.accept(TooltipUtils.getFluidComponent(FluidUtils.getTank(stack), FluidUtils.getCapacity(stack)));
+        consumer.accept(TooltipUtils.getMaxFluidOutComponent(distributionAmount * BUCKET / 1000L));
+        TooltipUtils.addDescriptionComponent(consumer, ConstantComponents.GAS_TANK_INFO);
     }
 
     public int getUseDuration(@NotNull ItemStack stack) {

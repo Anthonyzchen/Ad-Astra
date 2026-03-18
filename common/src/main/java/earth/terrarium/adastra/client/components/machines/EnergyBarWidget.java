@@ -10,6 +10,7 @@ import earth.terrarium.adastra.common.utils.TooltipUtils;
 import earth.terrarium.common_storage_lib.storage.base.ValueStorage;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.CommonComponents;
 
 import java.time.Duration;
@@ -43,7 +44,7 @@ public class EnergyBarWidget extends ConfigurationWidget implements CursorWidget
         int x = this.getX();
         int y = this.getY();
         try (var ignored = new CloseableScissor(graphics, x, y + GuiUtils.ENERGY_BAR_HEIGHT - (int) (GuiUtils.ENERGY_BAR_HEIGHT * ratio), GuiUtils.ENERGY_BAR_WIDTH, GuiUtils.ENERGY_BAR_HEIGHT)) {
-            graphics.blitSprite(GuiUtils.ENERGY_BAR, x, y, GuiUtils.ENERGY_BAR_WIDTH, GuiUtils.ENERGY_BAR_HEIGHT);
+            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, GuiUtils.ENERGY_BAR, x, y, GuiUtils.ENERGY_BAR_WIDTH, GuiUtils.ENERGY_BAR_HEIGHT);
         }
 
         if (this.isHoveredOrFocused()) {

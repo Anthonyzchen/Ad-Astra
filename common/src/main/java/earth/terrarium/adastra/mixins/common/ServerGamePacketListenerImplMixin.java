@@ -24,7 +24,7 @@ public abstract class ServerGamePacketListenerImplMixin {
     @Shadow
     public ServerPlayer player;
 
-    @Inject(method = "method_18784", at = @At("HEAD"))
+    @Inject(method = "tick", at = @At("HEAD"))
     public void adastra$tick(CallbackInfo ci) {
         if (player.tickCount % 50 == 0) {
             // Prevent the player from being kicked for flying a jet suit.

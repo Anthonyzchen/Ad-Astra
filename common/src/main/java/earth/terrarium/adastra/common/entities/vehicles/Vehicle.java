@@ -83,11 +83,10 @@ public abstract class Vehicle extends Entity implements PlayerRideable, ContentM
     }
 
     @Override
-    public boolean canBeCollidedWith() {
+    public boolean canBeCollidedWith(Entity entity) {
         return true;
     }
 
-    @Override
     public void lerpTo(double x, double y, double z, float yRot, float xRot, int lerpSteps) {
         lerpX = x;
         lerpY = y;
@@ -157,8 +156,13 @@ public abstract class Vehicle extends Entity implements PlayerRideable, ContentM
         return !isRemoved();
     }
 
-    public boolean hurtVehicle(DamageSource source, float amount) {
-        if (this.isInvulnerableTo(level() instanceof ServerLevel sl ? sl : null, source)) return false;
+    @Override
+    public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
+        return hurtVehicle(level, source, amount);
+    }
+
+    public boolean hurtVehicle(ServerLevel level, DamageSource source, float amount) {
+        if (this.isInvulnerableToBase(source)) return false;
         if (source.is(DamageTypeTags.IS_PROJECTILE)) return false;
         if (amount >= 0
             && source.getEntity() instanceof Player player

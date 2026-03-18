@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(Creeper.class)
 public abstract class CreeperMixin {
 
-    @Inject(method = "method_7006", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "explodeCreeper", at = @At("HEAD"), cancellable = true)
     private void adastra$explodeCreeper(CallbackInfo ci) {
         if (((Creeper) (Object) this) instanceof SulfurCreeper creeper) {
             ci.cancel();

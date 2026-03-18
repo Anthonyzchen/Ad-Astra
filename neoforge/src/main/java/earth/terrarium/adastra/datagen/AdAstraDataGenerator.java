@@ -12,43 +12,37 @@ import earth.terrarium.adastra.datagen.provider.server.tags.*;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 
 import java.util.concurrent.CompletableFuture;
 
-@Mod.EventBusSubscriber(modid = AdAstra.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public final class AdAstraDataGenerator {
 
-    @SubscribeEvent
     public static void gatherData(GatherDataEvent event) {
         DataGenerator generator = event.getGenerator();
         CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
         PackOutput packOutput = generator.getPackOutput();
-        ExistingFileHelper existingFileHelper = event.getExistingFileHelper();
 
-        generator.addProvider(event.includeClient(), new ModLangProvider(packOutput));
-        generator.addProvider(event.includeClient(), new ModBlockStateProvider(packOutput, existingFileHelper));
-        generator.addProvider(event.includeClient(), new ModHighlightBlockStateProvider(packOutput));
-        generator.addProvider(event.includeClient(), new ModItemModelProvider(packOutput, existingFileHelper));
-        generator.addProvider(event.includeClient(), new ModPlanetRendererProvider(packOutput));
+        event.addProvider(new ModLangProvider(packOutput));
+        event.addProvider(new ModBlockStateProvider(packOutput));
+        event.addProvider(new ModHighlightBlockStateProvider(packOutput));
+        event.addProvider(new ModItemModelProvider(packOutput));
+        event.addProvider(new ModPlanetRendererProvider(packOutput));
 
-        generator.addProvider(event.includeServer(), new ModRegistryProvider(packOutput, lookupProvider));
-        generator.addProvider(event.includeServer(), new ModPlanetProvider(packOutput));
-        generator.addProvider(event.includeServer(), new ModRecipeProvider(packOutput));
-        generator.addProvider(event.includeServer(), new ModLootTableProvider(packOutput));
-        generator.addProvider(event.includeServer(), new ModAdvancementProvider(packOutput, lookupProvider, existingFileHelper));
+        event.addProvider(new ModRegistryProvider(packOutput, lookupProvider));
+        event.addProvider(new ModPlanetProvider(packOutput));
+        event.addProvider(new ModRecipeProvider.Runner(packOutput, lookupProvider));
+        event.addProvider(new ModLootTableProvider(packOutput, lookupProvider));
+        event.addProvider(new ModAdvancementProvider(packOutput, lookupProvider));
 
-        generator.addProvider(event.includeServer(), new ModBlockTagProvider(packOutput, lookupProvider, existingFileHelper));
-        generator.addProvider(event.includeServer(), new ModItemTagProvider(packOutput, lookupProvider, existingFileHelper));
-        generator.addProvider(event.includeServer(), new ModFluidTagProvider(packOutput, lookupProvider, existingFileHelper));
-        generator.addProvider(event.includeServer(), new ModEntityTypeTagProvider(packOutput, lookupProvider, existingFileHelper));
-        generator.addProvider(event.includeServer(), new ModPaintingVariantTagProvider(packOutput, lookupProvider, existingFileHelper));
-        generator.addProvider(event.includeServer(), new ModDamageSourceTagProvider(packOutput, lookupProvider, existingFileHelper));
-        generator.addProvider(event.includeServer(), new ModBiomeTagProvider(packOutput, lookupProvider, existingFileHelper));
+        event.addProvider(new ModBlockTagProvider(packOutput, lookupProvider));
+        event.addProvider(new ModItemTagProvider(packOutput, lookupProvider));
+        event.addProvider(new ModFluidTagProvider(packOutput, lookupProvider));
+        event.addProvider(new ModEntityTypeTagProvider(packOutput, lookupProvider));
+        event.addProvider(new ModPaintingVariantTagProvider(packOutput, lookupProvider));
+        event.addProvider(new ModDamageSourceTagProvider(packOutput, lookupProvider));
+        event.addProvider(new ModBiomeTagProvider(packOutput, lookupProvider));
 
-        generator.addProvider(true, new StructureUpdater("structures", AdAstra.MOD_ID, existingFileHelper, packOutput));
+        event.addProvider(new StructureUpdater("structures", AdAstra.MOD_ID, packOutput));
     }
 }

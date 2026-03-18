@@ -12,10 +12,13 @@ import earth.terrarium.common_storage_lib.storage.base.ValueStorage;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -24,7 +27,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 public class EtrionicCapacitorItem extends Item implements EnergyProvider.Item {
 
@@ -87,17 +90,16 @@ public class EtrionicCapacitorItem extends Item implements EnergyProvider.Item {
     }
 
     @Override
-    public void appendHoverText(@NotNull ItemStack stack, @NotNull Item.TooltipContext context, @NotNull List<Component> tooltipComponents, @NotNull TooltipFlag isAdvanced) {
+    public void appendHoverText(@NotNull ItemStack stack, @NotNull Item.TooltipContext context, @NotNull TooltipDisplay tooltipDisplay, @NotNull Consumer<Component> consumer, @NotNull TooltipFlag isAdvanced) {
         SimpleValueStorage energy = getEnergyStorage(stack);
-        tooltipComponents.add(TooltipUtils.getEnergyComponent(energy.getStoredAmount(), energy.getCapacity()));
-        tooltipComponents.add(TooltipUtils.getMaxEnergyInComponent(250));
-        tooltipComponents.add(TooltipUtils.getMaxEnergyOutComponent(25));
-        TooltipUtils.addDescriptionComponent(tooltipComponents, ConstantComponents.ETRIONIC_CAPACITOR_INFO);
+        consumer.accept(TooltipUtils.getEnergyComponent(energy.getStoredAmount(), energy.getCapacity()));
+        consumer.accept(TooltipUtils.getMaxEnergyInComponent(250));
+        consumer.accept(TooltipUtils.getMaxEnergyOutComponent(25));
+        TooltipUtils.addDescriptionComponent(consumer, ConstantComponents.ETRIONIC_CAPACITOR_INFO);
     }
 
     @Override
-    public void inventoryTick(@NotNull ItemStack stack, @NotNull Level level, @NotNull Entity entity, int slotId, boolean isSelected) {
-        if (level.isClientSide()) return;
+    public void inventoryTick(@NotNull ItemStack stack, @NotNull ServerLevel level, @NotNull Entity entity, @NotNull EquipmentSlot slot) {
         if (entity.tickCount % 5 != 0) return;
         if (!active(stack)) return;
         if (!(entity instanceof Player player)) return;

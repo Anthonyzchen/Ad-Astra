@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class HumanoidModelMixin {
 
     @SuppressWarnings("unchecked")
-    @Inject(method = "method_17087", at = @At("TAIL"))
+    @Inject(method = "setupAnim", at = @At("TAIL"))
     private void adastra$setupAnimTail(HumanoidRenderState state, CallbackInfo ci) {
         var model = ((HumanoidModel<?>) (Object) this);
 

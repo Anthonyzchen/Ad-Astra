@@ -20,12 +20,12 @@ public abstract class ConfigurationWidget extends AbstractWidget {
     protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {}
 
     @Override
-    protected boolean isValidClickButton(int button) {
+    protected boolean isValidClickButton(net.minecraft.client.input.MouseButtonInfo button) {
         return ConfigurationScreen.isConfigurable();
     }
 
     @Override
-    public void onClick(double mouseX, double mouseY) {
+    public void onClick(net.minecraft.client.input.MouseButtonEvent event, boolean bl) {
         ConfigurationScreen.ifPresent((screen) -> screen.getSideConfigWidget().setIndex(this.configuration.index()));
     }
 

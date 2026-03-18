@@ -18,7 +18,7 @@ import java.util.function.BiConsumer;
 
 public class ModPlanetProvider extends ModCodecProvider<Planet> {
 
-    public static final ResourceKey<Registry<Planet>> PLANET_REGISTRY = ResourceKey.createRegistryKey(new Identifier(AdAstra.MOD_ID, "planets"));
+    public static final ResourceKey<Registry<Planet>> PLANET_REGISTRY = ResourceKey.createRegistryKey(Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "planets"));
 
     public ModPlanetProvider(PackOutput packOutput) {
         super(packOutput, Planet.CODEC, PLANET_REGISTRY);
@@ -34,7 +34,7 @@ public class ModPlanetProvider extends ModCodecProvider<Planet> {
         orbit(consumer, Planet.GLACIO_ORBIT, PlanetConstants.GLACIO_ORBIT_SOLAR_POWER, PlanetConstants.PROXIMA_CENTAURI, 4);
 
         consumer.accept(
-            new Identifier(AdAstra.MOD_ID, "earth"),
+            Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "earth"),
             new Planet(
                 Level.OVERWORLD,
                 true,
@@ -49,7 +49,7 @@ public class ModPlanetProvider extends ModCodecProvider<Planet> {
         );
 
         consumer.accept(
-            new Identifier(AdAstra.MOD_ID, "moon"),
+            Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "moon"),
             new Planet(Planet.MOON,
                 false,
                 PlanetConstants.MOON_TEMPERATURE,
@@ -63,7 +63,7 @@ public class ModPlanetProvider extends ModCodecProvider<Planet> {
         );
 
         consumer.accept(
-            new Identifier(AdAstra.MOD_ID, "mars"),
+            Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "mars"),
             new Planet(Planet.MARS,
                 false,
                 PlanetConstants.MARS_TEMPERATURE,
@@ -77,7 +77,7 @@ public class ModPlanetProvider extends ModCodecProvider<Planet> {
         );
 
         consumer.accept(
-            new Identifier(AdAstra.MOD_ID, "venus"),
+            Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "venus"),
             new Planet(Planet.VENUS,
                 false,
                 PlanetConstants.VENUS_TEMPERATURE,
@@ -91,7 +91,7 @@ public class ModPlanetProvider extends ModCodecProvider<Planet> {
         );
 
         consumer.accept(
-            new Identifier(AdAstra.MOD_ID, "mercury"),
+            Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "mercury"),
             new Planet(Planet.MERCURY,
                 false,
                 PlanetConstants.MERCURY_TEMPERATURE,
@@ -105,7 +105,7 @@ public class ModPlanetProvider extends ModCodecProvider<Planet> {
         );
 
         consumer.accept(
-            new Identifier(AdAstra.MOD_ID, "glacio"),
+            Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "glacio"),
             new Planet(Planet.GLACIO,
                 true,
                 PlanetConstants.GLACIO_TEMPERATURE,

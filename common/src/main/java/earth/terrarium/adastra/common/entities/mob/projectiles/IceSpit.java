@@ -19,7 +19,8 @@ public class IceSpit extends ThrowableItemProjectile {
     }
 
     public IceSpit(EntityType<? extends ThrowableItemProjectile> entityType, LivingEntity livingEntity, Level level) {
-        super(entityType, livingEntity, level);
+        super(entityType, level);
+        this.setOwner(livingEntity);
     }
 
     @Override

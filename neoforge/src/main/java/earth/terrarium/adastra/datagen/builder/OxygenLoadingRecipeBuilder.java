@@ -2,23 +2,26 @@ package earth.terrarium.adastra.datagen.builder;
 
 import com.teamresourceful.resourcefullib.common.datagen.CodecRecipeBuilder;
 import earth.terrarium.adastra.common.recipes.machines.OxygenLoadingRecipe;
-import earth.terrarium.botarium.common.fluid.base.FluidHolder;
-import earth.terrarium.botarium.common.fluid.utils.QuantifiedFluidIngredient;
+import earth.terrarium.common_storage_lib.resources.fluid.FluidResource;
+import earth.terrarium.common_storage_lib.resources.fluid.ingredient.SizedFluidIngredient;
 import net.minecraft.advancements.AdvancementRequirements;
 import net.minecraft.advancements.AdvancementRewards;
-import net.minecraft.advancements.critereon.RecipeUnlockedTrigger;
+import net.minecraft.advancements.criterion.RecipeUnlockedTrigger;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Recipe;
 import org.jetbrains.annotations.NotNull;
 
 public class OxygenLoadingRecipeBuilder extends CodecRecipeBuilder {
 
     private final OxygenLoadingRecipe recipe;
 
-    public OxygenLoadingRecipeBuilder(int cookingTime, int energy, QuantifiedFluidIngredient input, FluidHolder result) {
-        recipe = new OxygenLoadingRecipe(cookingTime, energy, input, result);
+    public OxygenLoadingRecipeBuilder(int cookingTime, int energy, SizedFluidIngredient input, FluidResource result, long resultAmount) {
+        recipe = new OxygenLoadingRecipe(cookingTime, energy, input, result, resultAmount);
     }
 
     @Override
@@ -26,14 +29,19 @@ public class OxygenLoadingRecipeBuilder extends CodecRecipeBuilder {
         return Items.AIR;
     }
 
-    @Override
     public void save(RecipeOutput recipeOutput, Identifier id) {
+        save(recipeOutput, ResourceKey.create(Registries.RECIPE, id));
+    }
+
+    @Override
+    public void save(RecipeOutput recipeOutput, ResourceKey<Recipe<?>> key) {
+        Identifier id = key.identifier();
         var builder = recipeOutput.advancement()
-            .addCriterion("has_the_recipe", RecipeUnlockedTrigger.unlocked(id))
-            .rewards(AdvancementRewards.Builder.recipe(id))
+            .addCriterion("has_the_recipe", RecipeUnlockedTrigger.unlocked(key))
+            .rewards(AdvancementRewards.Builder.recipe(key))
             .requirements(AdvancementRequirements.Strategy.OR);
         criteria.forEach(builder::addCriterion);
-        recipeOutput.accept(id, recipe, builder
-            .build(new Identifier(id.getNamespace(), "recipes/oxygen_loading/" + id.getPath())));
+        recipeOutput.accept(key, recipe, builder
+            .build(Identifier.fromNamespaceAndPath(id.getNamespace(), "recipes/oxygen_loading/" + id.getPath())));
     }
 }

@@ -13,9 +13,10 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public abstract class VehicleItem extends RenderedItem {
@@ -55,8 +56,8 @@ public abstract class VehicleItem extends RenderedItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents, TooltipFlag isAdvanced) {
-        tooltipComponents.add(TooltipUtils.getFluidComponent(
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay tooltipDisplay, Consumer<Component> consumer, TooltipFlag isAdvanced) {
+        consumer.accept(TooltipUtils.getFluidComponent(
             FluidUtils.getTank(stack),
             FluidUtils.getCapacity(stack),
             ModFluids.FUEL.get()));

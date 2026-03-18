@@ -4,6 +4,7 @@ import earth.terrarium.adastra.common.items.armor.SpaceSuitItem;
 // TODO: Migrate to CSL
 // import earth.terrarium.botarium.common.fluid.base.FluidContainer;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.AreaEffectCloud;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -12,7 +13,6 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
@@ -34,17 +34,21 @@ public class SulfurCreeper extends Creeper {
         if (this.level().isClientSide()) return;
         float power = isPowered() ? 2 : 1;
         this.dead = true;
-        Explosion explosion = this.level().explode(this, this.getX(), this.getY(), this.getZ(), 3 * power, Level.ExplosionInteraction.MOB);
+        this.level().explode(this, this.getX(), this.getY(), this.getZ(), 3 * power, Level.ExplosionInteraction.MOB);
         this.discard();
 
         // TODO: Migrate to CSL - re-implement oxygen drain on explosion
-        for (Player player : explosion.getHitPlayers().keySet()) {
-            var stack = player.getItemBySlot(EquipmentSlot.CHEST);
-            if (SpaceSuitItem.hasFullSet(player)) {
-                if (!(stack.getItem() instanceof SpaceSuitItem suit)) continue;
-                long amount = Math.max(0, (long) ((7 - player.getPosition(0).distanceTo(player.getPosition(0))) * 125));
-                suit.consumeOxygen(stack, amount);
-                player.setItemSlot(EquipmentSlot.CHEST, stack);
+        // Explosion no longer returns a value or tracks hit players directly.
+        // Nearby players need to be queried manually if oxygen drain is re-enabled.
+        if (this.level() instanceof ServerLevel serverLevel) {
+            for (Player player : serverLevel.getEntitiesOfClass(Player.class, this.getBoundingBox().inflate(7))) {
+                var stack = player.getItemBySlot(EquipmentSlot.CHEST);
+                if (SpaceSuitItem.hasFullSet(player)) {
+                    if (!(stack.getItem() instanceof SpaceSuitItem suit)) continue;
+                    long amount = Math.max(0, (long) ((7 - player.distanceTo(this)) * 125));
+                    suit.consumeOxygen(stack, amount);
+                    player.setItemSlot(EquipmentSlot.CHEST, stack);
+                }
             }
         }
 

@@ -19,6 +19,11 @@ public class ZombifiedMoglerRenderer extends MobRenderer<ZombifiedMogler, Living
     }
 
     @Override
+    public LivingEntityRenderState createRenderState() {
+        return new LivingEntityRenderState();
+    }
+
+    @Override
     public @NotNull Identifier getTextureLocation(LivingEntityRenderState state) {
         return TEXTURE;
     }

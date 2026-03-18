@@ -18,7 +18,7 @@ public abstract class BoatMixin extends Entity {
         super(entityType, level);
     }
 
-    @Inject(method = "method_64481", at = @At("TAIL"))
+    @Inject(method = "floatBoat", at = @At("TAIL"))
     public void adastra$floatBoat(CallbackInfo ci) {
         double gravity = -0.04 * GravityApi.API.getGravity(this);
         Vec3 velocity = this.getDeltaMovement();

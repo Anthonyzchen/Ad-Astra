@@ -72,7 +72,7 @@ public class GravityApiImpl implements GravityApi {
     @Override
     public void entityTick(Level level, LivingEntity entity, Vec3 travelVector, BlockPos movementAffectingPos) {
         if (AdAstraConfig.disableGravity) return;
-        if (!entity.isControlledByLocalInstance()) return;
+        if (!entity.isLocalInstanceAuthoritative()) return;
 
         boolean touchingSomething = false;
         for (Direction direction : Direction.values()) {
@@ -98,12 +98,12 @@ public class GravityApiImpl implements GravityApi {
 
         float friction = level.getBlockState(movementAffectingPos).getBlock().getFriction();
         float speed = touchingSomething ? entity.onGround() ? friction * 0.91f : 0.91f : entity.onGround() ? friction * PlanetConstants.SPACE_FRICTION : PlanetConstants.SPACE_FRICTION;
-        Vec3 movementVector = entity.handleRelativeFrictionAndCalculateMovement(travelVector, friction);
+        Vec3 movementVector = ((LivingEntityAccessor) entity).invokeHandleRelativeFrictionAndCalculateMovement(travelVector, friction);
 
         double downSpeed = movementVector.y;
         //noinspection deprecation
-        if (entity.level().isClientSide() && !entity.level().hasChunkAt(movementAffectingPos)) {
-            if (entity.getY() > entity.level().getMinBuildHeight()) {
+        if (entity.level().isClientSide() && !entity.level().hasChunkAt(entity.blockPosition())) {
+            if (entity.getY() > entity.level().getMinY()) {
                 downSpeed = -0.1;
             } else {
                 downSpeed = 0.0;

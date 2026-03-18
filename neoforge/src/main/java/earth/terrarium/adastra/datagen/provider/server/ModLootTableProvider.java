@@ -8,29 +8,29 @@ import earth.terrarium.adastra.common.blocks.properties.LaunchPadPartProperty;
 import earth.terrarium.adastra.common.blocks.properties.SlidingDoorPartProperty;
 import earth.terrarium.adastra.common.registry.ModBlocks;
 import earth.terrarium.adastra.common.registry.ModItems;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.loot.BlockLootSubProvider;
 import net.minecraft.data.loot.LootTableProvider;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.storage.loot.LootTable;
-import net.minecraft.world.level.storage.loot.ValidationContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
 
 public class ModLootTableProvider extends LootTableProvider {
 
-    public ModLootTableProvider(PackOutput output) {
-        super(output, Set.of(), List.of(new SubProviderEntry(BlockLootTables::new, LootContextParamSets.BLOCK)));
+    public ModLootTableProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
+        super(output, Set.of(), List.of(new SubProviderEntry(BlockLootTables::new, LootContextParamSets.BLOCK)), registries);
     }
 
     private static final Set<Supplier<Block>> DOESNT_DROP_SELF = Set.of(
@@ -67,14 +67,10 @@ public class ModLootTableProvider extends LootTableProvider {
         ModBlocks.GLACIO_STONE
     );
 
-    @Override
-    protected void validate(Map<Identifier, LootTable> map, ValidationContext validationTracker) {
-    }
-
     public static class BlockLootTables extends BlockLootSubProvider {
 
-        public BlockLootTables() {
-            super(Set.of(), FeatureFlags.REGISTRY.allFlags());
+        public BlockLootTables(HolderLookup.Provider registries) {
+            super(Set.of(), FeatureFlags.REGISTRY.allFlags(), registries);
         }
 
         @Override

@@ -1,18 +1,16 @@
 package earth.terrarium.adastra.common.planets;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
-import com.teamresourceful.resourcefullib.common.lib.Constants;
 import earth.terrarium.adastra.AdAstra;
 import earth.terrarium.adastra.api.planets.Planet;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.FileToIdConverter;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
-import net.minecraft.util.GsonHelper;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
@@ -20,22 +18,20 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class AdAstraData extends SimpleJsonResourceReloadListener {
+public class AdAstraData extends SimpleJsonResourceReloadListener<Planet> {
 
     private static final Map<ResourceKey<Level>, Planet> PLANETS = new HashMap<>();
     private static final Map<ResourceKey<Level>, ResourceKey<Level>> DIMENSIONS_TO_PLANETS = new HashMap<>();
 
     public AdAstraData() {
-        super(Constants.GSON, "planets");
+        super(Planet.CODEC, FileToIdConverter.json("planets"));
     }
 
     @Override
-    protected void apply(Map<Identifier, JsonElement> object, ResourceManager resourceManager, ProfilerFiller profiler) {
+    protected void apply(Map<Identifier, Planet> object, ResourceManager resourceManager, ProfilerFiller profiler) {
         PLANETS.clear();
         DIMENSIONS_TO_PLANETS.clear();
-        object.forEach((key, value) -> {
-            JsonObject json = GsonHelper.convertToJsonObject(value, "planets");
-            Planet planet = Planet.CODEC.parse(JsonOps.INSTANCE, json).getOrThrow();
+        object.forEach((key, planet) -> {
             PLANETS.put(planet.dimension(), planet);
             DIMENSIONS_TO_PLANETS.put(planet.dimension(), planet.dimension());
             for (ResourceKey<Level> dimension : planet.additionalLaunchDimensions()) {

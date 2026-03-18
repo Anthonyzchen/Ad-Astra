@@ -1,37 +1,32 @@
 package earth.terrarium.adastra.datagen.provider.client;
 
-
-import com.teamresourceful.resourcefullib.common.registry.RegistryEntry;
 import earth.terrarium.adastra.AdAstra;
-import earth.terrarium.adastra.common.registry.ModItems;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.data.CachedOutput;
+import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.item.Item;
-import net.neoforged.neoforge.client.model.generators.ItemModelProvider;
-import net.neoforged.neoforge.client.model.generators.ModelFile;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 
-public class ModItemModelProvider extends ItemModelProvider {
+// TODO: 1.21.11 - NeoForge removed ItemModelProvider and ExistingFileHelper.
+// Item model datagen needs to be reimplemented using vanilla datagen or manual JSON generation.
+public class ModItemModelProvider implements DataProvider {
 
-    public static final Identifier RENDERED_ITEM = new Identifier(AdAstra.MOD_ID, "item/rendered_item");
+    public static final Identifier RENDERED_ITEM = Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "item/rendered_item");
 
-    public ModItemModelProvider(PackOutput output, ExistingFileHelper existingFileHelper) {
-        super(output, AdAstra.MOD_ID, existingFileHelper);
+    public ModItemModelProvider(PackOutput output) {
     }
 
     @Override
-    protected void registerModels() {
-        ModItems.BASIC_ITEMS.getEntries().stream().map(RegistryEntry::get).forEach(this::basicItem);
-        ModItems.SLIDING_DOORS.getEntries().stream().map(RegistryEntry::get).forEach(this::basicItem);
-        ModItems.PIPES.getEntries().stream().map(RegistryEntry::get).forEach(this::basicItem);
-        ModItems.SPAWN_EGGS.getEntries().stream().map(RegistryEntry::get).forEach(this::spawnEggItem);
+    public CompletableFuture<?> run(@NotNull CachedOutput cache) {
+        AdAstra.LOGGER.warn("ModItemModelProvider is not yet implemented for 1.21.11 - NeoForge model generators were removed");
+        return CompletableFuture.completedFuture(null);
     }
 
-    public void spawnEggItem(Item item) {
-        getBuilder(Objects.requireNonNull(BuiltInRegistries.ITEM.getKey(item)).toString())
-            .parent(new ModelFile.UncheckedModelFile("item/template_spawn_egg"));
+    @NotNull
+    @Override
+    public String getName() {
+        return "Ad Astra Item Models";
     }
 }

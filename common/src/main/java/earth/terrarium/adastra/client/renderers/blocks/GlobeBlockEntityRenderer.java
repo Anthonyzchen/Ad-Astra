@@ -13,6 +13,7 @@ import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.block.ModelBlockRenderer;
 import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.state.CameraRenderState;
@@ -59,10 +60,9 @@ public class GlobeBlockEntityRenderer implements BlockEntityRenderer<GlobeBlockE
             poseStack.translate(0.5, 0, 0.5);
             poseStack.mulPose(Axis.YP.rotationDegrees(-yRot));
             poseStack.translate(-0.5, 0, -0.5);
-            Minecraft.getInstance().getBlockRenderer().getModelRenderer().renderModel(
+            ModelBlockRenderer.renderModel(
                 poseStack.last(),
                 buffer.getBuffer(Sheets.cutoutBlockSheet()),
-                blockState,
                 blockModel,
                 1, 1, 1,
                 packedLight, packedOverlay);
@@ -77,7 +77,7 @@ public class GlobeBlockEntityRenderer implements BlockEntityRenderer<GlobeBlockE
         }
 
         public void renderByItem(ItemStack stack, ItemDisplayContext displayContext, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay) {
-            BlockState state = BuiltInRegistries.BLOCK.get(BuiltInRegistries.ITEM.getKey(stack.getItem())).defaultBlockState();
+            BlockState state = BuiltInRegistries.BLOCK.getValue(BuiltInRegistries.ITEM.getKey(stack.getItem())).defaultBlockState();
 
             var minecraft = Minecraft.getInstance();
             float yRot = Util.getMillis() / 20f % 360f;
@@ -85,9 +85,8 @@ public class GlobeBlockEntityRenderer implements BlockEntityRenderer<GlobeBlockE
             poseStack.pushPose();
             try {
                 var model = minecraft.getBlockRenderer().getBlockModel(state);
-                minecraft.getBlockRenderer().getModelRenderer().renderModel(poseStack.last(),
+                ModelBlockRenderer.renderModel(poseStack.last(),
                     buffer.getBuffer(Sheets.cutoutBlockSheet()),
-                    state,
                     model,
                     1, 1, 1,
                     packedLight, packedOverlay);

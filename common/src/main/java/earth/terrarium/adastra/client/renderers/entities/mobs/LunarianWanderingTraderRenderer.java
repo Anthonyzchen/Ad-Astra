@@ -20,8 +20,13 @@ public class LunarianWanderingTraderRenderer extends MobRenderer<LunarianWanderi
 
     public LunarianWanderingTraderRenderer(EntityRendererProvider.Context context) {
         super(context, new LunarianModel(context.bakeLayer(LunarianModel.LAYER_LOCATION)), 0.5f);
-        this.addLayer(new CustomHeadLayer<>(this, context.getModelSet(), context.getItemInHandRenderer()));
-        this.addLayer(new CrossedArmsItemLayer<>(this, context.getItemInHandRenderer()));
+        this.addLayer(new CustomHeadLayer<>(this, context.getModelSet(), context.getPlayerSkinRenderCache()));
+        this.addLayer(new CrossedArmsItemLayer<>(this));
+    }
+
+    @Override
+    public VillagerRenderState createRenderState() {
+        return new VillagerRenderState();
     }
 
     @Override

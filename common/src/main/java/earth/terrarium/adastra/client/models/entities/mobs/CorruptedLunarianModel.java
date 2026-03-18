@@ -1,7 +1,5 @@
 package earth.terrarium.adastra.client.models.entities.mobs;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import earth.terrarium.adastra.AdAstra;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
@@ -29,6 +27,7 @@ public class CorruptedLunarianModel extends EntityModel<LivingEntityRenderState>
     private final ModelPart monsterarm4;
 
     public CorruptedLunarianModel(ModelPart root) {
+        super(root);
         this.head = root.getChild("head");
         this.body = root.getChild("body");
         this.leg0 = root.getChild("leg0");
@@ -122,17 +121,5 @@ public class CorruptedLunarianModel extends EntityModel<LivingEntityRenderState>
         this.arm1.xRot += Mth.cos(animationProgress * 0.04f) * 0.04f + 0.04f;
     }
 
-    @Override
-    public void renderToBuffer(PoseStack poseStack, VertexConsumer vertices, int packedLight, int packedOverlay, int color) {
-        head.render(poseStack, vertices, packedLight, packedOverlay, color);
-        body.render(poseStack, vertices, packedLight, packedOverlay, color);
-        leg0.render(poseStack, vertices, packedLight, packedOverlay, color);
-        leg1.render(poseStack, vertices, packedLight, packedOverlay, color);
-        arm1.render(poseStack, vertices, packedLight, packedOverlay, color);
-        arm2.render(poseStack, vertices, packedLight, packedOverlay, color);
-        monsterarm1.render(poseStack, vertices, packedLight, packedOverlay, color);
-        monsterarm2.render(poseStack, vertices, packedLight, packedOverlay, color);
-        monsterarm3.render(poseStack, vertices, packedLight, packedOverlay, color);
-        monsterarm4.render(poseStack, vertices, packedLight, packedOverlay, color);
-    }
+    // renderToBuffer is now final in Model - rendering is handled by root().render() automatically
 }

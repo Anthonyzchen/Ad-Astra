@@ -18,6 +18,11 @@ public class MartianRaptorRenderer extends MobRenderer<MartianRaptor, LivingEnti
     }
 
     @Override
+    public LivingEntityRenderState createRenderState() {
+        return new LivingEntityRenderState();
+    }
+
+    @Override
     public Identifier getTextureLocation(LivingEntityRenderState state) {
         return TEXTURE;
     }

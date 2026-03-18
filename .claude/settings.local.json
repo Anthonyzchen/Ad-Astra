@@ -50,7 +50,27 @@
       "Bash(javap -p /tmp/net/minecraft/world/item/crafting/Ingredient.class)",
       "Bash(JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-21.jdk/Contents/Home ./gradlew build 2>&1 | tail -80)",
       "Read(//Users/alextodd/temp/Github-NOTSYNCED/Common-Storage-Lib/**)",
-      "Bash(JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-21.jdk/Contents/Home ./gradlew build)"
+      "Bash(JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-21.jdk/Contents/Home ./gradlew build)",
+      "Bash(MC_JAR=\"/Users/alextodd/.gradle/caches/fabric-loom/minecraftMaven/net/minecraft/neoforge-21.11.38-beta-minecraft-merged/1.21.11-loom.mappings.1_21_11.layered+hash.168636975-v2-neoforge-21.11.38-beta/neoforge-21.11.38-beta-minecraft-merged-1.21.11-loom.mappings.1_21_11.layered+hash.168636975-v2-neoforge-21.11.38-beta-sources.jar\" TMP=/tmp/mc_sources_21_11 rm -rf $TMP)",
+      "Bash(mkdir -p $TMP cd $TMP unzip -l \"$MC_JAR\")",
+      "Bash(MAPJAR=\"/Users/alextodd/.gradle/caches/fabric-loom/1.21.11/loom.mappings.1_21_11.layered+hash.2198-v2/mappings.jar\")",
+      "Bash(MC_JAR=\"/Users/alextodd/.gradle/caches/fabric-loom/minecraftMaven/net/minecraft/minecraft-merged/1.21.11-loom.mappings.1_21_11.layered+hash.2198-v2/minecraft-merged-1.21.11-loom.mappings.1_21_11.layered+hash.2198-v2.jar\")",
+      "Bash(MC_JAR=/Users/alextodd/.gradle/caches/fabric-loom/minecraftMaven/net/minecraft/minecraft-merged/1.21.11-loom.mappings.1_21_11.layered+hash.2198-v2/minecraft-merged-1.21.11-loom.mappings.1_21_11.layered+hash.2198-v2.jar)",
+      "Bash(javap -classpath $MC_JAR -p net.minecraft.world.level.block.OakLeavesBlock)",
+      "Bash(javap -classpath $MC_JAR -p net.minecraft.world.level.block.TintedParticleLeavesBlock)",
+      "Bash(javap -classpath $MC_JAR -p net.minecraft.core.Registry)",
+      "Bash(javap -classpath $MC_JAR -p net.minecraft.core.HolderLookup)",
+      "Bash(javap -classpath $MC_JAR -p net.minecraft.core.HolderLookup$RegistryLookup)",
+      "Bash(MCJAR=/Users/alextodd/.gradle/caches/fabric-loom/minecraftMaven/net/minecraft/minecraft-merged-intermediary/1.21.11-loom.mappings.1_21_11.layered+hash.2198-v2/minecraft-merged-intermediary-1.21.11-loom.mappings.1_21_11.layered+hash.2198-v2.jar)",
+      "Bash(javap -c -p -cp $MCJAR net.minecraft.class_2170)",
+      "Bash(javap -classpath $MC_JAR -p net.minecraft.core.HolderGetter)",
+      "Bash(javap -cp $MCJAR net.minecraft.class_2168)",
+      "Bash(javap -classpath $MC_JAR -p net.minecraft.world.level.Level)",
+      "Bash(javap -p -cp $MCJAR net.minecraft.class_10286)",
+      "Bash(javap -p -cp $MCJAR net.minecraft.class_1534)",
+      "Bash(javap -p -cp $MCJAR net.minecraft.class_1799)",
+      "Bash(javap -cp $MCJAR net.minecraft.class_1799)",
+      "Bash(./gradlew :common:compileJava)"
     ]
   }
 }

@@ -1,7 +1,5 @@
 package earth.terrarium.adastra.client.models.entities.mobs;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import earth.terrarium.adastra.AdAstra;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
@@ -25,6 +23,7 @@ public class MoglerModel<T extends LivingEntityRenderState> extends EntityModel<
     private final ModelPart left_back_leg;
 
     public MoglerModel(ModelPart root) {
+        super(root);
         this.body = root.getChild("body");
         this.head = root.getChild("head");
         this.right_front_leg = root.getChild("right_front_leg");
@@ -86,18 +85,6 @@ public class MoglerModel<T extends LivingEntityRenderState> extends EntityModel<
         this.left_back_leg.xRot = this.left_front_leg.xRot;
     }
 
-    @Override
-    public void renderToBuffer(PoseStack poseStack, VertexConsumer vertices, int packedLight, int packedOverlay, int color) {
-        if (this.young) {
-            poseStack.scale(0.5f, 0.5f, 0.5f);
-            poseStack.translate(0, 1.5f, 0);
-        }
-
-        body.render(poseStack, vertices, packedLight, packedOverlay, color);
-        head.render(poseStack, vertices, packedLight, packedOverlay, color);
-        right_front_leg.render(poseStack, vertices, packedLight, packedOverlay, color);
-        left_front_leg.render(poseStack, vertices, packedLight, packedOverlay, color);
-        leg3.render(poseStack, vertices, packedLight, packedOverlay, color);
-        left_back_leg.render(poseStack, vertices, packedLight, packedOverlay, color);
-    }
+    // renderToBuffer is now final in Model - rendering is handled by root().render() automatically
+    // Baby scaling is now handled by the renderer via LivingEntityRenderState.isBaby
 }

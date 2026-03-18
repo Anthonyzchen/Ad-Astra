@@ -1,7 +1,6 @@
 package earth.terrarium.adastra.client.renderers.entities.mobs.features;
 
 import earth.terrarium.adastra.client.models.entities.mobs.SulfurCreeperModel;
-import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.EnergySwirlLayer;
@@ -20,6 +19,12 @@ public class SulfurCreeperChargeFeatureRenderer extends EnergySwirlLayer<LivingE
     }
 
     @Override
+    protected boolean isPowered(LivingEntityRenderState state) {
+        // TODO: 1.21.11 - Restore powered check using custom render state
+        return false;
+    }
+
+    @Override
     protected float xOffset(float partialAge) {
         return partialAge * 0.01f;
     }
@@ -30,7 +35,7 @@ public class SulfurCreeperChargeFeatureRenderer extends EnergySwirlLayer<LivingE
     }
 
     @Override
-    protected EntityModel<LivingEntityRenderState> model() {
+    protected SulfurCreeperModel<LivingEntityRenderState> model() {
         return this.model;
     }
 }

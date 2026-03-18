@@ -8,6 +8,7 @@ import earth.terrarium.adastra.common.blockentities.machines.SolarPanelBlockEnti
 import earth.terrarium.adastra.common.menus.machines.SolarPanelMenu;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
@@ -31,7 +32,7 @@ public class SolarPanelScreen extends MachineScreen<SolarPanelMenu, SolarPanelBl
     protected void renderBg(@NotNull GuiGraphics graphics, float partialTick, int mouseX, int mouseY) {
         super.renderBg(graphics, partialTick, mouseX, mouseY);
         if (entity.isDay()) {
-            graphics.blitSprite(GuiUtils.SUN, leftPos + 35, topPos + 59, 21, 21);
+            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, GuiUtils.SUN, leftPos + 35, topPos + 59, 21, 21);
         }
         boolean full = entity.getEnergyStorage().getStoredAmount() >= entity.getEnergyStorage().getCapacity();
         graphics.drawString(

@@ -15,6 +15,7 @@ import earth.terrarium.common_storage_lib.resources.fluid.FluidResource;
 // import earth.terrarium.botarium.common.fluid.base.FluidHolder;
 // import earth.terrarium.botarium.common.fluid.utils.ClientFluidHooks;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.Entity;
@@ -24,12 +25,13 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.equipment.ArmorMaterial;
 import net.minecraft.world.item.equipment.ArmorType;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 public class SpaceSuitItem extends CustomDyeableArmorItem {
 
@@ -43,12 +45,12 @@ public class SpaceSuitItem extends CustomDyeableArmorItem {
     }
 
     @Override
-    public void appendHoverText(@NotNull ItemStack stack, @NotNull Item.TooltipContext context, @NotNull List<Component> tooltipComponents, @NotNull TooltipFlag isAdvanced) {
+    public void appendHoverText(@NotNull ItemStack stack, @NotNull Item.TooltipContext context, @NotNull TooltipDisplay tooltipDisplay, @NotNull Consumer<Component> consumer, @NotNull TooltipFlag isAdvanced) {
         var fluidContainer = getFluidContainer(stack);
         long fluidAmount = fluidContainer.get(0).getAmount();
         long fluidCapacity = fluidContainer.get(0).getLimit(fluidContainer.get(0).getResource());
-        tooltipComponents.add(TooltipUtils.getFluidComponent(fluidAmount, fluidCapacity, ModFluids.OXYGEN.get()));
-        TooltipUtils.addDescriptionComponent(tooltipComponents, ConstantComponents.SPACE_SUIT_INFO);
+        consumer.accept(TooltipUtils.getFluidComponent(fluidAmount, fluidCapacity, ModFluids.OXYGEN.get()));
+        TooltipUtils.addDescriptionComponent(consumer, ConstantComponents.SPACE_SUIT_INFO);
     }
 
     public SimpleFluidStorage getFluidContainer(ItemStack holder) {
@@ -68,16 +70,15 @@ public class SpaceSuitItem extends CustomDyeableArmorItem {
     }
 
     public static boolean hasFullSet(LivingEntity entity, TagKey<Item> spaceSuitTag) {
-        for (var stack : entity.getArmorSlots()) {
-            if (!stack.is(spaceSuitTag)) return false;
+        for (EquipmentSlot slot : new EquipmentSlot[]{EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET}) {
+            if (!entity.getItemBySlot(slot).is(spaceSuitTag)) return false;
         }
         return true;
     }
 
     @Override
-    public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
-        super.inventoryTick(stack, level, entity, slotId, isSelected);
-        if (level.isClientSide()) return;
+    public void inventoryTick(ItemStack stack, ServerLevel level, Entity entity, EquipmentSlot slot) {
+        super.inventoryTick(stack, level, entity, slot);
         if (!(entity instanceof LivingEntity livingEntity)) return;
         if (livingEntity instanceof Player player && (player.isCreative() || player.isSpectator())) return;
         if (livingEntity.getItemBySlot(EquipmentSlot.CHEST) != stack) return;

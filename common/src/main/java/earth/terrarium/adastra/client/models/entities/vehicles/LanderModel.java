@@ -1,7 +1,5 @@
 package earth.terrarium.adastra.client.models.entities.vehicles;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import earth.terrarium.adastra.AdAstra;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
@@ -15,10 +13,11 @@ public class LanderModel extends EntityModel<EntityRenderState> {
 
     public static final ModelLayerLocation LAYER = new ModelLayerLocation(Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "lander"), "main");
 
-    private final ModelPart root;
+    private final ModelPart main;
 
     public LanderModel(ModelPart root) {
-        this.root = root.getChild("main");
+        super(root);
+        this.main = root.getChild("main");
     }
 
     @SuppressWarnings("unused")
@@ -111,8 +110,5 @@ public class LanderModel extends EntityModel<EntityRenderState> {
     @Override
     public void setupAnim(EntityRenderState state) {}
 
-    @Override
-    public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay, int color) {
-        root.render(poseStack, buffer, packedLight, packedOverlay, color);
-    }
+    // renderToBuffer is now final in Model - rendering is handled by root().render() automatically
 }

@@ -8,6 +8,7 @@ import earth.terrarium.adastra.client.utils.GuiUtils;
 import earth.terrarium.adastra.common.blockentities.machines.EtrionicBlastFurnaceBlockEntity;
 import earth.terrarium.adastra.common.menus.machines.EtrionicBlastFurnaceMenu;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -31,7 +32,7 @@ public class EtrionicBlastFurnaceScreen extends MachineScreen<EtrionicBlastFurna
         super.renderBg(graphics, partialTick, mouseX, mouseY);
         this.drawHorizontalProgressBar(graphics, GuiUtils.ARROW, mouseX, mouseY, 75, 50, 20, 12, entity.cookTime(), entity.cookTimeTotal(), false);
         if (entity.cookTimeTotal() > 0) {
-            graphics.blitSprite(FURNACE_OVERLAY, leftPos + 30, topPos + 51, 32, 43);
+            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, FURNACE_OVERLAY, leftPos + 30, topPos + 51, 32, 43);
         }
     }
 

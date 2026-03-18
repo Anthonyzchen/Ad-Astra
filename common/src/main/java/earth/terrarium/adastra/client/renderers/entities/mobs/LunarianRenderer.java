@@ -9,6 +9,7 @@ import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.client.renderer.entity.layers.CrossedArmsItemLayer;
 import net.minecraft.client.renderer.entity.layers.CustomHeadLayer;
 import net.minecraft.client.renderer.entity.state.VillagerRenderState;
+import net.minecraft.core.Holder;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.npc.villager.VillagerProfession;
 import org.jetbrains.annotations.NotNull;
@@ -33,39 +34,49 @@ public class LunarianRenderer extends MobRenderer<Lunarian, VillagerRenderState,
 
     public LunarianRenderer(EntityRendererProvider.Context context) {
         super(context, new LunarianModel(context.bakeLayer(LunarianModel.LAYER_LOCATION)), 0.5f);
-        this.addLayer(new CustomHeadLayer<>(this, context.getModelSet(), context.getItemInHandRenderer()));
-        this.addLayer(new CrossedArmsItemLayer<>(this, context.getItemInHandRenderer()));
+        this.addLayer(new CustomHeadLayer<>(this, context.getModelSet(), context.getPlayerSkinRenderCache()));
+        this.addLayer(new CrossedArmsItemLayer<>(this));
+    }
+
+    @Override
+    public VillagerRenderState createRenderState() {
+        return new VillagerRenderState();
+    }
+
+    @Override
+    public void extractRenderState(Lunarian entity, VillagerRenderState state, float partialTick) {
+        super.extractRenderState(entity, state, partialTick);
+        state.villagerData = entity.getVillagerData();
     }
 
     @Override
     public @NotNull Identifier getTextureLocation(VillagerRenderState state) {
-
-        VillagerProfession profession = state.villagerData.getProfession();
-        if (profession.equals(VillagerProfession.ARMORER)) {
+        Holder<VillagerProfession> profession = state.villagerData.profession();
+        if (profession.is(VillagerProfession.ARMORER)) {
             return ARMORER_TEXTURE;
-        } else if (profession.equals(VillagerProfession.BUTCHER)) {
+        } else if (profession.is(VillagerProfession.BUTCHER)) {
             return BUTCHER_TEXTURE;
-        } else if (profession.equals(VillagerProfession.CARTOGRAPHER)) {
+        } else if (profession.is(VillagerProfession.CARTOGRAPHER)) {
             return CARTOGRAPHER_TEXTURE;
-        } else if (profession.equals(VillagerProfession.CLERIC)) {
+        } else if (profession.is(VillagerProfession.CLERIC)) {
             return CLERIC_TEXTURE;
-        } else if (profession.equals(VillagerProfession.FARMER)) {
+        } else if (profession.is(VillagerProfession.FARMER)) {
             return FARMER_TEXTURE;
-        } else if (profession.equals(VillagerProfession.FISHERMAN)) {
+        } else if (profession.is(VillagerProfession.FISHERMAN)) {
             return FISHERMAN_TEXTURE;
-        } else if (profession.equals(VillagerProfession.FLETCHER)) {
+        } else if (profession.is(VillagerProfession.FLETCHER)) {
             return FLETCHER_TEXTURE;
-        } else if (profession.equals(VillagerProfession.LEATHERWORKER)) {
+        } else if (profession.is(VillagerProfession.LEATHERWORKER)) {
             return LEATHERWORKER_TEXTURE;
-        } else if (profession.equals(VillagerProfession.LIBRARIAN)) {
+        } else if (profession.is(VillagerProfession.LIBRARIAN)) {
             return LIBRARIAN_TEXTURE;
-        } else if (profession.equals(VillagerProfession.MASON)) {
+        } else if (profession.is(VillagerProfession.MASON)) {
             return MASON_TEXTURE;
-        } else if (profession.equals(VillagerProfession.SHEPHERD)) {
+        } else if (profession.is(VillagerProfession.SHEPHERD)) {
             return SHEPHERD_TEXTURE;
-        } else if (profession.equals(VillagerProfession.TOOLSMITH)) {
+        } else if (profession.is(VillagerProfession.TOOLSMITH)) {
             return TOOLSMITH_TEXTURE;
-        } else if (profession.equals(VillagerProfession.WEAPONSMITH)) {
+        } else if (profession.is(VillagerProfession.WEAPONSMITH)) {
             return WEAPONSMITH_TEXTURE;
         } else {
             return TEXTURE;

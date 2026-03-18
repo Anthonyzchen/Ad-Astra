@@ -15,6 +15,7 @@ import earth.terrarium.common_storage_lib.resources.fluid.FluidResource;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.CommonComponents;
 
@@ -66,7 +67,7 @@ public class FluidBarWidget extends ConfigurationWidget implements CursorWidget,
         }
 
         // Always draw the bar frame overlay on top
-        graphics.blitSprite(GuiUtils.FLUID_BAR, x, y, GuiUtils.FLUID_BAR_WIDTH, GuiUtils.FLUID_BAR_HEIGHT);
+        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, GuiUtils.FLUID_BAR, x, y, GuiUtils.FLUID_BAR_WIDTH, GuiUtils.FLUID_BAR_HEIGHT);
 
         if (this.isHoveredOrFocused()) {
             FluidResource resource = slot.getResource();
@@ -79,14 +80,14 @@ public class FluidBarWidget extends ConfigurationWidget implements CursorWidget,
     }
 
     @Override
-    protected boolean isValidClickButton(int button) {
-        return super.isValidClickButton(button) || (button == 1 && Screen.hasShiftDown());
+    protected boolean isValidClickButton(net.minecraft.client.input.MouseButtonInfo button) {
+        return super.isValidClickButton(button) || (button.button() == 1 && net.minecraft.client.Minecraft.getInstance().hasShiftDown());
     }
 
     @Override
-    public void onClick(double mouseX, double mouseY) {
+    public void onClick(net.minecraft.client.input.MouseButtonEvent event, boolean bl) {
         if (ConfigurationScreen.isConfigurable()) {
-            super.onClick(mouseX, mouseY);
+            super.onClick(event, bl);
         } else {
             NetworkHandler.CHANNEL.sendToServer(new ServerboundClearFluidTankPacket(this.tankPos, this.tank));
         }
@@ -94,6 +95,6 @@ public class FluidBarWidget extends ConfigurationWidget implements CursorWidget,
 
     @Override
     public CursorScreen.Cursor getCursor() {
-        return Screen.hasShiftDown() ? CursorScreen.Cursor.POINTER : CursorScreen.Cursor.DEFAULT;
+        return net.minecraft.client.Minecraft.getInstance().hasShiftDown() ? CursorScreen.Cursor.POINTER : CursorScreen.Cursor.DEFAULT;
     }
 }

@@ -1,8 +1,10 @@
 package earth.terrarium.adastra.common.entities.vehicles;
 
 import earth.terrarium.adastra.common.entities.multipart.MultipartPartEntity;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
@@ -38,10 +40,10 @@ public class VehiclePart extends Entity implements MultipartPartEntity<Vehicle> 
     protected void defineSynchedData(SynchedEntityData.Builder builder) {}
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag compound) {}
+    protected void readAdditionalSaveData(ValueInput input) {}
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag compound) {}
+    protected void addAdditionalSaveData(ValueOutput output) {}
 
     @Override
     public boolean isPickable() {
@@ -55,8 +57,8 @@ public class VehiclePart extends Entity implements MultipartPartEntity<Vehicle> 
     }
 
     @Override
-    public boolean hurt(DamageSource source, float amount) {
-        return this.vehicle.hurt(source, amount);
+    public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
+        return this.vehicle.hurtServer(level, source, amount);
     }
 
     @Override

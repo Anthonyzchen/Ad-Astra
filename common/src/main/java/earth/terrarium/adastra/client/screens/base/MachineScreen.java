@@ -22,8 +22,8 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.gui.layouts.LayoutElement;
-import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -131,9 +131,7 @@ public abstract class MachineScreen<M extends BaseContainerMenu<E>, E extends Co
         }
     }
 
-    public void setTooltipForNextRenderPass(Tooltip tooltip, ClientTooltipPositioner positioner, boolean override) {
-        this.setTooltipForNextRenderPass(tooltip.toCharSequence(this.minecraft), positioner, override);
-    }
+    // Tooltip rendering is now handled through GuiGraphics.setTooltipForNextFrame in 1.21.11
 
     @Override
     public void render(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float f) {
@@ -145,7 +143,7 @@ public abstract class MachineScreen<M extends BaseContainerMenu<E>, E extends Co
     protected void renderBg(@NotNull GuiGraphics graphics, float partialTick, int mouseX, int mouseY) {
         int left = (this.width - this.imageWidth) / 2;
         int top = (this.height - this.imageHeight) / 2;
-        graphics.blit(this.texture, left, top, 0, 0, this.imageWidth, this.imageHeight, this.imageWidth, this.imageHeight);
+        graphics.blit(RenderPipelines.GUI_TEXTURED, this.texture, left, top, 0, 0, this.imageWidth, this.imageHeight, this.imageWidth, this.imageHeight);
     }
 
     @Override
@@ -153,12 +151,12 @@ public abstract class MachineScreen<M extends BaseContainerMenu<E>, E extends Co
         Identifier texture = null;
         if (slot.isActive() && slot instanceof InventorySlot) {
             texture = this.slotTexture;
-        } else if (slot instanceof ImageSlot imageSlot) {
-            texture = imageSlot.getSlotTexture();
+        } else if (slot instanceof ImageSlot) {
+            // ImageSlot uses getNoItemIcon() for overlay sprites, no separate slot background texture
         }
 
         if (texture != null) {
-            graphics.blit(texture, slot.x - 1, slot.y - 1, 0, 0, 18, 18, 18, 18);
+            graphics.blit(RenderPipelines.GUI_TEXTURED, texture, slot.x - 1, slot.y - 1, 0, 0, 18, 18, 18, 18);
         }
     }
 
@@ -194,9 +192,9 @@ public abstract class MachineScreen<M extends BaseContainerMenu<E>, E extends Co
     }
 
     @Override
-    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+    public boolean mouseReleased(net.minecraft.client.input.MouseButtonEvent event) {
         setFocused(null);
-        return super.mouseReleased(mouseX, mouseY, button);
+        return super.mouseReleased(event);
     }
 
     public int leftPos() {
@@ -225,11 +223,11 @@ public abstract class MachineScreen<M extends BaseContainerMenu<E>, E extends Co
     }
 
     @Override
-    protected boolean hasClickedOutside(double mouseX, double mouseY, int guiLeft, int guiTop, int mouseButton) {
+    protected boolean hasClickedOutside(double mouseX, double mouseY, int guiLeft, int guiTop) {
         if (this.optionsBarWidget.isMouseOver(mouseX, mouseY)) {
             return false;
         }
-        return super.hasClickedOutside(mouseX, mouseY, guiLeft, guiTop, mouseButton);
+        return super.hasClickedOutside(mouseX, mouseY, guiLeft, guiTop);
     }
 
     @Override

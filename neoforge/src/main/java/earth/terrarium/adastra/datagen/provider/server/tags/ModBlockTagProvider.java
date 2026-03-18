@@ -8,22 +8,20 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
-import net.minecraft.data.tags.TagsProvider;
+import net.minecraft.data.tags.IntrinsicHolderTagsProvider;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagEntry;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
 @SuppressWarnings("deprecation")
-public class ModBlockTagProvider extends TagsProvider<Block> {
+public class ModBlockTagProvider extends IntrinsicHolderTagsProvider<Block> {
 
     private static final List<Supplier<Block>> MINEABLE_WITH_SHOVEL = List.of(
         ModBlocks.MOON_SAND,
@@ -75,8 +73,8 @@ public class ModBlockTagProvider extends TagsProvider<Block> {
         ModBlocks.HYDROGEN
     );
 
-    public ModBlockTagProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> completableFuture, ExistingFileHelper existingFileHelper) {
-        super(output, Registries.BLOCK, completableFuture, AdAstra.MOD_ID, existingFileHelper);
+    public ModBlockTagProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> completableFuture) {
+        super(output, Registries.BLOCK, completableFuture, block -> BuiltInRegistries.BLOCK.getResourceKey(block).orElseThrow(), AdAstra.MOD_ID);
     }
 
     @Override
@@ -84,8 +82,8 @@ public class ModBlockTagProvider extends TagsProvider<Block> {
         ModBlocks.GLOBES.stream().map(RegistryEntry::get).forEach(b -> tag(ModBlockTags.GLOBES).add(element(b)));
         ModBlocks.FLAGS.stream().map(RegistryEntry::get).forEach(b -> tag(ModBlockTags.FLAGS).add(element(b)));
         ModBlocks.SLIDING_DOORS.stream().map(RegistryEntry::get).forEach(b -> tag(ModBlockTags.SLIDING_DOORS).add(element(b)));
-        tag(ModBlockTags.PASSES_FLOOD_FILL).add(TagEntry.tag(BlockTags.FENCES.identifier()));
-        tag(ModBlockTags.PASSES_FLOOD_FILL).add(TagEntry.tag(BlockTags.LEAVES.identifier()));
+        tag(ModBlockTags.PASSES_FLOOD_FILL).addTag(BlockTags.FENCES);
+        tag(ModBlockTags.PASSES_FLOOD_FILL).addTag(BlockTags.LEAVES);
         tag(ModBlockTags.PASSES_FLOOD_FILL).add(element(Blocks.LADDER));
 
         add(ModBlockTags.CABLE_DUCTS, ModBlocks.CABLE_DUCT.get());
@@ -300,20 +298,20 @@ public class ModBlockTagProvider extends TagsProvider<Block> {
     }
 
     private void addFabricTag(Block item, TagKey<Block> tag, String fabricCommonTag) {
-        tag(tag).add(TagEntry.optionalTag(new Identifier("c", fabricCommonTag)));
+        tag(tag).add(TagEntry.optionalTag(Identifier.fromNamespaceAndPath("c", fabricCommonTag)));
 
-        var commonTag = TagKey.create(Registries.BLOCK, new Identifier("c", fabricCommonTag));
+        var commonTag = TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath("c", fabricCommonTag));
         tag(commonTag).add(element(item));
     }
 
     private void addForgeTag(Block item, TagKey<Block> tag, String forgeCommonTag) {
-        tag(tag).add(TagEntry.optionalTag(new Identifier("forge", forgeCommonTag)));
+        tag(tag).add(TagEntry.optionalTag(Identifier.fromNamespaceAndPath("forge", forgeCommonTag)));
 
-        var commonTag = TagKey.create(Registries.BLOCK, new Identifier("forge", forgeCommonTag));
+        var commonTag = TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath("forge", forgeCommonTag));
         tag(commonTag).add(element(item));
 
-        var folderTag = TagKey.create(Registries.BLOCK, new Identifier("forge", forgeCommonTag.split("/")[0]));
-        tag(folderTag).add(TagEntry.tag(commonTag.identifier()));
+        var folderTag = TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath("forge", forgeCommonTag.split("/")[0]));
+        tag(folderTag).add(TagEntry.tag(commonTag.location()));
     }
 
     private static TagEntry element(Block block) {

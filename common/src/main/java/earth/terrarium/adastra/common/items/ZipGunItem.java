@@ -23,10 +23,11 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 public class ZipGunItem extends Item {
 
@@ -133,12 +134,12 @@ public class ZipGunItem extends Item {
     }
 
     @Override
-    public void appendHoverText(@NotNull ItemStack stack, @NotNull Item.TooltipContext context, List<Component> tooltipComponents, @NotNull TooltipFlag isAdvanced) {
+    public void appendHoverText(@NotNull ItemStack stack, @NotNull Item.TooltipContext context, @NotNull TooltipDisplay tooltipDisplay, @NotNull Consumer<Component> consumer, @NotNull TooltipFlag isAdvanced) {
         var fluidContainer = getFluidContainer(stack);
         long amount = fluidContainer.get(0).getAmount();
         long capacity = fluidContainer.get(0).getLimit(fluidContainer.get(0).getResource());
-        tooltipComponents.add(TooltipUtils.getFluidComponent(amount, capacity, ModFluids.OXYGEN.get()));
-        TooltipUtils.addDescriptionComponent(tooltipComponents, ConstantComponents.ZIP_GUN_INFO);
+        consumer.accept(TooltipUtils.getFluidComponent(amount, capacity, ModFluids.OXYGEN.get()));
+        TooltipUtils.addDescriptionComponent(consumer, ConstantComponents.ZIP_GUN_INFO);
     }
 
     @Override

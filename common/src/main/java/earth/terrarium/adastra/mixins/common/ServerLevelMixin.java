@@ -57,7 +57,7 @@ public abstract class ServerLevelMixin {
             .build();
     }
 
-    @Inject(method = "method_18203", at = @At("TAIL"))
+    @Inject(method = "tickChunk", at = @At("TAIL"))
     public void tickChunk(LevelChunk chunk, int randomTickSpeed, CallbackInfo ci) {
         if (!OxygenApi.API.hasOxygen(chunk.getLevel())) {
             var level = chunk.getLevel();
@@ -68,7 +68,7 @@ public abstract class ServerLevelMixin {
     }
 
     @Inject(
-        method = "method_18765",
+        method = "tick",
         at = @At(
             value = "INVOKE",
             target = "Lnet/minecraft/server/level/ServerLevel;setDayTime(J)V",

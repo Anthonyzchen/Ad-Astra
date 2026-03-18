@@ -46,25 +46,23 @@ public class LunarianWanderingTraderSpawner implements CustomSpawner {
     }
 
     @Override
-    public int tick(ServerLevel level, boolean spawnMonsters, boolean spawnAnimals) {
-        if (!(Boolean) level.getGameRules().get(GameRules.SPAWN_WANDERING_TRADERS)) return 0;
-        if (--this.spawnTimer > 0) return 0;
+    public void tick(ServerLevel level, boolean spawnMonsters) {
+        if (!(Boolean) level.getGameRules().get(GameRules.SPAWN_WANDERING_TRADERS)) return;
+        if (--this.spawnTimer > 0) return;
 
         this.spawnTimer = DEFAULT_SPAWN_TIMER;
         this.spawnDelay -= DEFAULT_SPAWN_TIMER;
         this.properties.setWanderingTraderSpawnDelay(this.spawnDelay);
-        if (this.spawnDelay > 0) return 0;
+        if (this.spawnDelay > 0) return;
         this.spawnDelay = DEFAULT_SPAWN_DELAY;
-        if (!(Boolean) level.getGameRules().get(GameRules.SPAWN_MOBS)) return 0;
+        if (!(Boolean) level.getGameRules().get(GameRules.SPAWN_MOBS)) return;
         int i = this.spawnChance;
         this.spawnChance = Mth.clamp(this.spawnChance + 25, 25, 75);
         this.properties.setWanderingTraderSpawnChance(this.spawnChance);
-        if (this.random.nextInt(100) > i) return 0;
+        if (this.random.nextInt(100) > i) return;
         if (this.trySpawn(level)) {
             this.spawnChance = 25;
-            return 1;
         }
-        return 0;
     }
 
     private boolean trySpawn(ServerLevel level) {
@@ -90,7 +88,7 @@ public class LunarianWanderingTraderSpawner implements CustomSpawner {
                 this.properties.setWanderingTraderId(wanderingTraderEntity.getUUID());
                 wanderingTraderEntity.setDespawnDelay(48000);
                 wanderingTraderEntity.setWanderTarget(blockPos2);
-                wanderingTraderEntity.restrictTo(blockPos2, 16);
+                // restrictTo was removed in 1.21.11 - wandering trader home area restriction no longer available
                 return true;
             }
         }

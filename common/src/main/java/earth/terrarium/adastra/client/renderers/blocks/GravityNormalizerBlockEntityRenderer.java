@@ -14,6 +14,7 @@ import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.block.ModelBlockRenderer;
 import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.state.CameraRenderState;
@@ -95,10 +96,9 @@ public class GravityNormalizerBlockEntityRenderer implements BlockEntityRenderer
 
             poseStack.translate(-0.5, -0.7, -0.5);
 
-            Minecraft.getInstance().getBlockRenderer().getModelRenderer().renderModel(
+            ModelBlockRenderer.renderModel(
                 poseStack.last(),
                 buffer.getBuffer(Sheets.cutoutBlockSheet()),
-                state,
                 blockModel,
                 1, 1, 1,
                 packedLight, packedOverlay);
@@ -116,10 +116,9 @@ public class GravityNormalizerBlockEntityRenderer implements BlockEntityRenderer
                 poseStack.mulPose(Axis.XP.rotationDegrees(Mth.sin(animation / 50 + i) * 10));
                 poseStack.translate(-0.27, -0.27, -0.27);
 
-                Minecraft.getInstance().getBlockRenderer().getModelRenderer().renderModel(
+                ModelBlockRenderer.renderModel(
                     poseStack.last(),
                     buffer.getBuffer(Sheets.cutoutBlockSheet()),
-                    state,
                     toeModel,
                     1, 1, 1,
                     packedLight, packedOverlay);
@@ -137,7 +136,7 @@ public class GravityNormalizerBlockEntityRenderer implements BlockEntityRenderer
         }
 
         public void renderByItem(ItemStack stack, ItemDisplayContext displayContext, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay) {
-            BlockState state = BuiltInRegistries.BLOCK.get(BuiltInRegistries.ITEM.getKey(stack.getItem())).defaultBlockState();
+            BlockState state = BuiltInRegistries.BLOCK.getValue(BuiltInRegistries.ITEM.getKey(stack.getItem())).defaultBlockState();
 
             var minecraft = Minecraft.getInstance();
             float yRot = Util.getMillis() / 5f;
@@ -145,9 +144,8 @@ public class GravityNormalizerBlockEntityRenderer implements BlockEntityRenderer
             poseStack.pushPose();
             try {
                 var model = minecraft.getBlockRenderer().getBlockModel(state);
-                minecraft.getBlockRenderer().getModelRenderer().renderModel(poseStack.last(),
+                ModelBlockRenderer.renderModel(poseStack.last(),
                     buffer.getBuffer(Sheets.cutoutBlockSheet()),
-                    state,
                     model,
                     1, 1, 1,
                     packedLight, packedOverlay);

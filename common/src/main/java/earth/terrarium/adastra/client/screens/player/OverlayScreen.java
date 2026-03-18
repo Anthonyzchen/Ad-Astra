@@ -1,7 +1,7 @@
 package earth.terrarium.adastra.client.screens.player;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.RenderPipelines;
+import org.joml.Matrix3x2fStack;
 import earth.terrarium.adastra.AdAstra;
 import earth.terrarium.adastra.api.systems.PlanetData;
 import earth.terrarium.adastra.client.config.AdAstraConfigClient;
@@ -39,30 +39,30 @@ public class OverlayScreen {
         var font = minecraft.font;
         int width = minecraft.getWindow().getGuiScaledWidth();
         int height = minecraft.getWindow().getGuiScaledHeight();
-        PoseStack poseStack = graphics.pose();
+        Matrix3x2fStack poseStack = graphics.pose();
 
         // Rocket overlay
         if (player.getVehicle() instanceof Rocket rocket) {
             int countdown = Mth.ceil(rocket.launchTicks() / 20f);
             if (rocket.isLaunching()) {
-                poseStack.pushPose();
-                poseStack.translate(width / 2f, height / 2f, 0);
-                poseStack.scale(4, 4, 4);
+                poseStack.pushMatrix();
+                poseStack.translate(width / 2f, height / 2f);
+                poseStack.scale(4, 4);
                 graphics.drawCenteredString(font, String.valueOf(countdown), 0, -10, 0xe53253);
-                poseStack.popPose();
+                poseStack.popMatrix();
             }
 
             graphics.blitSprite(RenderPipelines.GUI_TEXTURED, ROCKET_BAR, 0, height / 2, 16, 128);
 
-            poseStack.pushPose();
+            poseStack.pushMatrix();
             double y = Mth.clamp(rocket.getY(), 100, AdAstraConfig.atmosphereLeave);
-            poseStack.translate(0.3f, (AdAstraConfig.atmosphereLeave - y - 500) / 4.5, 0);
+            poseStack.translate(0.3f, (float) ((AdAstraConfig.atmosphereLeave - y - 500) / 4.5));
             graphics.blitSprite(RenderPipelines.GUI_TEXTURED, ROCKET, 3, height / 2 + 113, 8, 11);
-            poseStack.popPose();
+            poseStack.popMatrix();
         }
 
         // Oxygen overlay
-        var chestStack = player.getInventory().getArmor(2);
+        var chestStack = player.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.CHEST);
         if (SpaceSuitItem.hasFullSet(player) && chestStack.getItem() instanceof SpaceSuitItem spaceSuit) {
             long amount = SpaceSuitItem.getOxygenAmount(player);
             var fc = spaceSuit.getFluidContainer(chestStack);
@@ -74,8 +74,8 @@ public class OverlayScreen {
             int y = AdAstraConfigClient.oxygenBarY;
             float scale = AdAstraConfigClient.oxygenBarScale;
 
-            poseStack.pushPose();
-            poseStack.scale(scale, scale, scale);
+            poseStack.pushMatrix();
+            poseStack.scale(scale, scale);
             graphics.blitSprite(RenderPipelines.GUI_TEXTURED, OXYGEN_TANK_EMPTY, x, y, 62, 52);
             graphics.blit(RenderPipelines.GUI_TEXTURED, OXYGEN_TANK, x, y + 52 - barHeight, 0, 52 - barHeight, 62, barHeight, 62, 52);
 
@@ -87,7 +87,7 @@ public class OverlayScreen {
                 color = 0x55ff55;
             }
             graphics.drawString(font, text, (int) (x + (62 - textWidth) / 2f), y + 52 + 3, color);
-            poseStack.popPose();
+            poseStack.popMatrix();
         }
 
         // Battery overlay
@@ -101,8 +101,8 @@ public class OverlayScreen {
             int y = AdAstraConfigClient.energyBarY;
             float scale = AdAstraConfigClient.energyBarScale;
 
-            poseStack.pushPose();
-            poseStack.scale(scale, scale, scale);
+            poseStack.pushMatrix();
+            poseStack.scale(scale, scale);
             graphics.blitSprite(RenderPipelines.GUI_TEXTURED, BATTERY_EMPTY, x, y, 49, 27);
             graphics.blit(RenderPipelines.GUI_TEXTURED, BATTERY, x, y, 0, 27, barWidth, 27, 49, 27);
 
@@ -110,16 +110,16 @@ public class OverlayScreen {
             int textWidth = font.width(text);
             int color = ratio <= 0 ? 0xDC143C : 0x55ffff;
             graphics.drawString(font, text, (int) (x + (49 - textWidth) / 2f), y + 27 + 3, color);
-            poseStack.popPose();
+            poseStack.popMatrix();
         }
 
         if (player.getVehicle() instanceof Lander lander && level.getBlockState(lander.getOnPos().below(2)).isAir()) {
             int ground = level.getHeightmapPos(Heightmap.Types.WORLD_SURFACE, lander.blockPosition()).getY();
             int distance = Math.max(0, lander.blockPosition().getY() - ground);
 
-            poseStack.pushPose();
-            poseStack.translate(width / 2f, height / 2f, 0);
-            poseStack.scale(1.4f, 1.4f, 1.4f);
+            poseStack.pushMatrix();
+            poseStack.translate(width / 2f, height / 2f);
+            poseStack.scale(1.4f, 1.4f);
 
             float alpha = Mth.clamp(0.1f - (float) (lander.getDeltaMovement().y() + 0.5), 0, 1);
             // TODO: 1.21.11 - RenderSystem.enableBlend/setShaderColor removed. Alpha blending
@@ -140,7 +140,7 @@ public class OverlayScreen {
                 String.valueOf(distance),
                 0, 30, distanceColor);
 
-            poseStack.popPose();
+            poseStack.popMatrix();
         }
     }
 }

@@ -132,8 +132,8 @@ public abstract class ContainerWidget extends AbstractContainerEventHandler impl
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        return this.active && super.mouseClicked(mouseX, mouseY, button);
+    public boolean mouseClicked(net.minecraft.client.input.MouseButtonEvent event, boolean bl) {
+        return this.active && super.mouseClicked(event, bl);
     }
 
     public void setActive(boolean active) {

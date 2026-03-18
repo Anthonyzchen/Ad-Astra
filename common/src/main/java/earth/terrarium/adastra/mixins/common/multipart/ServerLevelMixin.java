@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class ServerLevelMixin implements MultipartPartsHolder {
 
     @Inject(
-        method = "method_31424",
+        method = "getEntityOrPart",
         at = @At("HEAD"),
         cancellable = true
     )

@@ -11,7 +11,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 
-import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
 public class FlagUrlScreen extends Screen {
@@ -35,13 +34,13 @@ public class FlagUrlScreen extends Screen {
     protected void init() {
         int x = this.width / 2 - 100;
         int y = this.height / 2 - 20;
-        this.button = addRenderableWidget(new Button(x + 50, y + 30, 100, 20, ConstantComponents.CONFIRM, (button) -> {
+        this.button = addRenderableWidget(Button.builder(ConstantComponents.CONFIRM, (button) -> {
             var matcher = URL_REGEX.matcher(this.urlField.getValue());
             if (matcher.matches()) {
                 NetworkHandler.CHANNEL.sendToServer(new ServerboundSetFlagUrlPacket(this.pos, matcher.group()));
                 this.onClose();
             }
-        }, Supplier::get) {});
+        }).bounds(x + 50, y + 30, 100, 20).build());
         button.active = false;
         urlField = addRenderableWidget(new EditBox(font, x, y, 200, 20, Component.literal("https://imgur.com/urURL")));
         urlField.setResponder(url -> {

@@ -11,7 +11,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.HumanoidArm;
@@ -63,7 +63,7 @@ public class Ti69Renderer {
         poseStack.scale(0.0078125F, 0.0078125F, 0.0078125F);
         poseStack.scale(0.6f, 1.06f, 1);
 
-        VertexConsumer vertex = buffer.getBuffer(RenderType.text(TEXTURE));
+        VertexConsumer vertex = buffer.getBuffer(RenderTypes.text(TEXTURE));
         Matrix4f matrix4f = poseStack.last().pose();
         vertex.addVertex(matrix4f, -7.0F, 135.0F, 0.0F).setColor(255, 255, 255, 255).setUv(0.0F, 1.0F).setUv2(combinedLight & 0xFFFF, combinedLight >> 16 & 0xFFFF);
         vertex.addVertex(matrix4f, 135.0F, 135.0F, 0.0F).setColor(255, 255, 255, 255).setUv(1.0F, 1.0F).setUv2(combinedLight & 0xFFFF, combinedLight >> 16 & 0xFFFF);
@@ -90,7 +90,7 @@ public class Ti69Renderer {
         try {
             poseStack.scale(0.95f, 0.392f, 1.0f);
             poseStack.translate(21.0f, 48.0f, z);
-            VertexConsumer screenVertex = buffer.getBuffer(RenderType.text(overlay));
+            VertexConsumer screenVertex = buffer.getBuffer(RenderTypes.text(overlay));
             Matrix4f matrix4f = poseStack.last().pose();
             int red = (color >> 16) & 0xFF;
             int green = (color >> 8) & 0xFF;

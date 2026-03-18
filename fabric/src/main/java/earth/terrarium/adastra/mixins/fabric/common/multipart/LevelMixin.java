@@ -30,9 +30,8 @@ public class LevelMixin implements MultipartPartsHolder {
         return adastra$multipartEntityParts;
     }
 
-    // TODO: 1.21.11 - Verify intermediary name method_31593 is still correct for 1.21.11.
-    // Lambda names frequently change between MC versions. Check Level.getEntities in the
-    // 1.21.11 intermediary mappings. If it fails at runtime, use a refmap or check yarn/intermediary.
+    // Verified: method_31593 is an unmapped lambda in Level.getEntities, confirmed present in 1.21.11
+    // both intermediary and named jars. Signature: (Entity, Predicate, List, Entity)V
     @Inject(
         method = {"method_31593"},
         at = @At("TAIL")
@@ -48,9 +47,8 @@ public class LevelMixin implements MultipartPartsHolder {
         }
     }
 
-    // TODO: 1.21.11 - Verify intermediary name method_47576 is still correct for 1.21.11.
-    // Lambda names frequently change between MC versions. Check Level.getEntities in the
-    // 1.21.11 intermediary mappings.
+    // Verified: method_47576 is an unmapped lambda in Level.getEntities, confirmed present in 1.21.11
+    // both intermediary and named jars. Signature: (Predicate, List, int, EntityTypeTest, Entity)Continuation
     @Inject(
         method = {"method_47576"},
         at = @At(value = "RETURN", ordinal = 2),

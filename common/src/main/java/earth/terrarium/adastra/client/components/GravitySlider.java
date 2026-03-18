@@ -3,6 +3,7 @@ package earth.terrarium.adastra.client.components;
 import earth.terrarium.adastra.client.utils.GuiUtils;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractSliderButton;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 
@@ -35,6 +36,6 @@ public class GravitySlider extends AbstractSliderButton {
 
     @Override
     public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        graphics.blitSprite(GuiUtils.SLIDER, getX() + (int) (value * (double) (width - 8)), getY(), 5, 21);
+        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, GuiUtils.SLIDER, getX() + (int) (value * (double) (width - 8)), getY(), 5, 21);
     }
 }

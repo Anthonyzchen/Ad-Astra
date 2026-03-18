@@ -3,6 +3,7 @@ package earth.terrarium.adastra.common.entities.mob;
 import earth.terrarium.adastra.common.entities.mob.lunarians.LunarianMerchantOffers;
 import earth.terrarium.adastra.common.registry.ModEntityTypes;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.EntityType;
@@ -45,17 +46,19 @@ public class Lunarian extends Villager {
 
     // Custom trade offers
     @Override
-    protected void updateTrades() {
+    protected void updateTrades(ServerLevel serverLevel) {
         VillagerData villagerData = this.getVillagerData();
-        Int2ObjectMap<VillagerTrades.ItemListing[]> int2ObjectMap = LunarianMerchantOffers.PROFESSION_TO_LEVELED_TRADE.get(villagerData.getProfession());
+        ResourceKey<?> profession = villagerData.profession().unwrapKey().orElse(null);
+        if (profession == null) return;
+        Int2ObjectMap<VillagerTrades.ItemListing[]> int2ObjectMap = LunarianMerchantOffers.PROFESSION_TO_LEVELED_TRADE.get(profession);
         if (int2ObjectMap == null || int2ObjectMap.isEmpty()) {
             return;
         }
-        VillagerTrades.ItemListing[] factorys = int2ObjectMap.get(villagerData.getLevel());
+        VillagerTrades.ItemListing[] factorys = int2ObjectMap.get(villagerData.level());
         if (factorys == null) {
             return;
         }
         MerchantOffers tradeOfferList = this.getOffers();
-        this.addOffersFromItemListings(tradeOfferList, factorys, 2);
+        this.addOffersFromItemListings(serverLevel, tradeOfferList, factorys, 2);
     }
 }

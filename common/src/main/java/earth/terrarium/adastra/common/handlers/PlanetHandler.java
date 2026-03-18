@@ -29,7 +29,7 @@ public class PlanetHandler extends SavedData {
     }
 
     private void loadData(CompoundTag tag) {
-        var data = tag.getIntArray("");
+        var data = tag.getIntArray("").orElse(new int[0]);
         if (data.length % 3 != 0) {
             throw new RuntimeException("Invalid data length");
         }

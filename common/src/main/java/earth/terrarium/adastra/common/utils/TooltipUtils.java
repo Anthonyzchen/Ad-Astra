@@ -15,13 +15,14 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Consumer;
 
 public class TooltipUtils {
 
     private static final long BUCKET = 81000L;
 
     public static String getFormattedAmount(long number) {
-        if (com.mojang.blaze3d.platform.InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), com.mojang.blaze3d.platform.InputConstants.KEY_LSHIFT)) {
+        if (com.mojang.blaze3d.platform.InputConstants.isKeyDown(Minecraft.getInstance().getWindow(), com.mojang.blaze3d.platform.InputConstants.KEY_LSHIFT)) {
             return DecimalFormat.getNumberInstance().format(number);
         }
         NumberFormat compactFormat = NumberFormat.getCompactNumberInstance(Locale.ROOT, NumberFormat.Style.SHORT);
@@ -154,8 +155,25 @@ public class TooltipUtils {
         return Component.translatable("direction.ad_astra.relative.%s".formatted(direction.getName()));
     }
 
+    public static void addDescriptionComponent(Consumer<Component> consumer, Component description) {
+        if (!com.mojang.blaze3d.platform.InputConstants.isKeyDown(Minecraft.getInstance().getWindow(), com.mojang.blaze3d.platform.InputConstants.KEY_LSHIFT)) {
+            consumer.accept(ConstantComponents.SHIFT_DESCRIPTION);
+            return;
+        }
+
+        // Split the description into multiple lines if it's too long
+        for (FormattedCharSequence text : Minecraft.getInstance().font.split(description, 200)) {
+            StringBuilder builder = new StringBuilder();
+            text.accept((i, style, codePoint) -> {
+                builder.appendCodePoint(codePoint);
+                return true;
+            });
+            consumer.accept(Component.literal(builder.toString()).withStyle(description.getStyle()));
+        }
+    }
+
     public static void addDescriptionComponent(List<Component> tooltipComponents, Component description) {
-        if (!com.mojang.blaze3d.platform.InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), com.mojang.blaze3d.platform.InputConstants.KEY_LSHIFT)) {
+        if (!com.mojang.blaze3d.platform.InputConstants.isKeyDown(Minecraft.getInstance().getWindow(), com.mojang.blaze3d.platform.InputConstants.KEY_LSHIFT)) {
             tooltipComponents.add(ConstantComponents.SHIFT_DESCRIPTION);
             return;
         }

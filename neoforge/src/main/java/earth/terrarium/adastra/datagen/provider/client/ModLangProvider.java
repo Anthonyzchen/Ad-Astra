@@ -9,7 +9,7 @@ import earth.terrarium.adastra.common.registry.ModEntityTypes;
 import earth.terrarium.adastra.common.registry.ModFluids;
 import earth.terrarium.adastra.common.registry.ModItems;
 import earth.terrarium.adastra.datagen.provider.server.registry.ModBiomeDataProvider;
-import earth.terrarium.botarium.common.registry.fluid.BotariumFlowingFluid;
+import com.teamresourceful.resourcefullib.common.fluid.ResourcefulFlowingFluid;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.network.chat.Component;
@@ -521,7 +521,7 @@ public class ModLangProvider extends LanguageProvider {
     }
 
     public void addFluid(Supplier<? extends Fluid> key, String name) {
-        if (key.get() instanceof BotariumFlowingFluid) return;
+        if (key.get() instanceof ResourcefulFlowingFluid.Flowing) return;
         add("fluid_type.%s.%s".formatted(AdAstra.MOD_ID, Objects.requireNonNull(BuiltInRegistries.FLUID.getKey(key.get())).getPath()), name);
     }
 }

@@ -68,7 +68,7 @@ public class EatPermafrostGoal extends Goal {
         if (this.timer == this.adjustedTickDelay(4)) {
             BlockPos blockPos = this.mob.blockPosition();
             if (PERMAFROST_PREDICATE.test(this.level.getBlockState(blockPos))) {
-                if ((Boolean) this.level.getGameRules().get(GameRules.MOB_GRIEFING)) {
+                if (this.level instanceof net.minecraft.server.level.ServerLevel serverLevel && (Boolean) serverLevel.getGameRules().get(GameRules.MOB_GRIEFING)) {
                     this.level.destroyBlock(blockPos, false);
                 }
 
@@ -76,7 +76,7 @@ public class EatPermafrostGoal extends Goal {
             } else {
                 BlockPos blockPos2 = blockPos.below();
                 if (this.level.getBlockState(blockPos2).is(ModBlocks.PERMAFROST.get())) {
-                    if ((Boolean) this.level.getGameRules().get(GameRules.MOB_GRIEFING)) {
+                    if (this.level instanceof net.minecraft.server.level.ServerLevel serverLevel && (Boolean) serverLevel.getGameRules().get(GameRules.MOB_GRIEFING)) {
                         this.level.levelEvent(2001, blockPos2, Block.getId(ModBlocks.PERMAFROST.get().defaultBlockState()));
                         this.level.setBlock(blockPos2, Blocks.AIR.defaultBlockState(), 2);
                     }

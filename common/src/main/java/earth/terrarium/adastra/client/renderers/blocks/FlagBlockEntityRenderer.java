@@ -18,6 +18,7 @@ import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
@@ -25,7 +26,6 @@ import net.minecraft.client.renderer.blockentity.SkullBlockRenderer;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.client.renderer.texture.AbstractTexture;
-import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.core.Vec3i;
 import net.minecraft.resources.Identifier;
@@ -36,6 +36,11 @@ import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 
 public class FlagBlockEntityRenderer implements BlockEntityRenderer<FlagBlockEntity, BlockEntityRenderState> {
+
+    @Override
+    public BlockEntityRenderState createRenderState() {
+        return new BlockEntityRenderState();
+    }
 
     @Override
     public void extractRenderState(FlagBlockEntity entity, BlockEntityRenderState state, float partialTick, Vec3 cameraPos, ModelFeatureRenderer.CrumblingOverlay crumblingOverlay) {
@@ -59,14 +64,14 @@ public class FlagBlockEntityRenderer implements BlockEntityRenderer<FlagBlockEnt
     private static RenderType getFlagImage(FlagContent content) {
         Identifier id = content.toTexture();
         TextureManager manager = Minecraft.getInstance().getTextureManager();
-        AbstractTexture texture = manager.getTexture(id, MissingTextureAtlasSprite.getTexture());
-        if (texture == MissingTextureAtlasSprite.getTexture()) {
+        AbstractTexture texture = manager.getTexture(id);
+        if (texture == null) {
             if (content instanceof UrlContent url) {
                 manager.register(id, new FlagUrlTexture(url.url()));
             } else if (content instanceof ImageContent image) {
                 manager.register(id, new FlagImageTexture(image.data()));
             }
         }
-        return RenderType.entitySolid(id);
+        return RenderTypes.entitySolid(id);
     }
 }

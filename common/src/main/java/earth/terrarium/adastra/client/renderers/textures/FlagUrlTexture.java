@@ -1,15 +1,14 @@
 package earth.terrarium.adastra.client.renderers.textures;
 
 import com.mojang.blaze3d.platform.NativeImage;
-import com.mojang.blaze3d.platform.TextureUtil;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.logging.LogUtils;
 import earth.terrarium.adastra.AdAstra;
-import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.texture.SimpleTexture;
+import net.minecraft.client.renderer.texture.ReloadableTexture;
+import net.minecraft.client.renderer.texture.TextureContents;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
@@ -21,7 +20,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.concurrent.CompletableFuture;
 
-public class FlagUrlTexture extends SimpleTexture {
+public class FlagUrlTexture extends ReloadableTexture {
 
     private static final HttpClient CLIENT = HttpClient.newBuilder().build();
 
@@ -40,48 +39,30 @@ public class FlagUrlTexture extends SimpleTexture {
             .build();
     }
 
-    private void upload(NativeImage image) {
-        TextureUtil.prepareImage(this.getId(), image.getWidth(), image.getHeight());
-        image.upload(0, 0, 0, true);
-    }
-
     @Override
-    public void load(ResourceManager manager) {
-        Minecraft.getInstance().execute(() -> {
-            if (!this.loaded) {
-                try {
-                    super.load(manager);
-                } catch (IOException var3x) {
-                    LOGGER.warn("Failed to load texture: {}", this.location, var3x);
-                }
-                this.loaded = true;
-            }
-        });
-
+    public TextureContents loadContents(ResourceManager manager) throws IOException {
+        // Start async download if not already started
         if (this.loader == null) {
             this.loader = CompletableFuture.runAsync(() -> {
                 try {
                     HttpResponse<InputStream> data = CLIENT.send(request, HttpResponse.BodyHandlers.ofInputStream());
                     if (data.statusCode() / 100 == 2) {
-                        NativeImage image = this.loadTexture(data.body());
-                        Minecraft.getInstance().execute(() -> {
-                            if (image != null) {
-                                Minecraft.getInstance().execute(() -> {
-                                    this.loaded = true;
-                                    if (!RenderSystem.isOnRenderThread()) {
-                                        RenderSystem.recordRenderCall(() -> this.upload(image));
-                                    } else {
-                                        this.upload(image);
-                                    }
-                                });
-                            }
-                        });
+                        NativeImage image = loadTexture(data.body());
+                        if (image != null) {
+                            Minecraft.getInstance().execute(() -> {
+                                this.loaded = true;
+                                this.doLoad(image);
+                            });
+                        }
                     }
                 } catch (IOException | InterruptedException e) {
                     LOGGER.error("Couldn't download http texture", e);
                 }
             }, Util.backgroundExecutor());
         }
+
+        // Return default texture contents while loading
+        return TextureContents.load(manager, DEFAULT_FLAG);
     }
 
     @Nullable

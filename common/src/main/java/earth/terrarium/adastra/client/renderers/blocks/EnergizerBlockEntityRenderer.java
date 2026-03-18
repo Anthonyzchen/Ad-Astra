@@ -22,6 +22,11 @@ import java.util.Objects;
 public class EnergizerBlockEntityRenderer implements BlockEntityRenderer<EnergizerBlockEntity, BlockEntityRenderState> {
 
     @Override
+    public BlockEntityRenderState createRenderState() {
+        return new BlockEntityRenderState();
+    }
+
+    @Override
     public void extractRenderState(EnergizerBlockEntity entity, BlockEntityRenderState state, float partialTick, Vec3 cameraPos, ModelFeatureRenderer.CrumblingOverlay crumblingOverlay) {
         // TODO: 1.21.11 - Extract energizer-specific render data into a custom render state
     }

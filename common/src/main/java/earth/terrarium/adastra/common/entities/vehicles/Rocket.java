@@ -24,6 +24,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -133,9 +134,10 @@ public class Rocket extends Vehicle {
         return fluidContainer;
     }
 
-    public boolean hurtRocket(DamageSource source, float amount) {
+    @Override
+    public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
         if (!isLaunching() && !hasLaunched()) {
-            hurtVehicle(source, amount);
+            return hurtVehicle(level, source, amount);
         }
         return false;
     }

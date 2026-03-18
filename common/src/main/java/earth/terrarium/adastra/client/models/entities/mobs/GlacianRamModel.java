@@ -1,7 +1,5 @@
 package earth.terrarium.adastra.client.models.entities.mobs;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import earth.terrarium.adastra.AdAstra;
 import net.minecraft.client.model.QuadrupedModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
@@ -16,7 +14,7 @@ public class GlacianRamModel<T extends LivingEntityRenderState> extends Quadrupe
 
     public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "glacian_ram"), "main");
     public GlacianRamModel(ModelPart modelPart) {
-        super(modelPart, false, 8.0F, 8.0F, 2.0F, 2.0F, 24);
+        super(modelPart);
     }
 
     @SuppressWarnings("unused")
@@ -61,8 +59,4 @@ public class GlacianRamModel<T extends LivingEntityRenderState> extends Quadrupe
         this.head.xRot = 0.0f; // TODO: restore getHeadAngle from render state
     }
 
-    @Override
-    public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay, int color) {
-        super.renderToBuffer(poseStack, buffer, packedLight, packedOverlay, color);
-    }
 }

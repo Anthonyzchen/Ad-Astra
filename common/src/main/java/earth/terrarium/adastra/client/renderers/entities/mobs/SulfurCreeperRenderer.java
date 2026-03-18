@@ -23,6 +23,11 @@ public class SulfurCreeperRenderer extends MobRenderer<SulfurCreeper, LivingEnti
     }
 
     @Override
+    public LivingEntityRenderState createRenderState() {
+        return new LivingEntityRenderState();
+    }
+
+    @Override
     protected void scale(LivingEntityRenderState state, PoseStack poseStack) {
         // TODO: 1.21.11 - Restore creeper swelling animation using custom render state
     }

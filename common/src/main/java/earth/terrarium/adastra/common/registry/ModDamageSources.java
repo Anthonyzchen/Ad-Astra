@@ -19,10 +19,10 @@ public final class ModDamageSources {
     public static final ResourceKey<DamageType> ACID_RAIN = ResourceKey.create(Registries.DAMAGE_TYPE, Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "acid_rain"));
 
     public static DamageSource create(Level level, ResourceKey<DamageType> key) {
-        return new DamageSource(level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(key));
+        return new DamageSource(level.registryAccess().lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(key));
     }
 
     public static DamageSource ranOver(Level level, @Nullable Entity vehicle, @Nullable Entity directEntity) {
-        return new DamageSource(level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(RAN_OVER), vehicle, directEntity);
+        return new DamageSource(level.registryAccess().lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(RAN_OVER), vehicle, directEntity);
     }
 }

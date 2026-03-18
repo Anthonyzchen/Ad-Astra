@@ -41,7 +41,7 @@ public abstract class LivingEntityMixin extends Entity {
         super(type, level);
     }
 
-    @Inject(method = "method_5773", at = @At("TAIL"))
+    @Inject(method = "tick", at = @At("TAIL"))
     public void adastra$tick(CallbackInfo ci) {
         if (!(level() instanceof ServerLevel level)) return;
         LivingEntity entity = (LivingEntity) (Object) this;
@@ -71,7 +71,7 @@ public abstract class LivingEntityMixin extends Entity {
         }
     }
 
-    @Inject(method = "method_6091", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "travel", at = @At("HEAD"), cancellable = true)
     public void adastra$travel(Vec3 travelVector, CallbackInfo ci) {
         float gravity = GravityApi.API.getGravity(this);
         LivingEntity entity = (LivingEntity) (Object) this;
@@ -102,8 +102,8 @@ public abstract class LivingEntityMixin extends Entity {
         }
     }
 
-    @Inject(method = "hurt", at = @At("HEAD"), cancellable = true)
-    public void adastra$hurt(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
+    @Inject(method = "hurtServer", at = @At("HEAD"), cancellable = true)
+    public void adastra$hurt(ServerLevel level, DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
         LivingEntity entity = ((LivingEntity) (Object) this);
 
         if ((source.is(DamageTypeTags.IS_FIRE) || source.is(DamageTypes.HOT_FLOOR)) && SpaceSuitItem.hasFullNetheriteSet(entity)) {
@@ -113,7 +113,7 @@ public abstract class LivingEntityMixin extends Entity {
     }
 
     @ModifyVariable(
-        method = "method_5747",
+        method = "causeFallDamage",
         at = @At("HEAD"),
         ordinal = 0,
         argsOnly = true)
@@ -121,14 +121,14 @@ public abstract class LivingEntityMixin extends Entity {
         return multiplier * GravityApi.API.getGravity(this);
     }
 
-    @Inject(method = "method_5747", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "causeFallDamage", at = @At("HEAD"), cancellable = true)
     private void adastra$causeFallDamage(double fallDistance, float multiplier, DamageSource source, CallbackInfoReturnable<Boolean> cir) {
         if (!(fallDistance <= 3 / GravityApi.API.getGravity(this))) return;
         cir.setReturnValue(false);
     }
 
     // Fix dumb mods dismounting landers
-    @Inject(method = "method_5848", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "stopRiding", at = @At("HEAD"), cancellable = true)
     private void adastra$stopRiding(CallbackInfo ci) {
         if ((Object) this instanceof Player player) {
             if (player.getVehicle() instanceof Lander lander && lander.getY() > (AdAstraConfig.atmosphereLeave - 10)) {

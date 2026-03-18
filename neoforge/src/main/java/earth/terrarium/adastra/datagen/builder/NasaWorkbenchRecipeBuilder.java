@@ -4,12 +4,14 @@ import com.teamresourceful.resourcefullib.common.datagen.CodecRecipeBuilder;
 import earth.terrarium.adastra.common.recipes.machines.NasaWorkbenchRecipe;
 import net.minecraft.advancements.AdvancementRequirements;
 import net.minecraft.advancements.AdvancementRewards;
-import net.minecraft.advancements.critereon.RecipeUnlockedTrigger;
+import net.minecraft.advancements.criterion.RecipeUnlockedTrigger;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.Recipe;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -28,13 +30,14 @@ public class NasaWorkbenchRecipeBuilder extends CodecRecipeBuilder {
     }
 
     @Override
-    public void save(RecipeOutput recipeOutput, Identifier id) {
+    public void save(RecipeOutput recipeOutput, ResourceKey<Recipe<?>> key) {
+        Identifier id = key.identifier();
         var builder = recipeOutput.advancement()
-            .addCriterion("has_the_recipe", RecipeUnlockedTrigger.unlocked(id))
-            .rewards(AdvancementRewards.Builder.recipe(id))
+            .addCriterion("has_the_recipe", RecipeUnlockedTrigger.unlocked(key))
+            .rewards(AdvancementRewards.Builder.recipe(key))
             .requirements(AdvancementRequirements.Strategy.OR);
         criteria.forEach(builder::addCriterion);
-        recipeOutput.accept(id, recipe, builder
-            .build(new Identifier(id.getNamespace(), "recipes/nasa_workbench/" + id.getPath())));
+        recipeOutput.accept(key, recipe, builder
+            .build(Identifier.fromNamespaceAndPath(id.getNamespace(), "recipes/nasa_workbench/" + id.getPath())));
     }
 }

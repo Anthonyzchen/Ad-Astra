@@ -120,7 +120,8 @@ subprojects {
             "modCompileOnly"(group = "me.shedaniel", name = "RoughlyEnoughItems-api", version = reiVersion)
             "modCompileOnly"(group = "me.shedaniel", name = "RoughlyEnoughItems-default-plugin", version = reiVersion)
             compileOnly(group = "net.fabricmc", name = "sponge-mixin", version = "0.17.0+mixin.0.8.7")
-            "annotationProcessor"(group = "net.fabricmc", name = "sponge-mixin", version = "0.17.0+mixin.0.8.7")
+            // AP removed - using named method names in mixins, loom handles remapping
+            // "annotationProcessor"(group = "net.fabricmc", name = "sponge-mixin", version = "0.17.0+mixin.0.8.7")
             implementation(
                 "annotationProcessor"(
                     group = "io.github.llamalad7",

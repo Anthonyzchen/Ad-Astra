@@ -19,6 +19,11 @@ public class MoglerRenderer extends MobRenderer<Mogler, LivingEntityRenderState,
     }
 
     @Override
+    public LivingEntityRenderState createRenderState() {
+        return new LivingEntityRenderState();
+    }
+
+    @Override
     public @NotNull Identifier getTextureLocation(LivingEntityRenderState state) {
         return TEXTURE;
     }

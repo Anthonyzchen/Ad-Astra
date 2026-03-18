@@ -2,11 +2,14 @@ package earth.terrarium.adastra.common.registry;
 
 import earth.terrarium.adastra.AdAstra;
 import earth.terrarium.adastra.common.tags.ModItemTags;
-import net.minecraft.util.Util;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.util.Util;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.equipment.ArmorMaterial;
 import net.minecraft.world.item.equipment.ArmorType;
+import net.minecraft.world.item.equipment.EquipmentAsset;
+import net.minecraft.world.item.equipment.EquipmentAssets;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -27,7 +30,7 @@ public class ModArmorMaterials {
         0.0f,
         0.0f,
         ModItemTags.STEEL_INGOTS,
-        Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "space_suit")
+        ResourceKey.create(EquipmentAssets.ROOT_ID, Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "space_suit"))
     );
 
     public static final ArmorMaterial NETHERITE_SPACE_SUIT = new ArmorMaterial(
@@ -44,7 +47,7 @@ public class ModArmorMaterials {
         3.0f,
         0.1f,
         net.minecraft.tags.ItemTags.REPAIRS_NETHERITE_ARMOR,
-        Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "netherite_space_suit")
+        ResourceKey.create(EquipmentAssets.ROOT_ID, Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "netherite_space_suit"))
     );
 
     public static final ArmorMaterial JET_SUIT = new ArmorMaterial(
@@ -61,7 +64,7 @@ public class ModArmorMaterials {
         5.0f,
         0.1f,
         ModItemTags.CALORITE_INGOTS,
-        Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "jet_suit")
+        ResourceKey.create(EquipmentAssets.ROOT_ID, Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "jet_suit"))
     );
 
     public static void init() {

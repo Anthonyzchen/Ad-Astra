@@ -13,6 +13,7 @@ import earth.terrarium.common_storage_lib.storage.base.ValueStorage;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -20,6 +21,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.equipment.ArmorMaterial;
 import net.minecraft.world.item.equipment.ArmorType;
 import net.minecraft.world.level.Level;
@@ -27,7 +29,7 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 public class JetSuitItem extends SpaceSuitItem implements EnergyProvider.Item {
 
@@ -39,16 +41,16 @@ public class JetSuitItem extends SpaceSuitItem implements EnergyProvider.Item {
     }
 
     @Override
-    public void appendHoverText(@NotNull ItemStack stack, @NotNull Item.TooltipContext context, @NotNull List<Component> tooltipComponents, @NotNull TooltipFlag isAdvanced) {
+    public void appendHoverText(@NotNull ItemStack stack, @NotNull Item.TooltipContext context, @NotNull TooltipDisplay tooltipDisplay, @NotNull Consumer<Component> consumer, @NotNull TooltipFlag isAdvanced) {
         var fluidContainer = getFluidContainer(stack);
         long fluidAmount = fluidContainer.get(0).getAmount();
         long fluidCapacity = fluidContainer.get(0).getLimit(fluidContainer.get(0).getResource());
-        tooltipComponents.add(TooltipUtils.getFluidComponent(
+        consumer.accept(TooltipUtils.getFluidComponent(
             fluidAmount, fluidCapacity, ModFluids.OXYGEN.get()));
         var energy = getEnergyStorage(stack);
-        tooltipComponents.add(TooltipUtils.getEnergyComponent(energy.getStoredAmount(), energyCapacity));
-        tooltipComponents.add(TooltipUtils.getMaxEnergyInComponent(energy.getCapacity()));
-        TooltipUtils.addDescriptionComponent(tooltipComponents, ConstantComponents.JET_SUIT_INFO);
+        consumer.accept(TooltipUtils.getEnergyComponent(energy.getStoredAmount(), energyCapacity));
+        consumer.accept(TooltipUtils.getMaxEnergyInComponent(energy.getCapacity()));
+        TooltipUtils.addDescriptionComponent(consumer, ConstantComponents.JET_SUIT_INFO);
     }
 
     public SimpleValueStorage getEnergyStorage(ItemStack holder) {
@@ -61,13 +63,13 @@ public class JetSuitItem extends SpaceSuitItem implements EnergyProvider.Item {
     }
 
     @Override
-    public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
-        super.inventoryTick(stack, level, entity, slotId, isSelected);
+    public void inventoryTick(ItemStack stack, ServerLevel level, Entity entity, EquipmentSlot slot) {
+        super.inventoryTick(stack, level, entity, slot);
         if (!(entity instanceof Player player)) return;
         if (player.getItemBySlot(EquipmentSlot.CHEST) != stack) return;
 
         if (player.getAbilities().flying) return;
-        if (player.getCooldowns().isOnCooldown(stack.getItem())) return;
+        if (player.getCooldowns().isOnCooldown(stack)) return;
         if (!hasFullJetSuitSet(player)) return;
 
         if (!KeybindManager.suitFlightEnabled(player)) return;
@@ -76,10 +78,10 @@ public class JetSuitItem extends SpaceSuitItem implements EnergyProvider.Item {
 
         if (KeybindManager.sprintDown(player)) {
             fullFlight(player);
-            consume(player, stack, 100, slotId);
+            consume(player, stack, 100);
         } else {
             upwardsFlight(player);
-            consume(player, stack, 50, slotId);
+            consume(player, stack, 50);
         }
     }
 
@@ -104,7 +106,7 @@ public class JetSuitItem extends SpaceSuitItem implements EnergyProvider.Item {
         return player.isCreative() || getEnergyStorage(stack).getStoredAmount() > 0;
     }
 
-    private void consume(Player player, ItemStack stack, int amount, int slotId) {
+    private void consume(Player player, ItemStack stack, int amount) {
         if (player.isCreative() || player.isSpectator() || player.level().isClientSide()) return;
         var container = getEnergyStorage(stack);
         if (container == null) return;
@@ -142,7 +144,7 @@ public class JetSuitItem extends SpaceSuitItem implements EnergyProvider.Item {
         double sideOffsetX = Math.cos((yRot - 90) * Math.PI / 180) * pitch;
         double sideOffsetZ = Math.sin((yRot - 90) * Math.PI / 180) * pitch;
 
-        level.addParticle(ParticleTypes.FLAME, true,
+        level.addParticle(ParticleTypes.FLAME, true, false,
             entity.getX() + forwardOffsetX + sideOffsetX,
             entity.getY() + yOffset,
             entity.getZ() + sideOffsetZ + forwardOffsetZ,

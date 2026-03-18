@@ -105,9 +105,14 @@ public class PlanetsMenu extends AbstractContainerMenu {
         return SpaceStationRecipe.hasIngredients(player, level, recipe.value());
     }
 
+    @SuppressWarnings("unchecked")
     private Map<ResourceKey<Level>, List<Pair<ItemStack, Integer>>> getSpaceStationRecipes() {
-        List<SpaceStationRecipe> spaceStationRecipes = level.getRecipeManager().getAllRecipesFor(ModRecipeTypes.SPACE_STATION_RECIPE.get())
-            .stream().map(RecipeHolder::value).toList();
+        var server = level.getServer();
+        if (server == null) return new HashMap<>();
+        List<SpaceStationRecipe> spaceStationRecipes = server.getRecipeManager().getRecipes().stream()
+            .filter(holder -> holder.value().getType() == ModRecipeTypes.SPACE_STATION_RECIPE.get())
+            .map(holder -> ((RecipeHolder<SpaceStationRecipe>) (RecipeHolder<?>) holder).value())
+            .toList();
         Map<ResourceKey<Level>, List<Pair<ItemStack, Integer>>> recipes = new HashMap<>(spaceStationRecipes.size());
         for (var recipe : spaceStationRecipes) {
             for (IngredientHolder holder : recipe.ingredients()) {
@@ -118,7 +123,10 @@ public class PlanetsMenu extends AbstractContainerMenu {
                         count += stack.getCount();
                     }
                 }
-                recipes.computeIfAbsent(recipe.dimension(), k -> new ArrayList<>()).add(new Pair<>(holder.ingredient().getItems()[0].copyWithCount(holder.count()), count));
+                ItemStack displayStack = holder.ingredient().items().findFirst()
+                    .map(h -> new ItemStack(h, holder.count()))
+                    .orElse(ItemStack.EMPTY);
+                recipes.computeIfAbsent(recipe.dimension(), k -> new ArrayList<>()).add(new Pair<>(displayStack, count));
             }
         }
         return recipes;
@@ -147,12 +155,12 @@ public class PlanetsMenu extends AbstractContainerMenu {
     public List<Pair<String, SpaceStation>> getOwnedSpaceStations(ResourceKey<Level> dimension, GameProfile player) {
         var allStations = spaceStations.get(dimension);
         if (allStations == null) return List.of();
-        Set<SpaceStation> stations = allStations.get(player.getId());
+        Set<SpaceStation> stations = allStations.get(player.id());
         if (stations == null) return List.of();
 
         return stations.stream()
             .sorted(Comparator.comparing(station -> station.name().getString()))
-            .map(station -> new Pair<>(player.getName(), station)).toList();
+            .map(station -> new Pair<>(player.name(), station)).toList();
     }
 
     public List<Pair<String, SpaceStation>> getOwnedAndTeamSpaceStations(ResourceKey<Level> dimension) {

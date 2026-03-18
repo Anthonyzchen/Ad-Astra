@@ -12,7 +12,7 @@ import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
@@ -41,6 +41,11 @@ public class RocketRenderer extends EntityRenderer<Rocket, EntityRenderState> {
     }
 
     @Override
+    public EntityRenderState createRenderState() {
+        return new EntityRenderState();
+    }
+
+    @Override
     public void submit(EntityRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState cameraState) {
         super.submit(state, poseStack, collector, cameraState);
         // TODO: 1.21.11 - Migrate rocket rendering to the new SubmitNodeCollector pipeline.
@@ -65,7 +70,7 @@ public class RocketRenderer extends EntityRenderer<Rocket, EntityRenderState> {
             if (model == null) {
                 model = new RocketModel(Minecraft.getInstance().getEntityModels().bakeLayer(layer));
             }
-            var consumer = buffer.getBuffer(RenderType.entityCutoutNoCullZOffset(texture));
+            var consumer = buffer.getBuffer(RenderTypes.entityCutoutNoCullZOffset(texture));
             poseStack.pushPose();
             try {
                 poseStack.mulPose(Axis.ZP.rotationDegrees(180));

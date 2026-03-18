@@ -93,10 +93,10 @@ public class GravityNormalizerScreen extends MachineScreen<GravityNormalizerMenu
     }
 
     @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+    public boolean mouseDragged(net.minecraft.client.input.MouseButtonEvent event, double dragX, double dragY) {
         if (slider.isFocused()) {
-            slider.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+            slider.mouseDragged(event, dragX, dragY);
         }
-        return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+        return super.mouseDragged(event, dragX, dragY);
     }
 }

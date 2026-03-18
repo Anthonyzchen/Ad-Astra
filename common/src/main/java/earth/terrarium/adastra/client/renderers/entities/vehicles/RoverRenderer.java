@@ -11,7 +11,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
@@ -35,6 +35,11 @@ public class RoverRenderer extends EntityRenderer<Rover, EntityRenderState> {
     }
 
     @Override
+    public EntityRenderState createRenderState() {
+        return new EntityRenderState();
+    }
+
+    @Override
     public void submit(EntityRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState cameraState) {
         super.submit(state, poseStack, collector, cameraState);
         // TODO: 1.21.11 - Migrate rover rendering to the new SubmitNodeCollector pipeline.
@@ -54,7 +59,7 @@ public class RoverRenderer extends EntityRenderer<Rover, EntityRenderState> {
             if (model == null) {
                 model = new RoverModel(Minecraft.getInstance().getEntityModels().bakeLayer(RoverModel.LAYER));
             }
-            var consumer = buffer.getBuffer(RenderType.entityCutoutNoCullZOffset(TEXTURE));
+            var consumer = buffer.getBuffer(RenderTypes.entityCutoutNoCullZOffset(TEXTURE));
             poseStack.pushPose();
             try {
                 poseStack.mulPose(Axis.ZP.rotationDegrees(180));

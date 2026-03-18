@@ -13,7 +13,9 @@ import net.minecraft.world.item.equipment.ArmorMaterial;
 import net.minecraft.world.item.equipment.ArmorType;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
+import java.util.function.Consumer;
+
+import net.minecraft.world.item.component.TooltipDisplay;
 
 public class NetheriteSpaceSuitItem extends SpaceSuitItem {
 
@@ -22,11 +24,11 @@ public class NetheriteSpaceSuitItem extends SpaceSuitItem {
     }
 
     @Override
-    public void appendHoverText(@NotNull ItemStack stack, @NotNull Item.TooltipContext context, @NotNull List<Component> tooltipComponents, @NotNull TooltipFlag isAdvanced) {
-        tooltipComponents.add(TooltipUtils.getFluidComponent(
+    public void appendHoverText(@NotNull ItemStack stack, @NotNull Item.TooltipContext context, @NotNull TooltipDisplay tooltipDisplay, @NotNull Consumer<Component> consumer, @NotNull TooltipFlag isAdvanced) {
+        consumer.accept(TooltipUtils.getFluidComponent(
             FluidUtils.getTank(stack),
             tankSize * BUCKET / 1000L,
             ModFluids.OXYGEN.get()));
-        TooltipUtils.addDescriptionComponent(tooltipComponents, ConstantComponents.NETHERITE_SPACE_SUIT_INFO);
+        TooltipUtils.addDescriptionComponent(consumer, ConstantComponents.NETHERITE_SPACE_SUIT_INFO);
     }
 }

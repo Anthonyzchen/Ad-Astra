@@ -408,7 +408,7 @@ public class ModBlocks {
 
     public static final RegistryEntry<Block> GLACIAN_LOG = PILLARS.register("glacian_log", () -> new RotatedPillarBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_LOG).mapColor(MapColor.CLAY).friction(0.5f).mapColor(MapColor.COLOR_PINK)));
     public static final RegistryEntry<Block> STRIPPED_GLACIAN_LOG = PILLARS.register("stripped_glacian_log", () -> new RotatedPillarBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_OAK_LOG).mapColor(MapColor.CLAY).friction(0.5f).mapColor(MapColor.COLOR_PINK)));
-    public static final RegistryEntry<Block> GLACIAN_LEAVES = CUBES.register("glacian_leaves", () -> new LeavesBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_LEAVES).noOcclusion().friction(0.5f).mapColor(MapColor.COLOR_PINK)));
+    public static final RegistryEntry<Block> GLACIAN_LEAVES = CUBES.register("glacian_leaves", () -> new TintedParticleLeavesBlock(0.0f, BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_LEAVES).noOcclusion().friction(0.5f).mapColor(MapColor.COLOR_PINK)));
     public static final RegistryEntry<Block> GLACIAN_PLANKS = CUBES.register("glacian_planks", () -> new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_PLANKS).friction(0.5f).friction(0.5f).mapColor(MapColor.COLOR_PINK)));
     public static final RegistryEntry<Block> GLACIAN_STAIRS = STAIRS.register("glacian_stairs", () -> new StairBlock(GLACIAN_PLANKS.get().defaultBlockState(), BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_PLANKS).friction(0.5f).mapColor(MapColor.COLOR_PINK)));
     public static final RegistryEntry<Block> GLACIAN_SLAB = SLABS.register("glacian_slab", () -> new SlabBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_PLANKS).friction(0.5f).mapColor(MapColor.COLOR_PINK)));

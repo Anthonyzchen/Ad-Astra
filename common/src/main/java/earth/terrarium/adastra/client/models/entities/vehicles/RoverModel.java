@@ -1,9 +1,6 @@
 package earth.terrarium.adastra.client.models.entities.vehicles;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import earth.terrarium.adastra.AdAstra;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
@@ -17,10 +14,11 @@ public class RoverModel extends EntityModel<EntityRenderState> {
 
     public static final ModelLayerLocation LAYER = new ModelLayerLocation(Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "rover"), "main");
 
-    private final ModelPart root;
+    private final ModelPart main;
 
     public RoverModel(ModelPart root) {
-        this.root = root.getChild("main");
+        super(root);
+        this.main = root.getChild("main");
     }
 
     @SuppressWarnings({"unused", "DuplicatedCode"})
@@ -99,8 +97,5 @@ public class RoverModel extends EntityModel<EntityRenderState> {
         // TODO: Migrate wheel animation to use render state instead of entity reference
     }
 
-    @Override
-    public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay, int color) {
-        root.render(poseStack, buffer, packedLight, packedOverlay, color);
-    }
+    // renderToBuffer is now final in Model - rendering is handled by root().render() automatically
 }

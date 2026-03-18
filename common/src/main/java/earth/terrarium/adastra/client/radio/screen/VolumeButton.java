@@ -7,7 +7,7 @@ import earth.terrarium.adastra.client.utils.Debouncer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
@@ -26,7 +26,7 @@ public class VolumeButton extends Button {
 
     public VolumeButton(int x, int y, int width, int height, int amount) {
         super(x, y, width, height, CommonComponents.EMPTY, button -> {
-            int volume = RadioConfig.volume + amount * (Screen.hasShiftDown() ? 10 : 1);
+            int volume = RadioConfig.volume + amount * (Minecraft.getInstance().hasShiftDown() ? 10 : 1);
             int before = RadioConfig.volume;
             RadioConfig.volume = Mth.clamp(volume, 0, 100);
             if (before == RadioConfig.volume) return;
@@ -37,12 +37,12 @@ public class VolumeButton extends Button {
     }
 
     @Override
-    public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+    public void renderContents(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         Identifier sprite = this.isHoveredOrFocused() ? this.hovered : this.normal;
-        graphics.blitSprite(sprite, this.getX(), this.getY(), this.width, this.height);
+        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, sprite, this.getX(), this.getY(), this.width, this.height);
     }
 
     private static void saveConfigOnThread() {
-        Minecraft.getInstance().tell(() -> AdAstra.CONFIGURATOR.saveConfig(AdAstraConfigClient.class));
+        Minecraft.getInstance().execute(() -> AdAstra.CONFIGURATOR.saveConfig(AdAstraConfigClient.class));
     }
 }

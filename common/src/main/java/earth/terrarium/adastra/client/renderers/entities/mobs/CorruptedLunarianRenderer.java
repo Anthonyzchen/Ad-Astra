@@ -20,6 +20,11 @@ public class CorruptedLunarianRenderer extends MobRenderer<CorruptedLunarian, Li
     }
 
     @Override
+    public LivingEntityRenderState createRenderState() {
+        return new LivingEntityRenderState();
+    }
+
+    @Override
     public @NotNull Identifier getTextureLocation(LivingEntityRenderState state) {
         return TEXTURE;
     }

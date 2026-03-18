@@ -19,6 +19,11 @@ public class GlacianRamRenderer extends MobRenderer<GlacianRam, LivingEntityRend
         super(context, new GlacianRamModel<>(context.bakeLayer(GlacianRamModel.LAYER_LOCATION)), 0.7f);
     }
 
+    @Override
+    public LivingEntityRenderState createRenderState() {
+        return new LivingEntityRenderState();
+    }
+
     public @NotNull Identifier getTextureLocation(LivingEntityRenderState state) {
         // TODO: 1.21.11 - Restore sheared texture logic using custom render state
         return TEXTURE;

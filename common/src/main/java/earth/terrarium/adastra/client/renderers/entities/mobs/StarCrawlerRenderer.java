@@ -19,6 +19,11 @@ public class StarCrawlerRenderer extends MobRenderer<StarCrawler, LivingEntityRe
     }
 
     @Override
+    public LivingEntityRenderState createRenderState() {
+        return new LivingEntityRenderState();
+    }
+
+    @Override
     public @NotNull Identifier getTextureLocation(LivingEntityRenderState state) {
         return TEXTURE;
     }

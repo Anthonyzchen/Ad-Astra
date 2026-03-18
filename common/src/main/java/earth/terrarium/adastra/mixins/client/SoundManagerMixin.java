@@ -18,6 +18,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(SoundManager.class)
 public abstract class SoundManagerMixin {
@@ -26,14 +27,14 @@ public abstract class SoundManagerMixin {
     @Final
     private SoundEngine soundEngine;
 
-    @Inject(method = "method_4873", at = @At("HEAD"), cancellable = true)
-    private void adastra$play(SoundInstance sound, CallbackInfo ci) {
+    @Inject(method = "play", at = @At("HEAD"), cancellable = true)
+    private void adastra$play(SoundInstance sound, CallbackInfoReturnable<SoundEngine.PlayResult> cir) {
         if (adastra$play(sound, 0)) {
-            ci.cancel();
+            cir.setReturnValue(null);
         }
     }
 
-    @Inject(method = "method_4872", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "playDelayed", at = @At("HEAD"), cancellable = true)
     private void adastra$playDelayed(SoundInstance sound, int delay, CallbackInfo ci) {
         if (adastra$play(sound, delay)) {
             ci.cancel();

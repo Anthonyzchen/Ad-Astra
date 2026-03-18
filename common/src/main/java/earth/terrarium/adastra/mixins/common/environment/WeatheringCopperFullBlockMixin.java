@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(WeatheringCopperFullBlock.class)
 public abstract class WeatheringCopperFullBlockMixin {
 
-    @Inject(method = "method_9514", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "randomTick", at = @At("HEAD"), cancellable = true)
     private void adastra$randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random, CallbackInfo ci) {
         if (!OxygenApi.API.hasOxygen(level, pos)) {
             ci.cancel();

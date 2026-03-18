@@ -5,14 +5,14 @@ import earth.terrarium.adastra.AdAstra;
 import earth.terrarium.adastra.api.planets.Planet;
 import earth.terrarium.adastra.common.registry.ModItems;
 import net.minecraft.advancements.*;
-import net.minecraft.advancements.critereon.*;
+import net.minecraft.advancements.criterion.*;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
+import net.minecraft.data.advancements.AdvancementProvider;
+import net.minecraft.data.advancements.AdvancementSubProvider;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
-import net.neoforged.neoforge.common.data.AdvancementProvider;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,20 +22,23 @@ import java.util.function.Consumer;
 @SuppressWarnings("unused")
 public class ModAdvancementProvider extends AdvancementProvider {
 
-    public ModAdvancementProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> registries, ExistingFileHelper existingFileHelper) {
-        super(output, registries, existingFileHelper, List.of(new Advancements()));
+    public ModAdvancementProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
+        super(output, registries, List.of(new Advancements()));
     }
 
-    public static class Advancements implements AdvancementGenerator {
+    public static class Advancements implements AdvancementSubProvider {
+
+        private net.minecraft.core.HolderGetter<Item> items;
 
         @Override
-        public void generate(HolderLookup.Provider writer, Consumer<AdvancementHolder> consumer, ExistingFileHelper existingFileHelper) {
+        public void generate(HolderLookup.Provider writer, Consumer<AdvancementHolder> consumer) {
+            this.items = writer.lookupOrThrow(net.minecraft.core.registries.Registries.ITEM);
             AdvancementHolder adAstra = Advancement.Builder.advancement()
                 .display(
                     ModItems.EARTH_GLOBE.get(),
                     Component.translatable("advancements.ad_astra.ad_astra.title"),
                     Component.translatable("advancements.ad_astra.ad_astra.description"),
-                    new Identifier(AdAstra.MOD_ID, "textures/block/steel_panel.png"),
+                    Identifier.fromNamespaceAndPath(AdAstra.MOD_ID, "textures/block/steel_panel.png"),
                     AdvancementType.TASK,
                     false,
                     false,
@@ -119,7 +122,7 @@ public class ModAdvancementProvider extends AdvancementProvider {
                 )
                 .addCriterion(
                     ModItems.OIL_BUCKET.getId().getPath(),
-                    FilledBucketTrigger.TriggerInstance.filledBucket(ItemPredicate.Builder.item().of(ModItems.OIL_BUCKET.get())))
+                    FilledBucketTrigger.TriggerInstance.filledBucket(ItemPredicate.Builder.item().of(items,ModItems.OIL_BUCKET.get())))
                 .save(consumer, path("ocean_cleanup"));
 
             AdvancementHolder astronaut = Advancement.Builder.advancement()
@@ -172,7 +175,7 @@ public class ModAdvancementProvider extends AdvancementProvider {
                 )
                 .addCriterion("has_zip_gun", CriteriaTriggers.USING_ITEM.createCriterion(new UsingItemTrigger.TriggerInstance(
                     Optional.empty(),
-                    Optional.of(ItemPredicate.Builder.item().of(ModItems.ZIP_GUN.get()).build()))))
+                    Optional.of(ItemPredicate.Builder.item().of(items,ModItems.ZIP_GUN.get()).build()))))
                 .save(consumer, path("zip_gun"));
 
             AdvancementHolder ti69 = Advancement.Builder.advancement()
@@ -510,7 +513,7 @@ public class ModAdvancementProvider extends AdvancementProvider {
         }
 
         private Criterion<InventoryChangeTrigger.TriggerInstance> hasItem(Item item) {
-            return InventoryChangeTrigger.TriggerInstance.hasItems(ItemPredicate.Builder.item().of(item).build());
+            return InventoryChangeTrigger.TriggerInstance.hasItems(ItemPredicate.Builder.item().of(items,item).build());
         }
     }
 }

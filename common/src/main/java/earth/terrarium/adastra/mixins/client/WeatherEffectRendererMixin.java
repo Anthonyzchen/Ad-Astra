@@ -40,7 +40,7 @@ public abstract class WeatherEffectRendererMixin {
     private int rainSoundTime;
 
     @Inject(
-        method = "method_62319",
+        method = "tickRainParticles",
         at = @At("HEAD"),
         cancellable = true)
     public void adastra$tickRainParticles(ClientLevel level, Camera camera, int ticks, ParticleStatus particleStatus, int rainSoundTime, CallbackInfo ci) {

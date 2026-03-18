@@ -1,7 +1,5 @@
 package earth.terrarium.adastra.client.models.entities.mobs;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import earth.terrarium.adastra.AdAstra;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
@@ -20,6 +18,7 @@ public class SulfurCreeperModel<T extends LivingEntityRenderState> extends Entit
     private final ModelPart body;
 
     public SulfurCreeperModel(ModelPart root) {
+        super(root);
         this.body = root.getChild("body");
     }
 
@@ -59,8 +58,4 @@ public class SulfurCreeperModel<T extends LivingEntityRenderState> extends Entit
         this.body.getChild("FrontRightLeg").xRot = Mth.cos(limbAngle * 0.6662f) * 1.4f * limbDistance;
     }
 
-    @Override
-    public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, int color) {
-        body.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
-    }
 }

@@ -9,8 +9,8 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.decoration.painting.Painting;
@@ -19,6 +19,7 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.HangingEntityItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.TypedEntityData;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
@@ -58,9 +59,9 @@ public class SpacePaintingItem extends HangingEntityItem {
         }
         Painting painting = optional.get();
 
-        CustomData customData = stack.getOrDefault(DataComponents.ENTITY_DATA, CustomData.EMPTY);
-        if (!customData.isEmpty()) {
-            customData.loadInto(painting);
+        TypedEntityData<EntityType<?>> entityData = stack.get(DataComponents.ENTITY_DATA);
+        if (entityData != null) {
+            entityData.loadInto(painting);
         }
         if (painting.survives()) {
             if (!level.isClientSide()) {
@@ -75,38 +76,37 @@ public class SpacePaintingItem extends HangingEntityItem {
     }
 
     public Optional<Painting> create(Level level, BlockPos pos, Direction direction) {
-        var registry = level.registryAccess().registryOrThrow(Registries.PAINTING_VARIANT);
-        Optional<Holder.Reference<PaintingVariant>> defaultHolder = registry.getHolder(defaultVariantKey);
+        var registry = level.registryAccess().lookupOrThrow(Registries.PAINTING_VARIANT);
+        Optional<Holder.Reference<PaintingVariant>> defaultHolder = registry.get(defaultVariantKey);
         if (defaultHolder.isEmpty()) return Optional.empty();
 
-        Painting painting = new Painting(level, pos, direction, defaultHolder.get()) {
-            @Override
-            public ItemEntity spawnAtLocation(ItemLike item) {
-                return super.spawnAtLocation(ModItems.SPACE_PAINTING.get());
-            }
-
-            @Override
-            public ItemStack getPickResult() {
-                return new ItemStack(ModItems.SPACE_PAINTING.get());
-            }
-        };
         List<Holder<PaintingVariant>> list = new ArrayList<>();
         registry.getTagOrEmpty(variants).forEach(list::add);
-        if (!list.isEmpty()) {
-            list.removeIf((holder) -> {
-                painting.setVariant(holder);
-                return !painting.survives();
-            });
-            if (!list.isEmpty()) {
-                int max = list.stream().mapToInt(SpacePaintingItem::variantArea).max().orElse(0);
-                list.removeIf(holder -> variantArea(holder) < max);
-                return Util.getRandomSafe(list, level.getRandom()).map(holder -> {
-                    painting.setVariant(holder);
-                    return painting;
-                });
-            }
-        }
-        return Optional.empty();
+        if (list.isEmpty()) return Optional.empty();
+
+        list.removeIf(holder -> {
+            Painting test = new Painting(level, pos, direction, holder);
+            return !test.survives();
+        });
+        if (list.isEmpty()) return Optional.empty();
+
+        int max = list.stream().mapToInt(SpacePaintingItem::variantArea).max().orElse(0);
+        list.removeIf(holder -> variantArea(holder) < max);
+
+        return Util.getRandomSafe(list, level.getRandom()).map(holder -> {
+            Painting painting = new Painting(level, pos, direction, holder) {
+                @Override
+                public ItemEntity spawnAtLocation(ServerLevel serverLevel, ItemLike item) {
+                    return super.spawnAtLocation(serverLevel, ModItems.SPACE_PAINTING.get());
+                }
+
+                @Override
+                public ItemStack getPickResult() {
+                    return new ItemStack(ModItems.SPACE_PAINTING.get());
+                }
+            };
+            return painting;
+        });
     }
 
     private static int variantArea(Holder<PaintingVariant> variant) {
