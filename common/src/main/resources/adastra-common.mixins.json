@@ -5,6 +5,7 @@
     "compatibilityLevel": "JAVA_21",
     "mixins": [
         "common.BlockBehaviourPropertiesMixin",
+        "common.BlockItemNameMixin",
         "common.ItemPropertiesMixin",
         "common.EntityBelowWorldMixin",
         "common.LivingEntityAccessor",

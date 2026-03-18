@@ -14,7 +14,6 @@ import earth.terrarium.adastra.common.registry.ModBlocks;
 import earth.terrarium.adastra.common.registry.ModEntityTypes;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-// import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin; // TODO: 1.21.11 - API changed
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.*;
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
@@ -44,14 +43,8 @@ public class AdAstraClientFabric {
         KeyBindingHelper.registerKeyBinding(AdAstraClient.KEY_TOGGLE_SUIT_FLIGHT);
         KeyBindingHelper.registerKeyBinding(AdAstraClient.KEY_OPEN_RADIO);
         AdAstraClient.onRegisterParticles((particle, provider) -> ParticleFactoryRegistry.getInstance().register(particle, provider::create));
-        // TODO: 1.21.11 - BuiltinItemRendererRegistry was removed from Fabric API.
-        // Custom item rendering now requires a different approach (e.g., SpecialBlockRendererRegistry or vanilla mechanisms).
-        // AdAstraClient.onRegisterItemRenderers((item, renderer) -> ...);
         AdAstraClient.onRegisterEntityLayers((location, definition) -> EntityModelLayerRegistry.registerModelLayer(location, definition::get));
         AdAstraClient.onRegisterHud(hud -> HudRenderCallback.EVENT.register((graphics, tickCounter) -> hud.renderHud(graphics, tickCounter.getGameTimeDeltaPartialTick(false))));
-        // TODO: 1.21.11 - ModelLoadingPlugin.Context.addModels(Identifier) was removed.
-        // Models now use addModel(ExtraModelKey, UnbakedExtraModel). The onRegisterModels API needs rework.
-        // ModelLoadingPlugin.register(ctx -> AdAstraClient.onRegisterModels(ctx::addModels));
         WorldRenderEvents.BEFORE_TRANSLUCENT.register(ctx -> {
             var camera = Minecraft.getInstance().gameRenderer.getMainCamera();
             var poseStack = ctx.matrices();
@@ -59,9 +52,6 @@ public class AdAstraClientFabric {
                 AdAstraClient.renderOverlays(poseStack, camera);
             }
         });
-        // TODO: 1.21.11 - ColorProviderRegistry.ITEM was removed. Item tinting is now handled
-        // through data-driven components (DyedItemColor). The onAddItemColors call may no longer be needed.
-        // AdAstraClient.onAddItemColors(ColorProviderRegistry.ITEM::register);
         registerEntityRenderers();
 
         BlockRenderLayerMap.putBlock(ModBlocks.SOLAR_PANEL.get(), ChunkSectionLayer.CUTOUT);
@@ -120,10 +110,5 @@ public class AdAstraClientFabric {
 
     public static void registerDimensionEffects(Map<ResourceKey<Level>, ModDimensionSpecialEffects> renderers) {
         // TODO: 1.21.11 - DimensionRenderingRegistry was removed from Fabric API.
-        // Custom dimension effects (sky, clouds, weather) need a new rendering approach.
-        // Possible approaches:
-        // 1. Use vanilla DimensionType$Skybox enum (limited to NONE, OVERWORLD, END)
-        // 2. Use mixins to inject custom rendering into LevelRenderer
-        // 3. Use WorldRenderEvents to render custom sky/clouds/weather
     }
 }

@@ -63,20 +63,12 @@
     "ridges": "minecraft:overworld/ridges",
     "erosion": "minecraft:overworld/erosion",
     "depth": "ad_astra:depth",
-    "initial_density_without_jaggedness": {
-      "type": "minecraft:mul",
-      "argument1": 4,
-      "argument2": {
-        "type": "minecraft:quarter_negative",
-        "argument": {
-          "type": "minecraft:mul",
-          "argument1": "ad_astra:depth",
-          "argument2": {
-            "type": "minecraft:cache_2d",
-            "argument": "ad_astra:factor"
-          }
-        }
-      }
+    "preliminary_surface_level": {
+      "type": "minecraft:find_top_surface",
+      "cell_height": 8,
+      "density": "ad_astra:depth",
+      "lower_bound": -64,
+      "upper_bound": 320
     },
     "final_density": {
       "type": "minecraft:max",

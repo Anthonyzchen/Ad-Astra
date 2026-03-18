@@ -1,5 +1,7 @@
 package earth.terrarium.adastra.mixins.common;
 
+import earth.terrarium.adastra.common.registry.RegistryIdContext;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -12,12 +14,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Optional;
 
-/**
- * In 1.21.11, BlockBehaviour.Properties requires the block ID to be set before
- * effectiveDrops() and effectiveDescriptionId() are called in the constructor.
- * ResourcefulLib's registry creates blocks before setting IDs, causing a crash.
- * This mixin provides safe fallbacks when the ID hasn't been set yet.
- */
 @Mixin(BlockBehaviour.Properties.class)
 public abstract class BlockBehaviourPropertiesMixin {
 
@@ -34,7 +30,12 @@ public abstract class BlockBehaviourPropertiesMixin {
     @Inject(method = "effectiveDescriptionId", at = @At("HEAD"), cancellable = true)
     private void adastra$effectiveDescriptionId(CallbackInfoReturnable<String> cir) {
         if (this.id == null) {
-            cir.setReturnValue("block.unknown.unknown");
+            Identifier contextId = RegistryIdContext.CURRENT_ID.get();
+            if (contextId != null) {
+                cir.setReturnValue("block." + contextId.getNamespace() + "." + contextId.getPath());
+            } else {
+                cir.setReturnValue("block.unknown.unknown");
+            }
         }
     }
 }

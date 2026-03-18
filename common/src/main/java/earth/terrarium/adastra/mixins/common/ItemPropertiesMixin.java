@@ -1,5 +1,7 @@
 package earth.terrarium.adastra.mixins.common;
 
+import earth.terrarium.adastra.common.registry.RegistryIdContext;
+import net.minecraft.resources.DependantName;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
@@ -9,28 +11,44 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-/**
- * In 1.21.11, Item.Properties requires the item ID to be set before
- * effectiveDescriptionId() and effectiveModel() are called in the constructor.
- * ResourcefulLib's registry creates items before setting IDs, causing a crash.
- */
 @Mixin(Item.Properties.class)
 public abstract class ItemPropertiesMixin {
 
     @Shadow
     private ResourceKey<Item> id;
 
+    @Shadow
+    private DependantName<Item, String> descriptionId;
+
+    @Shadow
+    private static DependantName<Item, String> BLOCK_DESCRIPTION_ID;
+
+    @Shadow
+    private static DependantName<Item, String> ITEM_DESCRIPTION_ID;
+
     @Inject(method = "effectiveDescriptionId", at = @At("HEAD"), cancellable = true)
     private void adastra$effectiveDescriptionId(CallbackInfoReturnable<String> cir) {
         if (this.id == null) {
-            cir.setReturnValue("item.unknown.unknown");
+            Identifier contextId = RegistryIdContext.CURRENT_ID.get();
+            if (contextId != null) {
+                // Use the DependantName to compute the correct prefix (block. or item.)
+                String prefix = (this.descriptionId == BLOCK_DESCRIPTION_ID) ? "block" : "item";
+                cir.setReturnValue(prefix + "." + contextId.getNamespace() + "." + contextId.getPath());
+            } else {
+                cir.setReturnValue("item.unknown.unknown");
+            }
         }
     }
 
     @Inject(method = "effectiveModel", at = @At("HEAD"), cancellable = true)
     private void adastra$effectiveModel(CallbackInfoReturnable<Identifier> cir) {
         if (this.id == null) {
-            cir.setReturnValue(Identifier.fromNamespaceAndPath("ad_astra", "unknown"));
+            Identifier contextId = RegistryIdContext.CURRENT_ID.get();
+            if (contextId != null) {
+                cir.setReturnValue(contextId);
+            } else {
+                cir.setReturnValue(Identifier.fromNamespaceAndPath("ad_astra", "unknown"));
+            }
         }
     }
 }
