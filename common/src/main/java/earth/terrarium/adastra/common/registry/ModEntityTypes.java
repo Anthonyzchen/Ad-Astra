@@ -152,11 +152,17 @@ public class ModEntityTypes {
 
     @SuppressWarnings("all")
     public static void registerSpawnPlacements() {
-        // Use reflection to call SpawnPlacements.register which may be access-restricted in common
+        // SpawnPlacements.register is private — use reflection.
+        // In 1.21.1, SpawnPlacementType is an interface, so we find the method by scanning declared methods.
         try {
-            var method = SpawnPlacements.class.getDeclaredMethod("register",
-                EntityType.class, net.minecraft.world.entity.SpawnPlacementType.class,
-                Heightmap.Types.class, SpawnPlacements.SpawnPredicate.class);
+            java.lang.reflect.Method method = null;
+            for (var m : SpawnPlacements.class.getDeclaredMethods()) {
+                if (m.getParameterCount() == 4 && m.getParameterTypes()[0] == EntityType.class) {
+                    method = m;
+                    break;
+                }
+            }
+            if (method == null) throw new RuntimeException("Could not find SpawnPlacements.register method");
             method.setAccessible(true);
             method.invoke(null, ModEntityTypes.LUNARIAN.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, (SpawnPlacements.SpawnPredicate<Lunarian>) Lunarian::checkMobSpawnRules);
             method.invoke(null, ModEntityTypes.CORRUPTED_LUNARIAN.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, (SpawnPlacements.SpawnPredicate<CorruptedLunarian>) CorruptedLunarian::checkMonsterSpawnRules);

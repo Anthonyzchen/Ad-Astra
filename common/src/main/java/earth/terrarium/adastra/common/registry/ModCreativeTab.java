@@ -25,12 +25,19 @@ public class ModCreativeTab {
             .title(Component.translatable("itemGroup." + AdAstra.MOD_ID + ".main"))
             .icon(() -> new ItemStack(ModItems.TIER_1_ROCKET.get()))
             .displayItems((parameters, output) -> {
-                ModItems.ITEMS.stream()
-                    .map(RegistryEntry::get)
-                    .map(ItemStack::new)
-                    .forEach(output::accept);
-                // Add pre-filled energy/fluid items
-                getCustomNbtItems().filter(stack -> !stack.isEmpty()).forEach(output::accept);
+                try {
+                    ModItems.ITEMS.stream()
+                        .map(RegistryEntry::get)
+                        .map(ItemStack::new)
+                        .forEach(output::accept);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                try {
+                    getCustomNbtItems().filter(stack -> !stack.isEmpty()).forEach(output::accept);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             })
             .build()
     );

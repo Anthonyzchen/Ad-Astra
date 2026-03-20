@@ -14,4 +14,11 @@ pluginManagement {
 
 include("common")
 include("fabric")
-include("neoforge")
+
+val enabledPlatforms: String = java.util.Properties().apply {
+    file("gradle.properties").inputStream().use { load(it) }
+}.getProperty("enabledPlatforms", "fabric,neoforge")
+
+if (enabledPlatforms.contains("neoforge")) {
+    include("neoforge")
+}
